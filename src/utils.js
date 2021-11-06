@@ -6,12 +6,12 @@ import { RESERVED_PROPS } from './constants'
 export const toPascalCase = (str) => str.charAt(0).toUpperCase() + str.substring(1)
 
 /**
- * Prunes keys from an object.
+ * Filters keys from an object.
  */
-export const pruneKeys = (obj, ...keys) => {
-  const keysToRemove = new Set(keys.flat())
+export const filterKeys = (obj, prune = false, ...keys) => {
+  const keysToSelect = new Set(keys.flat())
 
-  return Object.fromEntries(Object.entries(obj).filter(([key]) => !keysToRemove.has(key)))
+  return Object.fromEntries(Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune))
 }
 
 /**
@@ -20,7 +20,7 @@ export const pruneKeys = (obj, ...keys) => {
 export const applyProps = (instance, newProps, oldProps = {}) => {
   // Filter identical props and reserved keys
   const identical = Object.keys(newProps).filter((key) => newProps[key] === oldProps[key])
-  const props = pruneKeys(newProps, [...identical, ...RESERVED_PROPS])
+  const props = filterKeys(newProps, true, ...identical, ...RESERVED_PROPS)
 
   // Mutate our OGL element
   if (Object.keys(props).length) {
@@ -88,8 +88,8 @@ export const checkShallow = (a, b) => {
  */
 export const diffProps = (instance, newProps, oldProps = {}) => {
   // Prune reserved props
-  newProps = pruneKeys(newProps, RESERVED_PROPS)
-  oldProps = pruneKeys(oldProps, RESERVED_PROPS)
+  newProps = filterKeys(newProps, true, ...RESERVED_PROPS)
+  oldProps = filterKeys(oldProps, true, ...RESERVED_PROPS)
 
   const changedProps = []
 
