@@ -175,6 +175,12 @@ export const reconciler = createReconciler({
     // Element is a primitive. We must recreate it when its object prop is changed
     if (instance.isPrimitive && newProps.object && newProps.object !== instance) return [true]
 
+    // Element is a program. Check whether its vertex or fragment props changed to recreate
+    if (type === 'program') {
+      if (oldProps.vertex !== newProps.vertex) return [true]
+      if (oldProps.fragment !== newProps.fragment) return [true]
+    }
+
     // If the instance has new props or arguments, recreate it
     if (newProps.args.some((value, index) => value !== oldProps.args[index])) return [true]
 
