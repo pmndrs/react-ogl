@@ -1,6 +1,7 @@
 import createReconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import { toPascalCase, applyProps, diffProps } from './utils'
+import { GL_ELEMENTS } from './constants'
 
 // Custom objects that extend the OGL namespace
 const catalogue = {}
@@ -13,7 +14,10 @@ export const extend = (objects) => Object.entries(objects).forEach(([key, value]
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type, { object, args, ...props }) => {
+export const createInstance = (type, { object, args, ...props }, root, internalHandle) => {
+  // Save rendering internals if specified
+  if (root?.state) internalHandle = root.state
+
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -25,6 +29,22 @@ export const createInstance = (type, { object, args, ...props }) => {
 
   // Validate primitives
   if (type === 'primitive' && !object) throw `"object" must be set when using primitives.`
+
+  // Accept shader props as args for Programs
+  if (type === 'program' && !args?.[1]) {
+    args = {
+      vertex: props?.vertex,
+      fragment: props?.fragment,
+      ...args,
+    }
+  }
+
+  // Pass internal state to elements which depend on it.
+  // This lets them be immutable upon creation and use props
+  if (GL_ELEMENTS.some((elem) => elem.isPrototypeOf(target) || elem === target)) {
+    const { gl } = internalHandle
+    args = Array.isArray(args) ? [gl, ...args] : [gl, args]
+  }
 
   // Create instance
   const instance = object || (Array.isArray(args) ? new target(...args) : new target(args))
@@ -48,11 +68,11 @@ export const createInstance = (type, { object, args, ...props }) => {
 /**
  * Switches instance to a new one, moving over children.
  */
-export const switchInstance = (instance, type, props) => {
+export const switchInstance = (instance, type, props, internalHandle) => {
   if (!instance.parent) return
 
   // Create a new instance
-  const newInstance = createInstance(type, props)
+  const newInstance = createInstance(type, props, null, internalHandle)
 
   // Move children to new instance
   if (!instance.isPrimitive && instance.children) {
@@ -166,9 +186,9 @@ export const reconciler = createReconciler({
     return null
   },
   // This is where we mutate OGL elements in the render phase
-  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps) {
+  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps, internalHandle) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps)
+    if (reconstruct) return switchInstance(instance, type, newProps, internalHandle)
 
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)
