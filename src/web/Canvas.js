@@ -9,7 +9,7 @@ import { RESERVED_PROPS } from '../constants'
 /**
  * A list of custom Canvas props.
  */
-export const CANVAS_PROPS = ['renderer', 'dpr', 'camera', 'events', 'onCreated']
+export const CANVAS_PROPS = ['renderer', 'dpr', 'camera', 'orthographic', 'events', 'onCreated']
 
 /**
  * Interpolates DPR from [min, max] based on device capabilities.
@@ -39,9 +39,12 @@ export const Canvas = forwardRef(({ resize, children, style, fallback, ...rest }
     const state = initialState.current
 
     // Set dpr, handle resize
-    state.renderer.dpr = calculateDpr(internalProps.dpr) || 1
+    state.renderer.dpr = calculateDpr(internalProps.dpr || [1, 2])
     state.renderer.setSize(width, height)
-    state.camera.perspective({ aspect: width / height })
+
+    // Update projection
+    const cameraType = internalProps.orthographic ? 'orthographic' : 'perspective'
+    state.camera[cameraType]({ aspect: width / height })
 
     if (width > 0 && height > 0) {
       state.root.render(
@@ -52,7 +55,7 @@ export const Canvas = forwardRef(({ resize, children, style, fallback, ...rest }
         </ErrorBoundary>,
       )
     }
-  }, [width, height, children])
+  }, [internalProps, width, height, children])
 
   return (
     <div
