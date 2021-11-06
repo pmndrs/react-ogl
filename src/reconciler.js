@@ -32,6 +32,13 @@ export const createInstance = (type, { object, args, ...props }) => {
   // If primitive, make a note of it
   if (type === 'primitive') instance.isPrimitive = true
 
+  // Auto-attach geometry and programs to meshes
+  if (instance instanceof OGL.Geometry) {
+    props = { attach: 'geometry', ...props }
+  } else if (instance instanceof OGL.Program) {
+    props = { attach: 'program', ...props }
+  }
+
   // Set initial props
   applyProps(instance, props)
 
