@@ -48,13 +48,21 @@ export const useDefaults = (canvas, props) => {
 
   useIsomorphicLayoutEffect(() => {
     // Create or accept renderer, apply props
-    const renderer = props.renderer?.render
-      ? props.renderer
-      : new OGL.Renderer({ ...props.renderer, canvas: canvas.current })
+    const renderer =
+      props.renderer instanceof OGL.Renderer
+        ? props.renderer
+        : new OGL.Renderer({
+            alpha: true,
+            antialias: true,
+            powerPreference: 'high-performance',
+            ...props.renderer,
+            canvas: canvas.current,
+          })
     if (props.renderer) applyProps(renderer, props.renderer)
+    const gl = renderer.gl
 
     // Create or accept camera, apply props
-    const camera = props.camera?.perspective ? props.camera : new OGL.Camera({ ...props.camera })
+    const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...props.camera })
     camera.position.z = 5
     if (props.camera) applyProps(camera, props.camera)
 
@@ -77,26 +85,34 @@ export const useDefaults = (canvas, props) => {
     const animate = (time) => {
       requestAnimationFrame(animate)
 
-      subscribed.forEach((ref) => ref.current?.(state, time))
+      subscribed.forEach((ref) => ref.current?.(state.current, time))
       renderer.render({ scene, camera })
     }
     animate()
 
+    // Bind events
+    const events = props.events
+    if (events?.connect) events.connect(canvas.current)
+
     // Set initial state
-    state.current = { renderer, camera, scene, subscribe }
+    state.current = { renderer, gl, camera, scene, subscribe, events }
 
     // Init root
     state.current.root = createRoot(canvas.current, state.current)
+
+    // Handle callback
+    if (props.onCreated) props.onCreated(state.current)
   }, [])
 
   // Cleanup on unmount
   useEffect(() => {
+    const animationRef = animation.current
+
     return () => {
-      cancelAnimationFrame(animation.current)
-      state?.current.events.disconnect?.()
-      state?.current.root.unmount?.()
+      cancelAnimationFrame(animationRef)
+      if (state.current.events?.disconnect) state.current.events.disconnect()
+      if (state.current.root) state.current.root.unmount()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return state
