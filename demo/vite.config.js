@@ -1,6 +1,7 @@
 import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import glsl from 'vite-plugin-glsl'
 
 export default defineConfig({
   resolve: {
@@ -11,5 +12,5 @@ export default defineConfig({
       'react-ogl/web': path.resolve('../src/web'),
     },
   },
-  plugins: [react()],
+  plugins: [react(), glsl()],
 })

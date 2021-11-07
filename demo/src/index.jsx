@@ -2,8 +2,8 @@ import * as OGL from 'ogl'
 import { useRef } from 'react'
 import { render } from 'react-dom'
 import { useFrame, Canvas } from 'react-ogl/web'
-import vertex from './shaders/vertex'
-import fragment from './shaders/fragment'
+import vertex from './shaders/vertex.glsl'
+import fragment from './shaders/fragment.glsl'
 
 const Box = (props) => {
   const mesh = useRef()
