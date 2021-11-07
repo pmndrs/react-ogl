@@ -17,8 +17,12 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
 
   // Create root
   if (!root) {
+    // Create scene if one isn't provided
     if (!state.scene) state.scene = new OGL.Transform()
     root = reconciler.createContainer(state.scene, RENDER_MODES[mode], false, null)
+
+    // Bind events
+    if (state.events?.connect) state.events.connect(canvas, state)
   }
 
   // Update root
@@ -43,7 +47,14 @@ export const unmountComponentAtNode = (canvas) => {
   const state = roots.get(canvas)
   if (!state) return
 
-  reconciler.updateContainer(null, state.root, null, () => roots.delete(canvas))
+  // Clear container
+  reconciler.updateContainer(null, state.root, null, () => {
+    // Delete root
+    roots.delete(canvas)
+
+    // Unbind events
+    if (state.events?.disconnect) state.events.disconnect(canvas)
+  })
 }
 
 /**

@@ -95,16 +95,10 @@ export const useDefaults = (canvas, props) => {
     animate()
 
     // Set initial state
-    state.current = { renderer, gl, camera, scene, subscribe }
+    state.current = { ...props, renderer, gl, camera, scene, subscribe }
 
     // Init root
     state.current.root = createRoot(canvas.current, state.current)
-
-    // Bind events
-    if (props.events) {
-      state.current.events = props.events
-      state.current.events.connect(canvas.current, state.current)
-    }
 
     // Handle callback
     if (props.onCreated) props.onCreated(state.current)
@@ -116,7 +110,6 @@ export const useDefaults = (canvas, props) => {
 
     return () => {
       cancelAnimationFrame(animationRef)
-      if (state.current.events?.disconnect) state.current.events.disconnect()
       if (state.current.root) state.current.root.unmount()
     }
   }, [])
