@@ -11,7 +11,9 @@ export const toPascalCase = (str) => str.charAt(0).toUpperCase() + str.substring
 export const filterKeys = (obj, prune = false, ...keys) => {
   const keysToSelect = new Set(keys.flat())
 
-  return Object.fromEntries(Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune))
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune),
+  )
 }
 
 /**
@@ -20,7 +22,10 @@ export const filterKeys = (obj, prune = false, ...keys) => {
 export const applyProps = (instance, newProps, oldProps = {}) => {
   // Filter identical props and reserved keys
   const identical = Object.keys(newProps).filter((key) => newProps[key] === oldProps[key])
-  const props = filterKeys(newProps, true, ...identical, ...RESERVED_PROPS)
+  const handlers = Object.keys(newProps).filter(
+    (key) => typeof newProps[key] === 'function' && key.startsWith('on'),
+  )
+  const props = filterKeys(newProps, true, ...identical, ...handlers, ...RESERVED_PROPS)
 
   // Mutate our OGL element
   if (Object.keys(props).length) {
@@ -58,6 +63,14 @@ export const applyProps = (instance, newProps, oldProps = {}) => {
         root[key] = value
       }
     })
+  }
+
+  // Collect event handlers.
+  if (handlers.length) {
+    instance.__handlers = handlers.reduce(
+      (acc, key) => ({ ...acc, [key]: newProps[key] }),
+      {},
+    )
   }
 }
 
