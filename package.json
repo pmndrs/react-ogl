@@ -1,0 +1,54 @@
+{
+  "name": "react-ogl",
+  "version": "0.1.0",
+  "description": "A barebones react renderer for OGL.",
+  "bugs": {
+    "url": "https://github.com/pmndrs/react-ogl/issues"
+  },
+  "homepage": "https://github.com/pmndrs/react-ogl",
+  "repository": "https://github.com/pmndrs/react-ogl.git",
+  "author": "Cody Bennett (https://github.com/codyjasonbennett)",
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "src/index.js",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./src/index.js"
+    },
+    "./": {
+      "require": "./dist/",
+      "import": "./src/"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "devDependencies": {
+    "ogl": "^0.0.76",
+    "react": "^17.0.2",
+    "react-merge-refs": "^1.1.0",
+    "react-use-measure": "^2.0.4"
+  },
+  "dependencies": {
+    "react-reconciler": "^0.26.2"
+  },
+  "peerDependencies": {
+    "ogl": ">=0.0.72",
+    "react": ">=17.0",
+    "react-dom": ">=17.0"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
