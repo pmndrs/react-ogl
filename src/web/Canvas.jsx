@@ -25,6 +25,9 @@ export const CANVAS_PROPS = [
 const calculateDpr = (dpr) =>
   Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
+/**
+ * A resizeable canvas whose children are declarative OGL elements.
+ */
 export const Canvas = forwardRef(
   ({ resize, children, style, fallback, ...rest }, ref) => {
     const internalProps = filterKeys(rest, false, ...CANVAS_PROPS)

@@ -2,11 +2,11 @@ import * as OGL from 'ogl'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 
-// We store roots here since we can render to multiple canvases
+// Store roots here since we can render to multiple canvases
 const roots = new Map()
 
 /**
- * This renders an element to a canvas, creating a renderer, scene, etc.
+ * Renders an element to a canvas, creating a renderer, scene, etc.
  */
 export const render = (element, canvas, { mode = 'blocking', ...config } = {}) => {
   // Get store and init/update OGL state
@@ -31,7 +31,7 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
 }
 
 /**
- * This is used to remove and cleanup internals on unmount.
+ * Removes and cleans up internals on unmount.
  */
 export const unmountComponentAtNode = (canvas) => {
   const state = roots.get(canvas)
@@ -41,8 +41,7 @@ export const unmountComponentAtNode = (canvas) => {
 }
 
 /**
- * The react-dom 18 API changes how you create roots, letting you specify
- * a container once and safely render/unmount later, so we mirror that.
+ * Creates a root to safely render/unmount.
  */
 export const createRoot = (canvas, config) => ({
   render: (element) => render(element, canvas, config),

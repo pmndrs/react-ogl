@@ -15,7 +15,7 @@ export const useIsomorphicLayoutEffect =
 export const OGLContext = createContext(null)
 
 /**
- * This hooks lets users access internal OGL state.
+ * Accesses internal OGL state.
  */
 export const useOGL = () => {
   const state = useContext(OGLContext)
@@ -26,7 +26,7 @@ export const useOGL = () => {
 }
 
 /**
- * This hook lets users subscribe their elements into a shared render loop.
+ * Subscribe an element into a shared render loop.
  */
 export const useFrame = (callback) => {
   const state = useOGL()
