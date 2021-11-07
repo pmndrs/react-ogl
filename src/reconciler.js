@@ -9,12 +9,18 @@ const catalogue = {}
 /**
  * Extends the OGL namespace, accepting an object of keys pointing to external classes.
  */
-export const extend = (objects) => Object.entries(objects).forEach(([key, value]) => (catalogue[key] = value))
+export const extend = (objects) =>
+  Object.entries(objects).forEach(([key, value]) => (catalogue[key] = value))
 
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type, { object, args, ...props }, root, internalHandle) => {
+export const createInstance = (
+  type,
+  { object, args, ...props },
+  root,
+  internalHandle,
+) => {
   // Save rendering internals if specified
   if (root?.state) internalHandle = root.state
 
@@ -25,7 +31,8 @@ export const createInstance = (type, { object, args, ...props }, root, internalH
   const target = catalogue[name] || OGL[name]
 
   // Validate OGL elements
-  if (type !== 'primitive' && !target) throw `${type} is not a part of the OGL namespace! Did you forget to extend?`
+  if (type !== 'primitive' && !target)
+    throw `${type} is not a part of the OGL namespace! Did you forget to extend?`
 
   // Validate primitives
   if (type === 'primitive' && !object) throw `"object" must be set when using primitives.`
@@ -60,7 +67,8 @@ export const createInstance = (type, { object, args, ...props }, root, internalH
   }
 
   // Create instance
-  const instance = object || (Array.isArray(args) ? new target(...args) : new target(args))
+  const instance =
+    object || (Array.isArray(args) ? new target(...args) : new target(args))
 
   // If primitive, make a note of it
   if (type === 'primitive') instance.isPrimitive = true
@@ -186,7 +194,8 @@ export const reconciler = createReconciler({
   // Returns [shouldReconstruct: boolean, changedProps]
   prepareUpdate(instance, type, oldProps, newProps) {
     // Element is a primitive. We must recreate it when its object prop is changed
-    if (instance.isPrimitive && newProps.object && newProps.object !== instance) return [true]
+    if (instance.isPrimitive && newProps.object && newProps.object !== instance)
+      return [true]
 
     // Element is a program. Check whether its vertex or fragment props changed to recreate
     if (type === 'program') {
@@ -204,7 +213,8 @@ export const reconciler = createReconciler({
     }
 
     // If the instance has new props or arguments, recreate it
-    if (newProps.args.some((value, index) => value !== oldProps.args[index])) return [true]
+    if (newProps.args.some((value, index) => value !== oldProps.args[index]))
+      return [true]
 
     // Diff through props and flag with changes
     const changedProps = diffProps(instance, newProps, oldProps)
@@ -214,7 +224,14 @@ export const reconciler = createReconciler({
     return null
   },
   // This is where we mutate OGL elements in the render phase
-  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps, internalHandle) {
+  commitUpdate(
+    instance,
+    [reconstruct, changedProps],
+    type,
+    oldProps,
+    newProps,
+    internalHandle,
+  ) {
     // If flagged for recreation, swap to a new instance.
     if (reconstruct) return switchInstance(instance, type, newProps, internalHandle)
 

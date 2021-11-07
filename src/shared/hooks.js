@@ -6,7 +6,8 @@ import { applyProps } from '../utils'
 /**
  * An SSR-friendly useLayoutEffect.
  */
-export const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
+export const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 /**
  * Internal OGL context.
@@ -62,7 +63,10 @@ export const useDefaults = (canvas, props) => {
     const gl = renderer.gl
 
     // Create or accept camera, apply props
-    const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...props.camera })
+    const camera =
+      props.camera instanceof OGL.Camera
+        ? props.camera
+        : new OGL.Camera({ ...props.camera })
     camera.position.z = 5
     if (props.camera) applyProps(camera, props.camera)
 
@@ -90,15 +94,17 @@ export const useDefaults = (canvas, props) => {
     }
     animate()
 
-    // Bind events
-    const events = props.events
-    if (events?.connect) events.connect(canvas.current)
-
     // Set initial state
-    state.current = { renderer, gl, camera, scene, subscribe, events }
+    state.current = { renderer, gl, camera, scene, subscribe }
 
     // Init root
     state.current.root = createRoot(canvas.current, state.current)
+
+    // Bind events
+    if (props.events) {
+      state.current.events = props.events
+      state.current.events.connect(canvas.current, state.current)
+    }
 
     // Handle callback
     if (props.onCreated) props.onCreated(state.current)
