@@ -39,6 +39,19 @@ export const createInstance = (type, { object, args, ...props }, root, internalH
     }
   }
 
+  // Accept attribute props as args for Geometries
+  if (type === 'geometry' && !args?.[1]) {
+    const attributes = Object.entries(props || {}).reduce((acc, [key, prop]) => {
+      if (prop.data && typeof prop.size === 'number') acc[key] = prop
+      return acc
+    }, {})
+
+    args = {
+      ...attributes,
+      ...args,
+    }
+  }
+
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
   if (GL_ELEMENTS.some((elem) => elem.isPrototypeOf(target) || elem === target)) {
@@ -179,6 +192,15 @@ export const reconciler = createReconciler({
     if (type === 'program') {
       if (oldProps.vertex !== newProps.vertex) return [true]
       if (oldProps.fragment !== newProps.fragment) return [true]
+    }
+
+    // Element is a geometry. Check whether its attribute props changed to recreate.
+    if (type === 'geometry') {
+      const oldAttributes = Object.keys(oldProps).filter(
+        (key) => oldProps[key].data && typeof oldProps[key].size === 'number',
+      )
+
+      if (oldAttributes.some((key) => oldProps[key] !== newProps[key])) return [true]
     }
 
     // If the instance has new props or arguments, recreate it
