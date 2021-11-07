@@ -8,6 +8,7 @@
     "vite-plugin-glsl": "^0.0.5"
   },
   "dependencies": {
+    "ogl": "^0.0.76",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
