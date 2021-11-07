@@ -27,7 +27,7 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
   // Update fiber
   state.scene.stateNode = state
   reconciler.updateContainer(
-    <OGLContext.Provider>{element}</OGLContext.Provider>,
+    <OGLContext.Provider value={{ ...state }}>{element}</OGLContext.Provider>,
     root,
     null,
     () => undefined,
