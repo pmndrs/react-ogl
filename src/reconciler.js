@@ -15,15 +15,7 @@ export const extend = (objects) =>
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (
-  type,
-  { object, args, ...props },
-  root,
-  internalHandle,
-) => {
-  // Save rendering internals if specified
-  if (root?.state) internalHandle = root.state
-
+export const createInstance = (type, { object, args, ...props }, root) => {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -66,7 +58,7 @@ export const createInstance = (
       (elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target,
     )
   ) {
-    const { gl } = internalHandle
+    const { gl } = root.stateNode
     args = Array.isArray(args) ? [gl, ...args] : [gl, args]
   }
 
@@ -93,11 +85,9 @@ export const createInstance = (
 /**
  * Switches instance to a new one, moving over children.
  */
-export const switchInstance = (instance, type, props, internalHandle) => {
-  if (!instance.parent) return
-
+export const switchInstance = (instance, type, props, root) => {
   // Create a new instance
-  const newInstance = createInstance(type, props, null, internalHandle)
+  const newInstance = createInstance(type, props, root)
 
   // Move children to new instance
   if (!instance.isPrimitive && instance.children) {
@@ -121,6 +111,7 @@ export const appendChild = (parentInstance, child) => {
   // Attach material, geometry, fog, etc.
   if (child.attach) {
     parentInstance[child.attach] = child
+    child.parent = parentInstance
   } else {
     child.setParent(parentInstance)
   }
@@ -133,10 +124,8 @@ export const removeChild = (parentInstance, child) => {
   if (!child) return
 
   // Remove material, geometry, fog, etc
-  if (child.attach) {
-    parentInstance[child.attach] = null
-  } else {
-    parentInstance.removeChild(child)
+  if (!child.attach) {
+    child.parent.removeChild(child)
   }
 
   // TODO: handle dispose
@@ -205,6 +194,7 @@ export const reconciler = createReconciler({
     if (type === 'program') {
       if (oldProps.vertex !== newProps.vertex) return [true]
       if (oldProps.fragment !== newProps.fragment) return [true]
+      if (oldProps.uniforms !== newProps.uniform) return [true]
     }
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
@@ -212,7 +202,6 @@ export const reconciler = createReconciler({
       const oldAttributes = Object.keys(oldProps).filter(
         (key) => oldProps[key].data && typeof oldProps[key].size === 'number',
       )
-
       if (oldAttributes.some((key) => oldProps[key] !== newProps[key])) return [true]
     }
 
@@ -228,16 +217,9 @@ export const reconciler = createReconciler({
     return null
   },
   // This is where we mutate OGL elements in the render phase
-  commitUpdate(
-    instance,
-    [reconstruct, changedProps],
-    type,
-    oldProps,
-    newProps,
-    internalHandle,
-  ) {
+  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps, root) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps, internalHandle)
+    if (reconstruct) return switchInstance(instance, type, newProps, root)
 
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)

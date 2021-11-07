@@ -24,7 +24,7 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
   roots.set(canvas, { root, state })
 
   // Update fiber
-  state.scene.state = state
+  state.scene.stateNode = state
   reconciler.updateContainer(element, root, null, () => undefined)
 
   return state
