@@ -213,7 +213,7 @@ export const reconciler = createReconciler({
     }
 
     // If the instance has new props or arguments, recreate it
-    if (newProps.args.some((value, index) => value !== oldProps.args[index]))
+    if (newProps.args?.some((value, index) => value !== oldProps.args[index]))
       return [true]
 
     // Diff through props and flag with changes
