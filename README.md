@@ -10,18 +10,20 @@ npm install ogl react-ogl
 
 ### What is it?
 
-**react-ogl** is a barebones [react renderer](https://reactjs.org/docs/codebase-overview.html#renderers) for [OGL](https://npmjs.com/ogl) with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as OGL elements -- `<mesh />` becomes `new OGL.Mesh()`. This happens dynamically; there's no wrapper involved.
+react-ogl is a barebones [react renderer](https://reactjs.org/docs/codebase-overview.html#renderers) for [`ogl`](https://npmjs.com/ogl) with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as ogl elements — `<mesh />` becomes `new OGL.Mesh()`. This happens dynamically; there's no wrapper involved.
 
 ### How does this compare to [`@react-three/fiber`](https://github.com/pmndrs/react-three-fiber)?
 
-react-ogl is a complete re-architecture of `@react-three/fiber` with:
+react-ogl is a complete re-architecture of @react-three/fiber with:
 
 - **no defaults**; you have complete control. No default renderer, camera, etc. For library/engine authors, this allows components to be completely transformative of rendering behavior and API. But this freedom leads to boilerplate. For both users and authors, there are —
-- **extendable helpers**; react-ogl exports helper components and hooks for both web and native with an API familiar to `@react-three/fiber`, but these helpers are also modular. This enables you to change or extend rendering behavior and API while maintaining interop with the react-ogl ecosystem.
+- **extendable helpers**; react-ogl exports helper components and hooks for both web and native with an API familiar to @react-three/fiber, but these helpers are also modular. This enables you to change or extend rendering behavior and API while maintaining interop with the react-ogl ecosystem.
+
+The API is the same as @react-three/fiber, but react-ogl is completely extensible.
 
 ### What does it look like?
 
-Elements can be completely declarative, or you can bridge the two with `<primitive object={MyOGLObject} />`.
+Elements can be completely declarative, or imperative with `<primitive object={MyOGLObject} />`.
 
 ```jsx
 import * as OGL from 'ogl'
@@ -82,14 +84,28 @@ root.render(
 renderer.render({ scene, camera })
 ```
 
-react-ogl itself is super minimal, but you can use the familiar `@react-three/fiber` API with some helpers targeted for different platforms:
+react-ogl itself is super minimal, but you can use the familiar @react-three/fiber API with some helpers targeted for different platforms:
 
 <details>
-  <summary>Usage with `react-dom`</summary>
+  <summary>Usage with react-dom</summary>
+
+<br />
+
+This example uses [`create-react-app`](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) for the sake of simplicity, but you can use your own environment or [create a codesandbox](https://react.new).
 
 ```bash
-npm install react-native
+# Create app
+npx create-react-app my-app
+cd my-app
+
+# Install dependencies
+npm install ogl react-ogl
+
+# Start
+npm run start
 ```
+
+Inside of our app, we can use the same API as @react-three/fiber but with OGL elements and methods.
 
 ```jsx
 import * as OGL from 'ogl'
@@ -169,14 +185,14 @@ render(
 )
 ```
 
-![Preview](/demo/preview.gif)
-
 </details>
 
 <details>
-  <summary>Usage with `react-native`</summary>
+  <summary>Usage with react-native</summary>
 
-This example uses `expo-cli` for the sake of simplicity, but you can use your own barebones setup if you wish.
+<br />
+
+This example uses [`expo-cli`](https://docs.expo.dev/get-started/create-a-new-app) for the sake of simplicity, but you can use your own barebones setup if you wish.
 
 ```bash
 # Install expo-cli, this will create our app
@@ -187,13 +203,13 @@ expo init my-app
 cd my-app
 
 # Install dependencies
-npm install react-ogl
+npm install ogl react-ogl
 
 # Start
 expo start
 ```
 
-Inside of our app, you can use the same API as web while running on native OpenGLES -- no webview needed.
+Inside of our app, you can use the same API as web while running on native OpenGLES — no webview needed.
 
 ```js
 import * as OGL from 'ogl'
@@ -273,7 +289,5 @@ const App = () => (
 
 registerRootComponent(App)
 ```
-
-![Preview](/demo/preview.gif)
 
 </details>
