@@ -1,6 +1,7 @@
 import * as OGL from 'ogl'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
+import { OGLContext } from './shared/hooks'
 
 // Store roots here since we can render to multiple canvases
 const roots = new Map()
@@ -25,7 +26,12 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
 
   // Update fiber
   state.scene.stateNode = state
-  reconciler.updateContainer(element, root, null, () => undefined)
+  reconciler.updateContainer(
+    <OGLContext.Provider>{element}</OGLContext.Provider>,
+    root,
+    null,
+    () => undefined,
+  )
 
   return state
 }

@@ -1,7 +1,7 @@
 import { forwardRef, useRef, useState, Suspense } from 'react'
 import useMeasure from 'react-use-measure'
 import mergeRefs from 'react-merge-refs'
-import { useDefaults, useIsomorphicLayoutEffect, OGLContext } from '../shared/hooks'
+import { useDefaults, useIsomorphicLayoutEffect } from '../shared/hooks'
 import { ErrorBoundary, Block } from '../shared/components'
 import { events } from './events'
 import { filterKeys } from '../utils'
@@ -62,9 +62,7 @@ export const Canvas = forwardRef(
       if (width > 0 && height > 0) {
         state.root.render(
           <ErrorBoundary set={setError}>
-            <Suspense fallback={<Block set={setBlock} />}>
-              <OGLContext.Provider value={{ ...state }}>{children}</OGLContext.Provider>
-            </Suspense>
+            <Suspense fallback={<Block set={setBlock} />}>{children}</Suspense>
           </ErrorBoundary>,
         )
       }

@@ -1,7 +1,7 @@
 import { createEvents } from '../shared/events'
 
 /**
- * Supported DOM events and their JSX keys with passive args.
+ * Base DOM events and their JSX keys with passive args.
  */
 export const EVENT_TYPES = {
   click: ['onClick', false],
