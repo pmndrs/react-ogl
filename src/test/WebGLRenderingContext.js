@@ -484,6 +484,10 @@ const extensions = {
   },
 }
 
+const GL_VERSION = 7938
+const SCISSOR_BOX = 3088
+const VIEWPORT = 2978
+
 /**
  * Polyfills a WebGL1/WebGL2 context.
  */
@@ -504,7 +508,7 @@ export class WebGLRenderingContext {
     })
   }
 
-  getShaderPrecisionFormat = () => {
+  getShaderPrecisionFormat() {
     return {
       rangeMin: 127,
       rangeMax: 127,
@@ -512,27 +516,25 @@ export class WebGLRenderingContext {
     }
   }
 
-  GL_VERSION = 7938
-  SCISSOR_BOX = 3088
-  VIEWPORT = 2978
-
-  getParameter = (paramId) => {
+  getParameter(paramId) {
     switch (paramId) {
-      case this.GL_VERSION:
+      case GL_VERSION:
         return ['WebGL1']
-      case this.SCISSOR_BOX:
-      case this.VIEWPORT:
+      case SCISSOR_BOX:
+      case VIEWPORT:
         return [0, 0, 1, 1]
     }
   }
 
-  getExtension = (ext) => {
-    const extension = extensions[ext]
-
-    return extension
+  getExtension(ext) {
+    return extensions[ext]
   }
 
-  getProgramInfoLog = () => ''
+  getProgramInfoLog() {
+    return ''
+  }
 
-  getShaderInfoLog = () => ''
+  getShaderInfoLog() {
+    return ''
+  }
 }
