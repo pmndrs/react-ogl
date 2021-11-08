@@ -1,4 +1,4 @@
-import { createEvents } from '../shared/events'
+import { createEvents } from '../shared/utils'
 
 /**
  * Base DOM events and their JSX keys with passive args.

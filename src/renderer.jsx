@@ -1,7 +1,7 @@
 import * as OGL from 'ogl'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
-import { OGLContext } from './shared/hooks'
+import { OGLContext } from './hooks'
 
 // Store roots here since we can render to multiple canvases
 const roots = new Map()
