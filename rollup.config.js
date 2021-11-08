@@ -5,7 +5,10 @@ const commonjs = require('@rollup/plugin-commonjs')
 const resolve = require('@rollup/plugin-node-resolve').default
 const { devDependencies, dependencies, peerDependencies } = require('./package.json')
 
-const external = Object.keys({ ...devDependencies, ...dependencies, ...peerDependencies })
+const external = [
+  'react-native/Libraries/Pressability/Pressability',
+  ...Object.keys({ ...devDependencies, ...dependencies, ...peerDependencies }),
+]
 const plugins = [
   commonjs(),
   babel({ babelHelpers: 'bundled' }),

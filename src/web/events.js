@@ -3,7 +3,7 @@ import { createEvents } from '../shared/utils'
 /**
  * Base DOM events and their JSX keys with passive args.
  */
-export const EVENT_TYPES = {
+export const EVENTS = {
   click: ['onClick', false],
   dblclick: ['onDoubleClick', false],
   pointerup: ['onPointerUp', true],
@@ -14,37 +14,47 @@ export const EVENT_TYPES = {
 /**
  * DOM OGL events manager.
  */
-export const events = {
-  /**
-   * Creates and registers event listeners on our canvas.
-   */
-  connect(canvas, state) {
-    // Event handlers
-    const { handleEvent } = createEvents(state)
+export const events = (state) => {
+  // Get event handler
+  const { handleEvent } = createEvents(state)
 
-    // Save listeners to canvas
-    canvas.__listeners = {}
+  return {
+    connected: false,
+    handlers: Object.entries(EVENTS).entries(
+      (acc, [name, [type]]) => ({
+        ...acc,
+        [name]: (event) => handleEvent(event, type),
+      }),
+      {},
+    ),
+    /**
+     * Creates and registers event listeners on our canvas.
+     */
+    connect(canvas) {
+      // Cleanup old handlers
+      state.events?.disconnect?.()
 
-    // Register events
-    Object.entries(EVENT_TYPES).forEach(([name, [type, passive]]) => {
-      const listener = (event) => handleEvent(event, type)
-      canvas.addEventListener(name, listener, { passive })
-      canvas.__listeners[name] = listener
-    })
-  },
-  /**
-   * Deletes and disconnects event listeners from canvas.
-   */
-  disconnect(canvas) {
-    // Get listeners from canvas
-    const listeners = canvas.__listeners
+      // Register handlers
+      Object.entries(state.events?.handlers ?? []).forEach(([name, handler]) => {
+        const [, passive] = EVENTS[name]
+        canvas.addEventListener(name, handler, { passive })
+        canvas.__listeners[name] = listener
+      })
 
-    // Disconnect listeners
-    Object.entries(listeners).forEach(([name, listener]) => {
-      canvas.removeEventListener(name, listener)
-    })
+      // Mark events as connected
+      state.events.connected = true
+    },
+    /**
+     * Deletes and disconnects event listeners from canvas.
+     */
+    disconnect(canvas) {
+      // Disconnect handlers
+      Object.entries(state.events?.handlers ?? []).forEach(([name, handler]) => {
+        canvas.removeEventListener(name, handler)
+      })
 
-    // Remove listeners from canvas
-    delete canvas.__listeners
-  },
+      // Mark events as disconnected
+      state.events.connected = false
+    },
+  }
 }

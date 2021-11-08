@@ -31,7 +31,7 @@ const calculateDpr = (dpr) =>
  * A resizeable canvas whose children are declarative OGL elements.
  */
 export const Canvas = forwardRef(
-  ({ resize, children, style, fallback, ...rest }, ref) => {
+  ({ resize, children, style, fallback, ...rest }, forwardedRef) => {
     const internalProps = filterKeys(rest, false, ...CANVAS_PROPS)
     const divProps = filterKeys(rest, true, ...CANVAS_PROPS, ...RESERVED_PROPS)
     const [div, { width, height }] = useMeasure({
@@ -87,6 +87,7 @@ export const Canvas = forwardRef(
 
     return (
       <div
+        {...divProps}
         ref={div}
         style={{
           position: 'relative',
@@ -95,9 +96,8 @@ export const Canvas = forwardRef(
           overflow: 'hidden',
           ...style,
         }}
-        {...divProps}
       >
-        <canvas ref={mergeRefs([canvas, ref])} style={{ display: 'block' }}>
+        <canvas ref={mergeRefs([canvas, forwardedRef])} style={{ display: 'block' }}>
           {fallback}
         </canvas>
       </div>
