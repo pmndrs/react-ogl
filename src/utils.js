@@ -6,6 +6,12 @@ import { RESERVED_PROPS } from './constants'
 export const toPascalCase = (str) => str.charAt(0).toUpperCase() + str.substring(1)
 
 /**
+ * Checks whether key/value pair is an attribute
+ */
+export const isAttribute = (key, value) =>
+  !key.startsWith('attributes-') && value?.data && typeof value?.size === 'number'
+
+/**
  * Filters keys from an object.
  */
 export const filterKeys = (obj, prune = false, ...keys) => {
@@ -41,10 +47,10 @@ export const applyProps = (instance, newProps, oldProps = {}) => {
         target = chain.reduce((acc, key) => acc[key], instance)
 
         // Switch root of target if atomic
-        if (target && !target.set) {
+        if (!target?.set) {
           // We're modifying the first of the chain instead of element.
           // Remove the key from the chain and target it instead.
-          key = chain.shift()
+          key = chain.pop()
           root = chain.reduce((acc, key) => acc[key], instance)
         }
       }

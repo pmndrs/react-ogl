@@ -1,6 +1,6 @@
 import createReconciler from 'react-reconciler'
 import * as OGL from 'ogl'
-import { toPascalCase, applyProps, diffProps } from './utils'
+import { toPascalCase, isAttribute, applyProps, diffProps } from './utils'
 import { GL_ELEMENTS } from './constants'
 
 // Custom objects that extend the OGL namespace
@@ -40,8 +40,8 @@ export const createInstance = (type, { object, args, ...props }, root) => {
 
   // Accept attribute props as args for Geometries
   if (type === 'geometry' && !args?.[1]) {
-    const attributes = Object.entries(props || {}).reduce((acc, [key, prop]) => {
-      if (prop.data && typeof prop.size === 'number') acc[key] = prop
+    const attributes = Object.entries(props || {}).reduce((acc, [key, value]) => {
+      if (isAttribute(key, value)) acc[key] = value
       return acc
     }, {})
 
@@ -199,8 +199,8 @@ export const reconciler = createReconciler({
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
     if (type === 'geometry') {
-      const oldAttributes = Object.keys(oldProps).filter(
-        (key) => oldProps[key].data && typeof oldProps[key].size === 'number',
+      const oldAttributes = Object.keys(oldProps).filter((key) =>
+        isAttribute(key, oldProps[key]),
       )
       if (oldAttributes.some((key) => oldProps[key] !== newProps[key])) return [true]
     }

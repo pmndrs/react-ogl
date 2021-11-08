@@ -1,5 +1,6 @@
+import * as OGL from 'ogl'
 import { render } from '../src/test'
-import { reconciler } from '../src'
+import { extend, reconciler } from '../src'
 
 describe('renderer', () => {
   it('should render JSX', async () => {
@@ -10,6 +11,40 @@ describe('renderer', () => {
     })
 
     expect(state.scene.children.length).not.toBe(0)
+  })
+
+  it('should render extended elements', async () => {
+    let state
+
+    class CustomElement extends OGL.Transform {}
+
+    await reconciler.act(async () => {
+      extend({ CustomElement })
+      state = render(<customElement />)
+    })
+
+    const [element] = state.scene.children
+
+    expect(element instanceof CustomElement).toBe(true)
+  })
+
+  it('should set pierced props', async () => {
+    let state
+
+    await reconciler.act(async () => {
+      state = render(
+        <mesh>
+          <geometry
+            attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }}
+          />
+          <program vertex="vertex" fragment="fragment" />
+        </mesh>,
+      )
+    })
+
+    const [element] = state.scene.children
+
+    expect(Object.keys(element.geometry.attributes)).toStrictEqual(['test'])
   })
 
   it('should pass gl to args', async () => {
