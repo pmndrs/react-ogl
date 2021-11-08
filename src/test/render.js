@@ -1,5 +1,5 @@
 import { createRoot } from '../'
-import { createDefaults } from '../shared'
+import { createInternals } from '../shared'
 
 /**
  * Renders JSX into OGL state.
@@ -9,7 +9,7 @@ export const render = (element, config = {}) => {
   const canvas = config.canvas || document.createElement('canvas')
 
   // Init state
-  const internalState = createDefaults(canvas, config)
+  const internalState = createInternals(canvas, config)
 
   // Render and get output state
   let state = {}

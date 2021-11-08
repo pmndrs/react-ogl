@@ -34,8 +34,8 @@ const renderer = new OGL.Renderer({ canvas })
 const camera = new OGL.Camera()
 const scene = new OGL.Transform()
 
-// Or you can use our own internals
-// const { root, renderer, camera, scene } = createDefaults(camera, config)
+// Or you can use our own internals. This will also set up a render loop.
+// const { root, renderer, camera, scene } = createInternals(camera, config)
 
 // Set initial size
 renderer.setSize(window.innerWidth, window.innerHeight)

@@ -63,9 +63,9 @@ export const createEvents = (state) => {
 }
 
 /**
- * Creates default rendering internals.
+ * Configures rendering internals akin to R3F.
  */
-export const createDefaults = (canvas, props) => {
+export const createInternals = (canvas, props) => {
   // Create or accept renderer, apply props
   const renderer =
     props.renderer instanceof OGL.Renderer

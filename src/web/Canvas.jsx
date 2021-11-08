@@ -2,7 +2,7 @@ import { forwardRef, useRef, useState, useEffect, Suspense } from 'react'
 import useMeasure from 'react-use-measure'
 import mergeRefs from 'react-merge-refs'
 import { useIsomorphicLayoutEffect } from '../shared/hooks'
-import { createDefaults } from '../shared/utils'
+import { createInternals } from '../shared/utils'
 import { ErrorBoundary, Block } from '../shared/components'
 import { events } from './events'
 import { filterKeys } from '../utils'
@@ -53,7 +53,7 @@ export const Canvas = forwardRef(
     useIsomorphicLayoutEffect(() => {
       // If first run, create default state
       if (!internalState.current) {
-        internalState.current = createDefaults(canvas.current, {
+        internalState.current = createInternals(canvas.current, {
           events,
           ...internalProps,
         })
