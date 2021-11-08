@@ -28,7 +28,7 @@ export const useOGL = () => {
 /**
  * Subscribe an element into a shared render loop.
  */
-export const useFrame = (callback) => {
+export const useFrame = (callback, renderPriority = 0) => {
   const state = useOGL()
   // Store frame callback in a ref so we can pass a mutable reference.
   // This allows the callback to dynamically update without blocking
@@ -37,7 +37,7 @@ export const useFrame = (callback) => {
   useLayoutEffect(() => void (ref.current = callback), [callback])
   // Subscribe on mount and unsubscribe on unmount (runs twice).
   // We used void in the last effect to have it only run on mount
-  useLayoutEffect(() => state.subscribe(ref), [state])
+  useLayoutEffect(() => state.subscribe(ref, renderPriority), [state, renderPriority])
 }
 
 /**
@@ -73,32 +73,58 @@ export const useDefaults = (canvas, props) => {
     // Create scene
     const scene = new OGL.Transform()
 
-    // Keep track of elements subscribed to the render loop with useFrame
-    let subscribed = []
+    // Init rendering internals for useFrame, keep track of subscriptions
+    let priority = 0
+    const subscribed = []
 
     // Subscribe/unsubscribe elements to the render loop
-    const subscribe = (refCallback) => {
+    const subscribe = (refCallback, renderPriority) => {
       if (subscribed.includes(refCallback)) {
+        // Unsubscribe callback
         subscribed = subscribed.filter((entry) => entry !== refCallback)
+
+        // Disable manual rendering if renderPriority is positive
+        if (renderPriority) priority -= 1
       } else {
+        // Subscribe callback
         subscribed.push(refCallback)
+
+        // Enable manual rendering if renderPriority is positive
+        if (renderPriority) priority += 1
       }
     }
 
-    // Animate
-    const animate = (time) => {
-      requestAnimationFrame(animate)
-
-      subscribed.forEach((ref) => ref.current?.(state.current, time))
-      renderer.render({ scene, camera })
-    }
-    animate()
-
     // Set initial state
-    state.current = { ...props, renderer, gl, camera, scene, subscribe }
+    state.current = {
+      ...props,
+      renderer,
+      gl,
+      camera,
+      scene,
+      priority,
+      subscribed,
+      subscribe,
+    }
 
     // Init root
     state.current.root = createRoot(canvas.current, state.current)
+
+    // Animate
+    const animate = (time) => {
+      // Cancel animation if frameloop is set, otherwise keep looping
+      if (props.frameloop === 'never') cancelAnimationFrame(animation.current)
+      animation.current = requestAnimationFrame(animate)
+
+      // Call subscribed elements
+      subscribed.forEach((ref) => ref.current?.(state.current, time))
+
+      // If rendering manually, skip render
+      if (priority) return
+
+      // Render to screen
+      renderer.render({ scene, camera })
+    }
+    if (props.frameloop !== 'never') animate()
 
     // Handle callback
     if (props.onCreated) props.onCreated(state.current)

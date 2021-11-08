@@ -15,10 +15,12 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
   let root = store?.root
   const state = Object.assign(store?.state || {}, config)
 
-  // Create root
+  // Init
   if (!root) {
     // Create scene if one isn't provided
     if (!state.scene) state.scene = new OGL.Transform()
+
+    // Create root
     root = reconciler.createContainer(state.scene, RENDER_MODES[mode], false, null)
 
     // Bind events

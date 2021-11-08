@@ -15,6 +15,7 @@ export const CANVAS_PROPS = [
   'dpr',
   'camera',
   'orthographic',
+  'frameloop',
   'events',
   'onCreated',
 ]
