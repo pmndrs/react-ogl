@@ -225,3 +225,16 @@ export const reconciler = createReconciler({
     applyProps(instance, changedProps)
   },
 })
+
+// Injects renderer meta into devtools.
+reconciler.injectIntoDevTools({
+  bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
+  rendererPackageName: 'react-ogl',
+  version: '0.1.0',
+})
+
+/**
+ * Portals into a remote OGL element.
+ */
+export const createPortal = (children, target) =>
+  reconciler.createPortal(children, target, null, null)
