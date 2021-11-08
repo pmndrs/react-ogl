@@ -7,7 +7,6 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-ogl': path.resolve('../src'),
-      'react-ogl/web': path.resolve('../src/web'),
     },
   },
   plugins: [react(), glsl()],

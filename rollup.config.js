@@ -1,9 +1,9 @@
-import fs from 'fs'
-import path from 'path'
-import babel from '@rollup/plugin-babel'
-import commonjs from '@rollup/plugin-commonjs'
-import resolve from '@rollup/plugin-node-resolve'
-import { devDependencies, dependencies, peerDependencies } from './package.json'
+const fs = require('fs')
+const path = require('path')
+const babel = require('@rollup/plugin-babel').default
+const commonjs = require('@rollup/plugin-commonjs')
+const resolve = require('@rollup/plugin-node-resolve').default
+const { devDependencies, dependencies, peerDependencies } = require('./package.json')
 
 const external = Object.keys({ ...devDependencies, ...dependencies, ...peerDependencies })
 const plugins = [
@@ -13,28 +13,30 @@ const plugins = [
 ]
 
 // Traverse targets
-const targets = fs.readdirSync(path.resolve(process.cwd(), 'src')).reduce(
-  (acc, fileName) => {
+const targets = fs
+  .readdirSync(path.resolve(process.cwd(), 'src'))
+  .reduce((acc, fileName) => {
     const isFolder = !fileName.includes('.')
-    if (isFolder) acc.push(`${fileName}/index`)
+    if (isFolder) acc.push(fileName)
 
     return acc
-  },
-  ['index'],
-)
+  }, [])
 
 // Export targets
-export default targets.flatMap((target) => [
-  {
-    input: `./src/${target}.js`,
-    output: { file: `dist/${target}.js`, format: 'esm' },
-    external,
-    plugins,
-  },
-  {
-    input: `./src/${target}.js`,
-    output: { file: `dist/${target}.cjs`, format: 'cjs' },
-    external,
-    plugins,
-  },
-])
+module.exports = ['index', ...targets.map((target) => `${target}/index`)].flatMap(
+  (target) => [
+    {
+      input: `./src/${target}.js`,
+      output: { file: `dist/${target}.js`, format: 'esm' },
+      external,
+      plugins,
+    },
+    {
+      input: `./src/${target}.js`,
+      output: { file: `dist/${target}.cjs`, format: 'cjs' },
+      external,
+      plugins,
+    },
+  ],
+)
+module.exports.targets = targets

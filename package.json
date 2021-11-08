@@ -5,29 +5,17 @@
   "bugs": {
     "url": "https://github.com/pmndrs/react-ogl/issues"
   },
-  "homepage": "https://github.com/pmndrs/react-ogl",
-  "repository": "https://github.com/pmndrs/react-ogl.git",
+  "homepage": "https://github.com/pmndrs/react-ogl#readme",
+  "repository": "pmndrs/react-ogl",
+  "keywords": [
+    "react",
+    "renderer",
+    "webgl",
+    "ogl",
+    "shaders"
+  ],
   "author": "Cody Bennett (https://github.com/codyjasonbennett)",
   "license": "MIT",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
-    },
-    "./": {
-      "require": "./dist/",
-      "import": "./dist/"
-    }
-  },
-  "files": [
-    "dist",
-    "src",
-    "LICENSE",
-    "package.json",
-    "README.md"
-  ],
   "sideEffects": false,
   "devDependencies": {
     "@babel/core": "^7.16.0",
@@ -64,10 +52,11 @@
     }
   },
   "scripts": {
-    "dev": "cd demo && yarn && yarn dev",
-    "build": "rimraf dist && rollup -c",
+    "dev": "cd demo && npm install && npm run dev",
+    "build": "rimraf dist && rollup -c && node bin/patch-targets",
     "test": "jest",
     "lint": "prettier src --check && eslint src",
-    "lint-fix": "prettier src --write && eslint src --fix"
+    "lint-fix": "prettier src --write && eslint src --fix",
+    "publish": "npm run build && cd dist && npm publish"
   }
 }
