@@ -30,10 +30,15 @@
   ],
   "sideEffects": false,
   "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/preset-react": "^7.16.0",
+    "babel-jest": "^27.3.1",
     "eslint": "^8.2.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "jest": "^27.3.1",
     "ogl": "^0.0.76",
     "prettier": "^2.4.1",
     "react": "^17.0.2"
@@ -54,7 +59,7 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "prettier src --check && eslint src",
     "lint-fix": "prettier src --write && eslint src --fix"
   }
