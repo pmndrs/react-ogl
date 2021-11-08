@@ -35,9 +35,11 @@ export const useFrame = (callback, renderPriority = 0) => {
   // the render loop.
   const ref = useRef(callback)
   useLayoutEffect(() => void (ref.current = callback), [callback])
-  // Subscribe on mount and unsubscribe on unmount (runs twice).
-  // We used void in the last effect to have it only run on mount
-  useLayoutEffect(() => state.subscribe(ref, renderPriority), [state, renderPriority])
+  // Subscribe on mount and unsubscribe on unmount
+  useLayoutEffect(() => {
+    state.subscribe(ref, renderPriority)
+    return () => state.unsubscribe(ref, renderPriority)
+  }, [state, renderPriority])
 }
 
 /**
@@ -75,23 +77,23 @@ export const useDefaults = (canvas, props) => {
 
     // Init rendering internals for useFrame, keep track of subscriptions
     let priority = 0
-    const subscribed = []
+    let subscribed = []
 
     // Subscribe/unsubscribe elements to the render loop
     const subscribe = (refCallback, renderPriority) => {
-      if (subscribed.includes(refCallback)) {
-        // Unsubscribe callback
-        subscribed = subscribed.filter((entry) => entry !== refCallback)
+      // Subscribe callback
+      subscribed.push(refCallback)
 
-        // Disable manual rendering if renderPriority is positive
-        if (renderPriority) priority -= 1
-      } else {
-        // Subscribe callback
-        subscribed.push(refCallback)
+      // Enable manual rendering if renderPriority is positive
+      if (renderPriority) priority += 1
+    }
 
-        // Enable manual rendering if renderPriority is positive
-        if (renderPriority) priority += 1
-      }
+    const unsubscribe = (refCallback, renderPriority) => {
+      // Unsubscribe callback
+      subscribed = subscribed.filter((entry) => entry !== refCallback)
+
+      // Disable manual rendering if renderPriority is positive
+      if (renderPriority) priority -= 1
     }
 
     // Set initial state
@@ -104,6 +106,7 @@ export const useDefaults = (canvas, props) => {
       priority,
       subscribed,
       subscribe,
+      unsubscribe,
     }
 
     // Init root
@@ -112,7 +115,7 @@ export const useDefaults = (canvas, props) => {
     // Animate
     const animate = (time) => {
       // Cancel animation if frameloop is set, otherwise keep looping
-      if (props.frameloop === 'never') cancelAnimationFrame(animation.current)
+      if (props.frameloop === 'never') return cancelAnimationFrame(animation.current)
       animation.current = requestAnimationFrame(animate)
 
       // Call subscribed elements
