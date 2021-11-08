@@ -7,7 +7,7 @@ import { OGLContext } from './shared/hooks'
 const roots = new Map()
 
 /**
- * Renders an element to a canvas, creating a renderer, scene, etc.
+ * Renders React elements into OGL elements.
  */
 export const render = (element, canvas, { mode = 'blocking', ...config } = {}) => {
   // Get store and init/update OGL state
