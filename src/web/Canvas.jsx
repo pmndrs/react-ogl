@@ -1,7 +1,8 @@
-import { forwardRef, useRef, useState, Suspense } from 'react'
+import { forwardRef, useRef, useState, useEffect, Suspense } from 'react'
 import useMeasure from 'react-use-measure'
 import mergeRefs from 'react-merge-refs'
-import { useDefaults, useIsomorphicLayoutEffect } from '../shared/hooks'
+import { useIsomorphicLayoutEffect } from '../shared/hooks'
+import { createDefaults } from '../shared/utils'
 import { ErrorBoundary, Block } from '../shared/components'
 import { events } from './events'
 import { filterKeys } from '../utils'
@@ -39,7 +40,7 @@ export const Canvas = forwardRef(
       ...resize,
     })
     const canvas = useRef()
-    const internalState = useDefaults(canvas, { events, ...internalProps })
+    const internalState = useRef()
     const [block, setBlock] = useState(false)
     const [error, setError] = useState(false)
 
@@ -50,17 +51,26 @@ export const Canvas = forwardRef(
 
     // Execute JSX in the reconciler as a layout-effect
     useIsomorphicLayoutEffect(() => {
+      // If first run, create default state
+      if (!internalState.current) {
+        internalState.current = createDefaults(canvas.current, {
+          events,
+          ...internalProps,
+        })
+      }
+
       const state = internalState.current
 
-      // Set dpr, handle resize
-      state.renderer.dpr = calculateDpr(internalProps.dpr || [1, 2])
-      state.renderer.setSize(width, height)
-
-      // Update projection
-      const cameraType = internalProps.orthographic ? 'orthographic' : 'perspective'
-      state.camera[cameraType]({ aspect: width / height })
-
       if (width > 0 && height > 0) {
+        // Set dpr, handle resize
+        state.renderer.dpr = calculateDpr(internalProps.dpr || [1, 2])
+        state.renderer.setSize(width, height)
+
+        // Update projection
+        const projection = internalProps.orthographic ? 'orthographic' : 'perspective'
+        state.camera[projection]({ aspect: width / height })
+
+        // Render to screen
         state.root.render(
           <ErrorBoundary set={setError}>
             <Suspense fallback={<Block set={setBlock} />}>{children}</Suspense>
@@ -68,6 +78,12 @@ export const Canvas = forwardRef(
         )
       }
     }, [internalProps, width, height, children])
+
+    // Cleanup on unmount
+    useEffect(() => {
+      const state = internalState.current
+      return () => state?.root.unmount()
+    }, [])
 
     return (
       <div

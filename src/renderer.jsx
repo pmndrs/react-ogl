@@ -54,6 +54,9 @@ export const unmountComponentAtNode = (canvas) => {
     // Delete root
     roots.delete(canvas)
 
+    // Cancel animation
+    if (state.current?.animation) cancelAnimationFrame(state.current.animation)
+
     // Unbind events
     if (state.events?.disconnect) state.events.disconnect(canvas)
   })
