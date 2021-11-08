@@ -23,7 +23,7 @@ The API is the same as @react-three/fiber, but react-ogl is completely extensibl
 
 ### What does it look like?
 
-Elements can be completely declarative, or imperative with `<primitive object={MyOGLObject} />`.
+The following takes complete control and declaratively renders a mesh that can react to state.
 
 ```jsx
 import * as OGL from 'ogl'
@@ -33,6 +33,9 @@ import { createRoot } from 'react-ogl'
 const renderer = new OGL.Renderer({ canvas })
 const camera = new OGL.Camera()
 const scene = new OGL.Transform()
+
+// Or you can use our own internals
+// const { root, renderer, camera, scene } = createDefaults(camera, config)
 
 // Set initial size
 renderer.setSize(window.innerWidth, window.innerHeight)
