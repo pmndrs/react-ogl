@@ -59,7 +59,7 @@
   },
   "scripts": {
     "dev": "cd demo && npm install && npm run dev",
-    "build": "rimraf dist && rollup -c && node bin/patch-targets",
+    "build": "rimraf dist && rollup -c",
     "test": "jest",
     "lint": "prettier src --check && eslint src",
     "lint-fix": "prettier src --write && eslint src --fix",
