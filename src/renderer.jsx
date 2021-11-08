@@ -46,16 +46,18 @@ export const render = (element, canvas, { mode = 'blocking', ...config } = {}) =
  * Removes and cleans up internals on unmount.
  */
 export const unmountComponentAtNode = (canvas) => {
-  const state = roots.get(canvas)
-  if (!state) return
+  const store = roots.get(canvas)
+  if (!store) return
+
+  const { state, root } = store
 
   // Clear container
-  reconciler.updateContainer(null, state.root, null, () => {
+  reconciler.updateContainer(null, root, null, () => {
     // Delete root
     roots.delete(canvas)
 
     // Cancel animation
-    if (state.current?.animation) cancelAnimationFrame(state.current.animation)
+    if (state.animation) cancelAnimationFrame(state.animation)
 
     // Unbind events
     if (state.events?.disconnect) state.events.disconnect(canvas)
