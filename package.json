@@ -17,8 +17,6 @@
   "author": "Cody Bennett (https://github.com/codyjasonbennett)",
   "license": "MIT",
   "sideEffects": false,
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
   "devDependencies": {
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
@@ -69,7 +67,9 @@
   },
   "scripts": {
     "dev": "npm run --prefix demo dev",
-    "build": "node build",
+    "prebuild": "rimraf dist",
+    "build": "babel src -d dist --extensions .ts,.tsx",
+    "postbuild": "tsc && node patch-targets",
     "test": "jest",
     "lint": "prettier src --check && eslint src/**/*.{ts,tsx}",
     "lint-fix": "prettier src --write && eslint --fix src/**/*.{ts,tsx}",
