@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { exec } = require('child_process')
+const package = require('./package.json')
 
 /**
  * Runs a CLI script, returning a promise.
@@ -19,19 +20,39 @@ const run = async (command) =>
   // Purge prev build
   await run('rimraf dist')
 
-  // Generate ts files / commonjs entrypoint
+  // Generate js files
+  await run('babel src -d dist --extensions .ts,.tsx')
+
+  // Generate ts files
   await run('tsc')
 
   // Copy files
-  ;['LICENSE', 'README.md', 'package.json'].forEach((file) => {
+  ;['LICENSE', 'README.md'].forEach((file) => {
     fs.copyFileSync(path.resolve(process.cwd(), file), path.resolve(process.cwd(), 'dist', file))
   })
 
+  // Add package.json with updated resolution fields
+  fs.writeFileSync(
+    path.resolve(process.cwd(), 'dist/package.json'),
+    JSON.stringify(
+      {
+        ...package,
+        types: './index.d.ts',
+        module: './index.js',
+      },
+      null,
+      2,
+    ),
+  )
+
   // Traverse targets
-  const targets = fs
-    .readdirSync(path.resolve(process.cwd(), 'src'))
-    .filter((fileName) => !fileName.includes('.'))
-    .map((folder) => path.resolve(`dist/${folder}`))
+  const targets = fs.readdirSync(path.resolve(process.cwd(), 'src')).reduce((acc, name) => {
+    if (!name.includes('.')) {
+      acc.push(path.resolve(`dist/${name}`))
+    }
+
+    return acc
+  }, [])
 
   // Create a package.json for each target with resolution fields
   targets.forEach((target) => {
@@ -40,7 +61,6 @@ const run = async (command) =>
       JSON.stringify(
         {
           types: './index.d.ts',
-          main: './index.cjs',
           module: './index.js',
         },
         null,
@@ -48,17 +68,4 @@ const run = async (command) =>
       ),
     )
   })
-
-  // Rename commonjs .js => .cjs
-  ;['dist', ...targets].forEach((target) => {
-    fs.readdirSync(target).forEach((file) => {
-      if (!file.endsWith('.js')) return
-
-      const filePath = path.resolve(target, file)
-      fs.renameSync(filePath, filePath.replace('.js', '.cjs'))
-    })
-  })
-
-  // Generate module build
-  await run('babel src -d dist --extensions .ts,.tsx')
 })()

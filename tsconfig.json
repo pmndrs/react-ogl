@@ -10,6 +10,7 @@
     "pretty": true,
     "skipLibCheck": true,
     "declaration": true,
+    "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
