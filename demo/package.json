@@ -4,8 +4,7 @@
   "private": true,
   "devDependencies": {
     "@vitejs/plugin-react": "^1.0.7",
-    "vite": "^2.4.3",
-    "vite-plugin-glsl": "^0.0.5"
+    "vite": "^2.4.3"
   },
   "dependencies": {
     "ogl": "^0.0.76",
