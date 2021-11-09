@@ -9,10 +9,10 @@ export const render = (element: React.ReactNode, config: RenderProps) => {
   const canvas = document.createElement('canvas')
 
   // Init internals
-  const { root } = createInternals(canvas, config)
+  const { root } = createInternals(canvas, config || {})
 
   // Render and get output state
   const state = root.render(element)
 
-  return state
+  return { ...state, root }
 }

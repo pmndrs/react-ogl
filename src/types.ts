@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as OGL from 'ogl'
 import type { MutableRefObject } from 'react'
 
@@ -63,7 +64,6 @@ export interface RootState {
   subscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   unsubscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   animation?: number
-  root?: Root
   events?: EventManager
   mouse?: OGL.Vec2
   raycaster?: OGL.Raycast

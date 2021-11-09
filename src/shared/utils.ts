@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as OGL from 'ogl'
 import { applyProps } from '../utils'
 import { createRoot } from '../renderer'
@@ -112,7 +113,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   }
 
   // Set initial state
-  const config = {
+  const state: RootState = {
     ...props,
     renderer,
     gl,
@@ -125,10 +126,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   }
 
   // Init root
-  const state: RootState = {
-    ...config,
-    root: createRoot(canvas, config),
-  }
+  const root = createRoot(canvas, state)
 
   // Handle callback
   if (props.onCreated) props.onCreated(state)
@@ -150,5 +148,5 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   }
   if (props.frameloop !== 'never') animate()
 
-  return state
+  return { ...state, root }
 }

@@ -131,7 +131,7 @@ const functions = [
   'vertexAttrib4fv',
   'vertexAttribPointer',
   'viewport',
-]
+] as const
 
 const enums: { [key: string]: any } = {
   DEPTH_BUFFER_BIT: 256,
@@ -431,7 +431,7 @@ const enums: { [key: string]: any } = {
   CONTEXT_LOST_WEBGL: 37442,
   UNPACK_COLORSPACE_CONVERSION_WEBGL: 37443,
   BROWSER_DEFAULT_WEBGL: 37444,
-}
+} as const
 
 const extensions: { [key: string]: any } = {
   // ratified
@@ -481,7 +481,7 @@ const extensions: { [key: string]: any } = {
     drawArraysInstancedANGLE: () => {},
     drawElementsInstancedANGLE: () => {},
   },
-}
+} as const
 
 /**
  * Polyfills a WebGL1/WebGL2 context.

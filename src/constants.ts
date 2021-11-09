@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as OGL from 'ogl'
 
 /**

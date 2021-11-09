@@ -1,4 +1,5 @@
 import Reconciler from 'react-reconciler'
+// @ts-ignore
 import * as OGL from 'ogl'
 import { toPascalCase, isAttribute, applyProps, diffProps } from './utils'
 import { GL_ELEMENTS } from './constants'
@@ -171,8 +172,12 @@ export const reconciler = Reconciler({
   // These methods add elements to the scene
   appendChild,
   appendInitialChild: appendChild,
+  // @ts-ignore
+  appendChildToContainer: appendChild,
   // These methods remove elements from the scene
   removeChild,
+  // @ts-ignore
+  removeChildFromContainer: removeChild,
   // We can specify an order for children to be specified here.
   // This is useful if you want to override stuff like materials
   insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance) {
