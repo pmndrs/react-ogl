@@ -33,8 +33,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
   if (GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
-    const { renderer } = root.stateNode
-    const { gl } = renderer
+    const { gl } = root.stateNode
     args = Array.isArray(args) ? [gl, ...args] : [gl, args]
   }
 
