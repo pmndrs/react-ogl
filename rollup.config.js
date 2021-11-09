@@ -37,7 +37,6 @@ const plugins = [
             path.resolve(outputDir, 'package.json'),
             JSON.stringify(
               {
-                sideEffects: 'false',
                 main: './index.cjs',
                 module: './index.js',
               },

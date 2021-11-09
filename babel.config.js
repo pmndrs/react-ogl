@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = (api) => ({
   presets: [
     [
       '@babel/preset-env',
@@ -12,17 +12,12 @@ module.exports = {
         bugfixes: true,
         loose: true,
         modules: false,
-        targets: '> 1%, not dead, not ie 11, not op_mini all',
+        targets: api.env('test')
+          ? { targets: { node: 'current' } }
+          : '> 1%, not dead, not ie 11, not op_mini all',
       },
     ],
-    ['@babel/preset-react', { runtime: 'automatic' }],
+    '@babel/preset-react',
+    '@babel/preset-typescript',
   ],
-  env: {
-    test: {
-      presets: [
-        ['@babel/preset-env', { targets: { node: 'current' } }],
-        ['@babel/preset-react', { runtime: 'automatic' }],
-      ],
-    },
-  },
-}
+})

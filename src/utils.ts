@@ -1,36 +1,33 @@
 import { RESERVED_PROPS } from './constants'
+import { Instance, InstanceProps } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
  */
-export const toPascalCase = (str) => str.charAt(0).toUpperCase() + str.substring(1)
+export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.substring(1)
 
 /**
  * Checks whether key/value pair is an attribute
  */
-export const isAttribute = (key, value) =>
+export const isAttribute = (key: string, value: { data?: number; size?: Float32Array }) =>
   !key.startsWith('attributes-') && value?.data && typeof value?.size === 'number'
 
 /**
  * Filters keys from an object.
  */
-export const filterKeys = (obj, prune = false, ...keys) => {
+export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
   const keysToSelect = new Set(keys.flat())
 
-  return Object.fromEntries(
-    Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune),
-  )
+  return Object.fromEntries(Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune))
 }
 
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (instance, newProps, oldProps = {}) => {
+export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
   // Filter identical props and reserved keys
   const identical = Object.keys(newProps).filter((key) => newProps[key] === oldProps[key])
-  const handlers = Object.keys(newProps).filter(
-    (key) => typeof newProps[key] === 'function' && key.startsWith('on'),
-  )
+  const handlers = Object.keys(newProps).filter((key) => typeof newProps[key] === 'function' && key.startsWith('on'))
   const props = filterKeys(newProps, true, ...identical, ...handlers, ...RESERVED_PROPS)
 
   // Mutate our OGL element
@@ -73,17 +70,14 @@ export const applyProps = (instance, newProps, oldProps = {}) => {
 
   // Collect event handlers.
   if (handlers.length) {
-    instance.__handlers = handlers.reduce(
-      (acc, key) => ({ ...acc, [key]: newProps[key] }),
-      {},
-    )
+    instance.__handlers = handlers.reduce((acc, key) => ({ ...acc, [key]: newProps[key] }), {})
   }
 }
 
 /**
  * Shallow checks objects.
  */
-export const checkShallow = (a, b) => {
+export const checkShallow = (a: any, b: any) => {
   // If comparing arrays, shallow compare
   if (Array.isArray(a)) {
     // Check if types match
@@ -105,7 +99,7 @@ export const checkShallow = (a, b) => {
 /**
  * Prepares a set of changes to be applied to the instance.
  */
-export const diffProps = (instance, newProps, oldProps = {}) => {
+export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
   // Prune reserved props
   newProps = filterKeys(newProps, true, ...RESERVED_PROPS)
   oldProps = filterKeys(oldProps, true, ...RESERVED_PROPS)

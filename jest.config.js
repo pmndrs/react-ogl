@@ -1,12 +1,10 @@
 module.exports = {
-  transform: {
-    '^.+\\.(mjs|jsx?)$': 'babel-jest',
-  },
+  preset: 'ts-jest',
   transformIgnorePatterns: ['node_modules/(?!ogl)'],
-  testMatch: ['<rootDir>/__tests__/**/*.test.{js,jsx}'],
+  testMatch: ['<rootDir>/tests/**/*.test.{ts,tsx}'],
   testEnvironment: 'jsdom',
-  moduleFileExtensions: ['js', 'jsx'],
+  moduleFileExtensions: ['ts', 'tsx'],
   verbose: true,
   testTimeout: 30000,
-  setupFilesAfterEnv: ['<rootDir>/__tests__/setupTests.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.js'],
 }

@@ -1,3 +1,4 @@
+import * as React from 'react'
 import * as OGL from 'ogl'
 import { render } from '../src/test'
 import { extend, reconciler } from '../src'

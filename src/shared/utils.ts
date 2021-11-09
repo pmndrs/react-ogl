@@ -1,24 +1,26 @@
 import * as OGL from 'ogl'
 import { applyProps } from '../utils'
 import { createRoot } from '../renderer'
+import { RootState, EventHandlers, RenderProps, Subscription } from '../types'
+import { MutableRefObject } from 'react'
 
 /**
  * Creates event handlers, returning an event handler method.
  */
-export const createEvents = (state) => {
+export const createEvents = (state: RootState) => {
   // Init event state
   state.mouse = new OGL.Vec2()
   state.raycaster = new OGL.Raycast(state.gl)
   state.hovered = new Map()
 
-  const handleEvent = (event, type) => {
+  const handleEvent = (event: MouseEvent | PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
     state.mouse.x = (event.clientX / state.renderer.width) * 2 - 1
     state.mouse.y = -(event.clientY / state.renderer.height) * 2 + 1
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects = state.raycaster.intersectBounds(state.scene.children)
+    const intersects: OGL.Transform[] = state.raycaster.intersectBounds(state.scene.children)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -65,7 +67,7 @@ export const createEvents = (state) => {
 /**
  * Configures rendering internals akin to R3F.
  */
-export const createInternals = (canvas, props) => {
+export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): RootState => {
   // Create or accept renderer, apply props
   const renderer =
     props.renderer instanceof OGL.Renderer
@@ -81,10 +83,7 @@ export const createInternals = (canvas, props) => {
   const gl = renderer.gl
 
   // Create or accept camera, apply props
-  const camera =
-    props.camera instanceof OGL.Camera
-      ? props.camera
-      : new OGL.Camera({ ...props.camera })
+  const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...props.camera })
   camera.position.z = 5
   if (props.camera) applyProps(camera, props.camera)
 
@@ -96,7 +95,7 @@ export const createInternals = (canvas, props) => {
   let subscribed = []
 
   // Subscribe/unsubscribe elements to the render loop
-  const subscribe = (refCallback, renderPriority) => {
+  const subscribe = (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => {
     // Subscribe callback
     subscribed.push(refCallback)
 
@@ -104,7 +103,7 @@ export const createInternals = (canvas, props) => {
     if (renderPriority) priority += 1
   }
 
-  const unsubscribe = (refCallback, renderPriority) => {
+  const unsubscribe = (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => {
     // Unsubscribe callback
     subscribed = subscribed.filter((entry) => entry !== refCallback)
 
@@ -113,7 +112,7 @@ export const createInternals = (canvas, props) => {
   }
 
   // Set initial state
-  const state = {
+  const config = {
     ...props,
     renderer,
     gl,
@@ -126,13 +125,16 @@ export const createInternals = (canvas, props) => {
   }
 
   // Init root
-  state.root = createRoot(canvas, state)
+  const state: RootState = {
+    ...config,
+    root: createRoot(canvas, config),
+  }
 
   // Handle callback
   if (props.onCreated) props.onCreated(state)
 
   // Animate
-  const animate = (time) => {
+  const animate = (time?: number) => {
     // Cancel animation if frameloop is set, otherwise keep looping
     if (props.frameloop === 'never') return cancelAnimationFrame(state.animation)
     state.animation = requestAnimationFrame(animate)
