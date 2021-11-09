@@ -19,8 +19,8 @@ const run = async (command) =>
   // Purge prev build
   await run('rimraf dist')
 
-  // Generate commonjs build
-  await run('tsc --module commonjs')
+  // Generate ts files / commonjs entrypoint
+  await run('tsc')
 
   // Copy files
   ;['LICENSE', 'README.md', 'package.json'].forEach((file) => {
@@ -60,5 +60,5 @@ const run = async (command) =>
   })
 
   // Generate module build
-  await run('tsc --module esnext')
+  await run('babel src -d dist --extensions .ts,.tsx')
 })()
