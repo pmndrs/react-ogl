@@ -188,9 +188,9 @@ export type EulerProps = OGL.Euler | Parameters<OGL.Euler['set']>
 export type Mat3Props = OGL.Mat3 | Parameters<OGL.Mat3['set']>
 export type Mat4Props = OGL.Mat4 | Parameters<OGL.Mat4['set']>
 export type QuatProps = OGL.Quat | Parameters<OGL.Quat['set']>
-export type Vec2Props = OGL.Vec2 | Parameters<OGL.Vec2['set']>
-export type Vec3Props = OGL.Vec3 | Parameters<OGL.Vec3['set']>
-export type Vec4Props = OGL.Vec4 | Parameters<OGL.Vec4['set']>
+export type Vec2Props = OGL.Vec2 | Parameters<OGL.Vec2['set']> | number
+export type Vec3Props = OGL.Vec3 | Parameters<OGL.Vec3['set']> | number
+export type Vec4Props = OGL.Vec4 | Parameters<OGL.Vec4['set']> | number
 
 // Extras
 export type PlaneProps = Node<OGL.Plane, typeof OGL.Plane>

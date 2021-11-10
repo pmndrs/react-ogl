@@ -60,7 +60,9 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
         } else if (Array.isArray(value)) {
           target.set(...value)
         } else {
-          target.set(value)
+          // Support shorthand scalar syntax like scale={1}
+          const scalar = new Array(target.length).fill(value)
+          target.set(...scalar)
         }
       } else {
         root[key] = value
@@ -104,7 +106,7 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
   newProps = filterKeys(newProps, true, ...RESERVED_PROPS)
   oldProps = filterKeys(oldProps, true, ...RESERVED_PROPS)
 
-  const changedProps = []
+  const changedProps: InstanceProps = {}
 
   // Sort through props
   Object.entries(newProps).forEach(([key, value]) => {
@@ -113,8 +115,8 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
     // Skip if props match
     if (checkShallow(value, oldProps[key])) return
 
-    // Add pierced props
-    if (key.includes('-')) changedProps.push([key, value, false, key.split('-')])
+    // Props changed, add them
+    changedProps[key] = value
   })
 
   return changedProps

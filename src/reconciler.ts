@@ -202,7 +202,6 @@ export const reconciler = Reconciler({
     if (type === 'program') {
       if (oldProps.vertex !== newProps.vertex) return [true]
       if (oldProps.fragment !== newProps.fragment) return [true]
-      if (oldProps.uniforms !== newProps.uniform) return [true]
     }
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
@@ -216,7 +215,7 @@ export const reconciler = Reconciler({
 
     // Diff through props and flag with changes
     const changedProps = diffProps(instance, newProps, oldProps)
-    if (changedProps.length) return [false, changedProps]
+    if (Object.keys(changedProps).length) return [false, changedProps]
 
     // No changes, don't update the instance
     return null

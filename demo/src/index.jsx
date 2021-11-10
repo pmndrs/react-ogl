@@ -17,11 +17,12 @@ const Box = (props) => {
     <mesh
       {...props}
       ref={mesh}
+      scale={active ? 1.5 : 1}
       onClick={() => setActive((value) => !value)}
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
     >
-      <box args={[active ? { width: 1.5, height: 1.5, depth: 1.5 } : { width: 1, height: 1, depth: 1 }]} />
+      <box />
       <program
         vertex={`
           attribute vec3 position;
