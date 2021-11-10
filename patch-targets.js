@@ -3,10 +3,10 @@ const fs = require('fs')
 const path = require('path')
 const package = require('./package.json')
 
-// Copy files
-;['LICENSE', 'README.md'].forEach((file) => {
-  fs.copyFileSync(path.resolve(process.cwd(), file), path.resolve(process.cwd(), 'dist', file))
-})
+const PACKAGE_TEMPLATE = {
+  types: './index.d.ts',
+  module: './index.js',
+}
 
 // Add package.json with updated resolution fields
 fs.writeFileSync(
@@ -14,8 +14,7 @@ fs.writeFileSync(
   JSON.stringify(
     {
       ...package,
-      types: './index.d.ts',
-      module: './index.js',
+      ...PACKAGE_TEMPLATE,
     },
     null,
     2,
@@ -33,15 +32,10 @@ const targets = fs.readdirSync(path.resolve(process.cwd(), 'src')).reduce((acc, 
 
 // Create a package.json for each target with resolution fields
 targets.forEach((target) => {
-  fs.writeFileSync(
-    path.resolve(target, 'package.json'),
-    JSON.stringify(
-      {
-        types: './index.d.ts',
-        module: './index.js',
-      },
-      null,
-      2,
-    ),
-  )
+  fs.writeFileSync(path.resolve(target, 'package.json'), JSON.stringify(PACKAGE_TEMPLATE, null, 2))
+})
+
+// Copy files
+;['LICENSE', 'README.md'].forEach((file) => {
+  fs.copyFileSync(path.resolve(process.cwd(), file), path.resolve(process.cwd(), 'dist', file))
 })

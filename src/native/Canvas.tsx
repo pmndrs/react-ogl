@@ -55,10 +55,11 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
         clientHeight: context.drawingBufferHeight,
       } as HTMLCanvasElement
 
+      ;(canvas.getContext as any) = () => context
+
       internalState.current = createInternals(canvas, {
         events,
         ...internalProps,
-        renderer: { ...internalProps?.renderer, context },
       })
 
       const manager = internalState.current.events.connected as any

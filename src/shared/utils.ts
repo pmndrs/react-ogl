@@ -2,7 +2,7 @@
 import * as OGL from 'ogl'
 import { applyProps } from '../utils'
 import { createRoot } from '../renderer'
-import { RootState, EventHandlers, RenderProps, Subscription } from '../types'
+import { RootState, EventHandlers, RenderProps, Subscription, InstanceProps } from '../types'
 import { MutableRefObject } from 'react'
 
 /**
@@ -21,7 +21,7 @@ export const createEvents = (state: RootState) => {
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: OGL.Transform[] = state.raycaster.intersectBounds(state.scene.children)
+    const intersects: OGL.Transform[] = state.raycaster.intersectBounds(state.scene.children as OGL.Mesh[])
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -46,7 +46,7 @@ export const createEvents = (state: RootState) => {
 
     // Cleanup stale hover events
     if (isHoverEvent) {
-      state.hovered.forEach((object) => {
+      state.hovered.forEach((object: OGL.Mesh & { __handlers?: any }) => {
         const handlers = object.__handlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
@@ -77,16 +77,16 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
           alpha: true,
           antialias: true,
           powerPreference: 'high-performance',
-          ...props.renderer,
+          ...(props.renderer as any),
           canvas: canvas,
         })
-  if (props.renderer) applyProps(renderer, props.renderer)
+  if (props.renderer) applyProps(renderer, props.renderer as InstanceProps)
   const gl = renderer.gl
 
   // Create or accept camera, apply props
-  const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...props.camera })
+  const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...(props.camera as any) })
   camera.position.z = 5
-  if (props.camera) applyProps(camera, props.camera)
+  if (props.camera) applyProps(camera, props.camera as InstanceProps)
 
   // Create scene
   const scene = new OGL.Transform()
