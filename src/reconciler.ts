@@ -3,7 +3,7 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import { toPascalCase, isAttribute, applyProps, diffProps } from './utils'
 import { GL_ELEMENTS } from './constants'
-import { Catalogue, Instance, InstanceProps } from './types'
+import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue: Catalogue = {}
@@ -18,6 +18,9 @@ export const extend = (objects: Catalogue) =>
  * Creates an OGL element from a React node.
  */
 export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: Reconciler.Fiber) => {
+  // Get root state
+  const stateNode: RootState = props?.stateNode ?? root?.stateNode
+
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -33,8 +36,8 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
   if (GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
-    const { gl } = root.stateNode
-    args = Array.isArray(args) ? [gl, ...args] : [gl, args]
+    const gl = stateNode?.gl
+    args = (Array.isArray(args) ? [gl, ...args] : [gl, args]).filter(Boolean)
   }
 
   // Accept shader props as args for Programs
@@ -83,7 +86,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   }
 
   // Set initial props
-  applyProps(instance, props)
+  applyProps(instance, { ...props, stateNode })
 
   return instance
 }
@@ -138,6 +141,29 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
 }
 
 /**
+ * Gets the root store and container from a target container and child instance.
+ */
+export const getContainer = (
+  container: RootState | Instance,
+  child: Instance,
+): { root: RootState; container: Instance } => ({
+  root: container?.scene ? container : container?.rootNode ?? child.rootNode,
+  container: container?.scene || container,
+})
+
+/**
+ * Inserts an instance between instances of a ReactNode.
+ */
+export const insertBefore = (parentInstance: Instance, child: Instance, beforeChild: Instance) => {
+  if (!child) return
+
+  child.parent = parentInstance
+
+  const index = parentInstance.children.indexOf(beforeChild)
+  parentInstance.children = [...parentInstance.children.slice(0, index), child, ...parentInstance.children.slice(index)]
+}
+
+/**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
 // @ts-ignore
@@ -147,11 +173,11 @@ export const reconciler = Reconciler({
   // We set this to false because this can work on top of react-dom
   isPrimaryRenderer: false,
   // We can modify the ref here, but we return it instead (no-op)
-  getPublicInstance: (instance) => instance,
+  getPublicInstance: (instance: Instance) => instance,
   // This object that's passed into the reconciler is the host context.
-  // We don't need to expose it though
-  getRootHostContext: () => ({}),
-  getChildHostContext: () => ({}),
+  // Don't expose the root though, only children for portalling
+  getRootHostContext: () => null,
+  getChildHostContext: (parentHostContext: any) => parentHostContext,
   // Text isn't supported so we skip it
   createTextInstance: () => console.warn('Text is not allowed in the OGL scene-graph!'),
   // This lets us store stuff before React mutates our OGL elements.
@@ -163,6 +189,7 @@ export const reconciler = Reconciler({
   // We can mutate elements once they're assembled into the scene graph here.
   // applyProps removes the need for this though
   finalizeInitialChildren: () => false,
+  preparePortalMount: (container: any) => container,
   // This can modify the container and clear children.
   // Might be useful for disposing on demand later
   clearContainer: () => false,
@@ -172,24 +199,29 @@ export const reconciler = Reconciler({
   appendChild,
   appendInitialChild: appendChild,
   // @ts-ignore
-  appendChildToContainer: appendChild,
+  appendChildToContainer(parentInstance: RootState | Instance, child: Instance) {
+    const { root, container } = getContainer(parentInstance, child)
+
+    // Update child's copy of local state
+    child.stateNode = root
+
+    // Add child to container
+    appendChild(container, child)
+  },
   // These methods remove elements from the scene
   removeChild,
   // @ts-ignore
-  removeChildFromContainer: removeChild,
+  removeChildFromContainer(parentInstance: RootState | Instance, child: Instance) {
+    const { container } = getContainer(parentInstance, child)
+    removeChild(container, child)
+  },
   // We can specify an order for children to be specified here.
   // This is useful if you want to override stuff like materials
-  insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance) {
-    if (!child) return
-
-    child.parent = parentInstance
-
-    const index = parentInstance.children.indexOf(beforeChild)
-    parentInstance.children = [
-      ...parentInstance.children.slice(0, index),
-      child,
-      ...parentInstance.children.slice(index),
-    ]
+  insertBefore,
+  // @ts-ignore
+  insertInContainerBefore(parentInstance: RootState | Instance, child: Instance, beforeChild: Instance) {
+    const { container } = getContainer(parentInstance, child)
+    insertBefore(container, child, beforeChild)
   },
   // Used to calculate updates in the render phase or commitUpdate.
   // Greatly improves performance by reducing paint to rapid mutations.
@@ -235,4 +267,11 @@ export const reconciler = Reconciler({
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)
   },
+})
+
+// Injects renderer meta into devtools.
+reconciler.injectIntoDevTools({
+  bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
+  rendererPackageName: 'react-ogl',
+  version: '0.1.0',
 })

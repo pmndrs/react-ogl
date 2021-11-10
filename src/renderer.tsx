@@ -78,3 +78,9 @@ export const createRoot = (target: HTMLCanvasElement, config: RootState): Root =
   render: (element) => render(element, target, config),
   unmount: () => unmountComponentAtNode(target),
 })
+
+/**
+ * Portals into a remote OGL element.
+ */
+export const createPortal = (children: React.ReactNode, target: OGL.Transform): React.ReactNode =>
+  reconciler.createPortal(children, target, null, null)
