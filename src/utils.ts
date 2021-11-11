@@ -9,7 +9,7 @@ export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.s
 /**
  * Checks whether key/value pair is an attribute
  */
-export const isAttribute = (key: string, value: { data?: number; size?: Float32Array }) =>
+export const isAttribute = (key: string, value: any) =>
   !key.startsWith('attributes-') && value?.data && typeof value?.size === 'number'
 
 /**

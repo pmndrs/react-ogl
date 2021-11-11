@@ -30,7 +30,7 @@ export const events: EventManager = {
     state.events.handlers = Object.entries(EVENTS).reduce(
       (acc, [name, [type]]: [keyof typeof EVENTS, typeof EVENTS[keyof typeof EVENTS]]) => ({
         ...acc,
-        [name]: (event) => handleEvent(event, type),
+        [name]: (event: MouseEvent | PointerEvent) => handleEvent(event, type),
       }),
       {},
     )

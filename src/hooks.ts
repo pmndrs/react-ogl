@@ -10,7 +10,7 @@ export const OGLContext = createContext(null)
  * Accesses internal OGL state.
  */
 export const useOGL = () => {
-  const state: RootState = useContext(OGLContext)
+  const state: RootState | null = useContext(OGLContext)
   // We can only access context from within the scope of a context provider.
   // If used outside, we throw an error instead of returning null for DX.
   if (!state) throw 'Hooks must used inside a canvas or OGLContext provider!'
