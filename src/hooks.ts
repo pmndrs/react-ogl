@@ -1,16 +1,21 @@
-import { useLayoutEffect, createContext, useContext, useRef } from 'react'
+import * as React from 'react'
 import { RootState, Subscription } from './types'
+
+/**
+ * An SSR-friendly useLayoutEffect.
+ */
+export const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
 
 /**
  * Internal OGL context.
  */
-export const OGLContext = createContext(null)
+export const OGLContext = React.createContext(null)
 
 /**
  * Accesses internal OGL state.
  */
 export const useOGL = () => {
-  const state: RootState | null = useContext(OGLContext)
+  const state: RootState | null = React.useContext(OGLContext)
   // We can only access context from within the scope of a context provider.
   // If used outside, we throw an error instead of returning null for DX.
   if (!state) throw 'Hooks must used inside a canvas or OGLContext provider!'
@@ -25,10 +30,10 @@ export const useFrame = (callback: Subscription, renderPriority = 0) => {
   // Store frame callback in a ref so we can pass a mutable reference.
   // This allows the callback to dynamically update without blocking
   // the render loop.
-  const ref = useRef(callback)
-  useLayoutEffect(() => void (ref.current = callback), [callback])
+  const ref = React.useRef(callback)
+  React.useLayoutEffect(() => void (ref.current = callback), [callback])
   // Subscribe on mount and unsubscribe on unmount
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     state.subscribe(ref, renderPriority)
     return () => void state.unsubscribe(ref, renderPriority)
   }, [state, renderPriority])

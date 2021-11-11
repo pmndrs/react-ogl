@@ -2,6 +2,7 @@ import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 
 // Util funcs
+export type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : T
 export type NonFunctionKeys<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]
 export type Overwrite<T, O> = Omit<T, NonFunctionKeys<O>> & O
 export type Filter<T, O> = T extends []
@@ -136,11 +137,6 @@ export type RenderProps = {
  * OGL / JSX types
  *
  */
-
-/**
- * If `T` contains a constructor, @see ConstructorParameters must be used, otherwise `T`.
- */
-type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : T
 
 export interface NodeProps<T> {
   /** Attaches this class onto the parent under the given name and nulls it on unmount */

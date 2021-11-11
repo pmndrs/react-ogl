@@ -1,4 +1,4 @@
-import { createEvents } from '../shared/utils'
+import { createEvents } from '../utils'
 import { EventManager } from '../types'
 
 /**

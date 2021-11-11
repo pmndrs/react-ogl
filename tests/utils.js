@@ -1,10 +1,9 @@
-import { createInternals } from '../shared'
-import { RenderProps } from '../types'
+import { createInternals } from '../dist'
 
 /**
  * Renders JSX into OGL state.
  */
-export const render = (element: React.ReactNode, config: RenderProps) => {
+export const render = (element, config) => {
   // Create canvas shim
   const canvas = document.createElement('canvas')
 

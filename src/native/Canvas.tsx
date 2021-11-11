@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet } from 'react-native'
 import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
-import { useIsomorphicLayoutEffect } from '../shared/hooks'
-import { createInternals } from '../shared/utils'
-import { SetBlock, ErrorBoundary, Block } from '../shared/components'
+import { useIsomorphicLayoutEffect } from '../hooks'
+import { createInternals, SetBlock, ErrorBoundary, Block, filterKeys } from '../utils'
 import { events } from './events'
-import { filterKeys } from '../utils'
 import { RESERVED_PROPS } from '../constants'
 import { RenderProps, RootState } from '../types'
 

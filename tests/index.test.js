@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { render } from '../dist/test'
+import { render } from './utils'
 import { extend, reconciler } from '../dist'
 
 describe('renderer', () => {

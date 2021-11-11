@@ -2,11 +2,9 @@ import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import mergeRefs from 'react-merge-refs'
-import { useIsomorphicLayoutEffect } from '../shared/hooks'
-import { createInternals } from '../shared/utils'
-import { SetBlock, ErrorBoundary, Block } from '../shared/components'
+import { useIsomorphicLayoutEffect } from '../hooks'
+import { createInternals, SetBlock, ErrorBoundary, Block, filterKeys } from '../utils'
 import { events } from './events'
-import { filterKeys } from '../utils'
 import { RESERVED_PROPS } from '../constants'
 import { RenderProps, DPR, RootState } from '../types'
 
@@ -82,7 +80,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, Props>(
     // Cleanup on unmount
     React.useEffect(() => {
       const state = internalState.current
-      return () => state?.root.unmount()
+      return () => state.root.unmount()
     }, [])
 
     return (

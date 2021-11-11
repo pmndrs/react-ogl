@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const package = require('./package.json')
 
+// Base package.json keys
 const PACKAGE_TEMPLATE = {
   types: './index.d.ts',
   module: './index.js',
@@ -21,21 +22,17 @@ fs.writeFileSync(
   ),
 )
 
-// Traverse targets
-const targets = fs.readdirSync(path.resolve(process.cwd(), 'src')).reduce((acc, name) => {
-  if (!name.includes('.')) {
-    acc.push(path.resolve(`dist/${name}`))
+// Traverse targets and create a package.json for each target with resolution fields
+fs.readdirSync(path.resolve(process.cwd(), 'src')).forEach((name) => {
+  const isFolder = !name.includes('.')
+
+  if (isFolder) {
+    const target = path.resolve(`dist/${name}/package.json`)
+    fs.writeFileSync(target, JSON.stringify(PACKAGE_TEMPLATE, null, 2))
   }
-
-  return acc
-}, [])
-
-// Create a package.json for each target with resolution fields
-targets.forEach((target) => {
-  fs.writeFileSync(path.resolve(target, 'package.json'), JSON.stringify(PACKAGE_TEMPLATE, null, 2))
 })
 
 // Copy files
 ;['LICENSE', 'README.md'].forEach((file) => {
-  fs.copyFileSync(path.resolve(process.cwd(), file), path.resolve(process.cwd(), 'dist', file))
+  fs.copyFileSync(path.resolve(process.cwd(), file), path.resolve(process.cwd(), `dist/${file}`))
 })
