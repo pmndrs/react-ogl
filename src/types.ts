@@ -23,7 +23,7 @@ export type Catalogue = { [key: string]: OGL.Transform }
  */
 export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach'> & {
   isPrimitive?: boolean
-  __handlers?: any
+  __handlers?: EventHandlers
   children: Instance[]
   attach?: string
 }

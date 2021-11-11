@@ -1,4 +1,4 @@
-import { createInternals } from '../dist'
+import { createInternals } from '../../dist'
 
 /**
  * Renders JSX into OGL state.

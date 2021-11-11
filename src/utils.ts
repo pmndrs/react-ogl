@@ -136,14 +136,14 @@ export const createEvents = (state: RootState) => {
   state.raycaster = new OGL.Raycast(state.gl)
   state.hovered = new Map()
 
-  const handleEvent = (event: MouseEvent | PointerEvent, type: keyof EventHandlers) => {
+  const handleEvent = (event: PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
     state.mouse.x = (event.clientX / state.renderer.width) * 2 - 1
     state.mouse.y = -(event.clientY / state.renderer.height) * 2 + 1
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: OGL.Transform[] = state.raycaster.intersectBounds(state.scene.children as OGL.Mesh[])
+    const intersects: Instance[] = state.raycaster.intersectBounds(state.scene.children as OGL.Mesh[])
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -168,7 +168,7 @@ export const createEvents = (state: RootState) => {
 
     // Cleanup stale hover events
     if (isHoverEvent) {
-      state.hovered.forEach((object: OGL.Mesh & { __handlers?: any }) => {
+      state.hovered.forEach((object: Instance) => {
         const handlers = object.__handlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
