@@ -1,6 +1,12 @@
 module.exports = {
   transform: {
-    '^.+\\.(mjs|jsx?)$': 'babel-jest',
+    '^.+\\.(mjs|jsx?)$': ["babel-jest", {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        '@babel/preset-react',
+        '@babel/preset-typescript',
+      ],
+    }],
   },
   transformIgnorePatterns: ['node_modules/(?!ogl)'],
   testMatch: ['<rootDir>/tests/**/*.test.{js,jsx}'],
