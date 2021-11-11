@@ -181,9 +181,9 @@ export const reconciler = Reconciler({
   // Text isn't supported so we skip it
   createTextInstance: () => console.warn('Text is not allowed in the OGL scene-graph!'),
   // This lets us store stuff before React mutates our OGL elements.
-  // We don't do anything here but return an empty object
-  prepareForCommit: () => ({}),
-  resetAfterCommit: () => ({}),
+  // We don't do anything here
+  prepareForCommit: () => null,
+  resetAfterCommit: () => {},
   // OGL elements don't have textContent, so we skip this
   shouldSetTextContent: () => false,
   // We can mutate elements once they're assembled into the scene graph here.
