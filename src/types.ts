@@ -4,6 +4,13 @@ import type { MutableRefObject } from 'react'
 // Util funcs
 export type NonFunctionKeys<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]
 export type Overwrite<T, O> = Omit<T, NonFunctionKeys<O>> & O
+export type Filter<T, O> = T extends []
+  ? []
+  : T extends [infer H, ...infer R]
+  ? H extends O
+    ? Filter<R, O>
+    : [H, ...Filter<R, O>]
+  : T
 
 /**
  * Extended OGL namespace.
@@ -139,7 +146,7 @@ export interface NodeProps<T> {
   /** Attaches this class onto the parent under the given name and nulls it on unmount */
   attach?: string
   /** Constructor arguments */
-  args?: Args<T>
+  args?: Filter<Args<T>, OGL.OGLRenderingContext>
   children?: React.ReactNode
   ref?: React.Ref<React.ReactNode>
   key?: React.Key
