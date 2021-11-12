@@ -192,7 +192,6 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
     props.renderer instanceof OGL.Renderer
       ? props.renderer
       : new OGL.Renderer({
-          alpha: true,
           antialias: true,
           powerPreference: 'high-performance',
           ...(props.renderer as any),
@@ -200,6 +199,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
         })
   if (props.renderer) applyProps(renderer, props.renderer as InstanceProps)
   const gl = renderer.gl
+  gl.clearColor(1, 1, 1, 0)
 
   // Create or accept camera, apply props
   const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...(props.camera as any) })
