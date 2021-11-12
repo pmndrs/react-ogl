@@ -252,7 +252,7 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@rollup/pluginutils@^4.1.0", "@rollup/pluginutils@^4.1.1":
+"@rollup/pluginutils@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-4.1.1.tgz#1d4da86dd4eded15656a57d933fda2b9a08d47ec"
   integrity sha512-clDjivHqWGXi7u+0d2r2sBi4Ie6VLEAzWMIkvJLnDmxoOhBYOTfzGbOQBA32THHm11/LiJbd01tJUpJsbshSWQ==
@@ -653,19 +653,6 @@ to-fast-properties@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"
   integrity sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4=
-
-tslib@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
-  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
-
-vite-plugin-glsl@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/vite-plugin-glsl/-/vite-plugin-glsl-0.0.5.tgz#c94b4a3f7b36836c1651f78dc7312c10ab2fad9c"
-  integrity sha512-tysCM2AJRZMOEW3sdwF8Yz4A3SIOAZy2WOlLNwAvSR6FGb0lcFLH+oVbADfKx1lhT0N9qbLYTH3JtLhLhnFrew==
-  dependencies:
-    "@rollup/pluginutils" "^4.1.0"
-    tslib "^2.3.1"
 
 vite@^2.4.3:
   version "2.6.13"

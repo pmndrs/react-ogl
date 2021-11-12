@@ -1,6 +1,7 @@
+import * as React from 'react'
 import * as OGL from 'ogl'
-import { render } from '../src/test'
-import { extend, reconciler } from '../src'
+import { render } from './utils'
+import { extend, reconciler } from '../dist'
 
 describe('renderer', () => {
   it('should render JSX', async () => {
@@ -34,9 +35,7 @@ describe('renderer', () => {
     await reconciler.act(async () => {
       state = render(
         <mesh>
-          <geometry
-            attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }}
-          />
+          <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
           <program vertex="vertex" fragment="fragment" />
         </mesh>,
       )

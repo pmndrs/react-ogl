@@ -1,3 +1,7 @@
+// Mock scheduler to test React features
+jest.mock('scheduler', () => require('scheduler/unstable_mock'))
+
+// Polyfill WebGL Context
 const functions = [
   'attachShader',
   'bindAttribLocation',
@@ -460,7 +464,6 @@ const extensions = {
     drawBuffers: () => {},
     drawBuffersWEBGL: () => {},
   },
-  OES_texture_float_linear: null,
   OES_texture_half_float_linear: null,
   EXT_blend_minmax: { MIN_EXT: 0, MAX_EXT: 0 },
   EXT_shader_texture_lod: null,
@@ -488,19 +491,14 @@ const GL_VERSION = 7938
 const SCISSOR_BOX = 3088
 const VIEWPORT = 2978
 
-/**
- * Polyfills a WebGL1/WebGL2 context.
- */
-export class WebGLRenderingContext {
+class WebGLRenderingContext {
   constructor(canvas) {
     this.canvas = canvas
     this.drawingBufferWidth = canvas.width
     this.drawingBufferHeight = canvas.height
 
     functions.forEach((func) => {
-      this[func] = () => {
-        return {}
-      }
+      this[func] = () => ({})
     })
 
     Object.keys(enums).forEach((key) => {
@@ -508,7 +506,7 @@ export class WebGLRenderingContext {
     })
   }
 
-  getShaderPrecisionFormat() {
+  getShaderPrecisionFormat = () => {
     return {
       rangeMin: 127,
       rangeMax: 127,
@@ -516,7 +514,7 @@ export class WebGLRenderingContext {
     }
   }
 
-  getParameter(paramId) {
+  getParameter = (paramId) => {
     switch (paramId) {
       case GL_VERSION:
         return ['WebGL1']
@@ -526,15 +524,36 @@ export class WebGLRenderingContext {
     }
   }
 
-  getExtension(ext) {
+  getExtension = (ext) => {
     return extensions[ext]
   }
 
-  getProgramInfoLog() {
-    return ''
+  getProgramInfoLog = () => ''
+
+  getShaderInfoLog = () => ''
+}
+
+HTMLCanvasElement.prototype.getContext = function () {
+  return new WebGLRenderingContext(this)
+}
+
+// Polyfill PointerEvent
+if (!global.PointerEvent) {
+  class PointerEvent extends MouseEvent {
+    constructor(type, params = {}) {
+      super(type, params)
+
+      this.pointerId = params.pointerId
+      this.width = params.width
+      this.height = params.height
+      this.pressure = params.pressure
+      this.tangentialPressure = params.tangentialPressure
+      this.tiltX = params.tiltX
+      this.tiltY = params.tiltY
+      this.pointerType = params.pointerType
+      this.isPrimary = params.isPrimary
+    }
   }
 
-  getShaderInfoLog() {
-    return ''
-  }
+  global.PointerEvent = PointerEvent
 }

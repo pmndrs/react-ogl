@@ -1,48 +1,46 @@
-import { forwardRef, useRef, useState, useEffect, Suspense } from 'react'
-import useMeasure from 'react-use-measure'
+import * as React from 'react'
+// eslint-disable-next-line import/named
+import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import mergeRefs from 'react-merge-refs'
-import { useIsomorphicLayoutEffect } from '../shared/hooks'
-import { createInternals } from '../shared/utils'
-import { ErrorBoundary, Block } from '../shared/components'
+import { useIsomorphicLayoutEffect } from '../hooks'
+import { createInternals, SetBlock, ErrorBoundary, Block, filterKeys } from '../utils'
 import { events } from './events'
-import { filterKeys } from '../utils'
 import { RESERVED_PROPS } from '../constants'
+import { RenderProps, DPR, RootState } from '../types'
+
+export interface Props extends Omit<RenderProps, 'size'>, React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  fallback?: React.ReactNode
+  resize?: ResizeOptions
+}
 
 /**
  * A list of custom Canvas props.
  */
-export const CANVAS_PROPS = [
-  'renderer',
-  'dpr',
-  'camera',
-  'orthographic',
-  'frameloop',
-  'events',
-  'onCreated',
-]
+export const CANVAS_PROPS = ['renderer', 'dpr', 'camera', 'orthographic', 'frameloop', 'events', 'onCreated'] as const
 
 /**
  * Interpolates DPR from [min, max] based on device capabilities.
  */
-const calculateDpr = (dpr) =>
+const calculateDpr = (dpr: DPR) =>
   Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
 /**
  * A resizeable canvas whose children are declarative OGL elements.
  */
-export const Canvas = forwardRef(
+export const Canvas = React.forwardRef<HTMLCanvasElement, Props>(
   ({ resize, children, style, fallback, ...rest }, forwardedRef) => {
-    const internalProps = filterKeys(rest, false, ...CANVAS_PROPS)
-    const divProps = filterKeys(rest, true, ...CANVAS_PROPS, ...RESERVED_PROPS)
+    const internalProps: RenderProps = filterKeys(rest, false, ...CANVAS_PROPS)
+    const divProps: React.HTMLAttributes<HTMLDivElement> = filterKeys(rest, true, ...CANVAS_PROPS, ...RESERVED_PROPS)
     const [div, { width, height }] = useMeasure({
       scroll: true,
       debounce: { scroll: 50, resize: 0 },
       ...resize,
     })
-    const canvas = useRef()
-    const internalState = useRef()
-    const [block, setBlock] = useState(false)
-    const [error, setError] = useState(false)
+    const canvas = React.useRef<HTMLCanvasElement>()
+    const internalState = React.useRef<RootState>()
+    const [block, setBlock] = React.useState<SetBlock>(false)
+    const [error, setError] = React.useState(false)
 
     // Suspend this component if block is a promise (2nd run)
     if (block) throw block
@@ -73,16 +71,16 @@ export const Canvas = forwardRef(
         // Render to screen
         state.root.render(
           <ErrorBoundary set={setError}>
-            <Suspense fallback={<Block set={setBlock} />}>{children}</Suspense>
+            <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
           </ErrorBoundary>,
         )
       }
     }, [internalProps, width, height, children])
 
     // Cleanup on unmount
-    useEffect(() => {
+    React.useEffect(() => {
       const state = internalState.current
-      return () => state?.root.unmount()
+      return () => state.root.unmount()
     }, [])
 
     return (
