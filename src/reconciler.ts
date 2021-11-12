@@ -1,7 +1,7 @@
 import Reconciler from 'react-reconciler'
 // @ts-ignore
 import * as OGL from 'ogl'
-import { toPascalCase, isAttribute, applyProps, diffProps } from './utils'
+import { toPascalCase, applyProps, diffProps } from './utils'
 import { GL_ELEMENTS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
@@ -35,41 +35,16 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  if (GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
+  if (!object && GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
     const gl = stateNode?.gl
-    args = (Array.isArray(args) ? [gl, ...args] : [gl, args]).filter(Boolean)
-  }
 
-  // Accept shader props as args for Programs
-  if (type === 'program') {
-    const [gl, attrs = {}] = args
-
-    args = [
-      gl,
-      {
-        vertex: props?.vertex,
-        fragment: props?.fragment,
-        ...attrs,
-      },
-    ]
-  }
-
-  // Accept attribute props as args for Geometries
-  if (type === 'geometry') {
-    const [gl, attrs = {}] = args
-
-    const propAttributes = Object.entries(props || {}).reduce((acc, [key, value]) => {
-      if (isAttribute(key, value)) acc[key] = value
+    // Add gl to beginning of args and accept props as args
+    const attrs = Object.entries(props || {}).reduce((acc, [key, value]) => {
+      if (!key.includes('-')) acc[key] = value
       return acc
-    }, {})
+    }, args?.[0] || {})
 
-    args = [
-      gl,
-      {
-        ...propAttributes,
-        ...attrs,
-      },
-    ]
+    args = [gl, attrs]
   }
 
   // Create instance
@@ -120,10 +95,11 @@ export const appendChild = (parentInstance: Instance, child: Instance) => {
   // Attach material, geometry, fog, etc.
   if (child.attach) {
     parentInstance[child.attach] = child
-    child.parent = parentInstance
   } else {
-    child.setParent(parentInstance)
+    child.setParent?.(parentInstance)
   }
+
+  child.parent = parentInstance
 }
 
 /**
@@ -133,8 +109,8 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
   if (!child) return
 
   // Remove material, geometry, fog, etc
-  if (!child.attach) {
-    parentInstance.removeChild(child)
+  if (!child.attach && child.setParent) {
+    parentInstance?.removeChild?.(child)
   }
 
   // TODO: handle dispose
@@ -237,8 +213,8 @@ export const reconciler = Reconciler({
     }
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
-    if (type === 'geometry') {
-      const oldAttributes = Object.keys(oldProps).filter((key) => isAttribute(key, oldProps[key]))
+    if (instance instanceof OGL.Geometry) {
+      const oldAttributes = Object.keys(oldProps).filter((key) => !key.startsWith('attributes-'))
       if (oldAttributes.some((key) => oldProps[key] !== newProps[key])) return [true]
     }
 
@@ -266,6 +242,12 @@ export const reconciler = Reconciler({
 
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)
+  },
+  hideInstance(instance: Instance) {
+    instance.visible = false
+  },
+  unhideInstance(instance: Instance) {
+    instance.visible = true
   },
 })
 

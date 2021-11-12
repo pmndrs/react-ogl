@@ -71,8 +71,8 @@
     "build": "swc src -d dist",
     "postbuild": "tsc && node patch-targets",
     "test": "jest",
-    "lint": "prettier src --check && eslint src/**/*.{ts,tsx}",
-    "lint-fix": "prettier src --write && eslint --fix src/**/*.{ts,tsx}",
+    "lint": "prettier . --check && eslint src/**/*.{ts,tsx}",
+    "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}",
     "publish": "npm build && npm publish dist"
   }
 }

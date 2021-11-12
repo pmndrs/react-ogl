@@ -4,7 +4,15 @@ import * as OGL from 'ogl'
 /**
  * OGL elements which must accept `gl` via constructor args.
  */
-export const GL_ELEMENTS = [OGL.Camera, OGL.Geometry, OGL.Mesh, OGL.Program] as const
+export const GL_ELEMENTS = [
+  OGL.Camera,
+  OGL.Geometry,
+  OGL.Mesh,
+  OGL.Program,
+  OGL.Texture,
+  OGL.Polyline,
+  OGL.NormalProgram,
+] as const
 
 /**
  * React's internal props.

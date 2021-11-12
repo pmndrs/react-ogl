@@ -12,12 +12,6 @@ import { Instance, InstanceProps, RootState, EventHandlers, RenderProps, Subscri
 export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.substring(1)
 
 /**
- * Checks whether key/value pair is an attribute
- */
-export const isAttribute = (key: string, value: any) =>
-  !key.startsWith('attributes-') && value?.data && typeof value?.size === 'number'
-
-/**
  * Filters keys from an object.
  */
 export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
@@ -143,7 +137,9 @@ export const createEvents = (state: RootState) => {
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Instance[] = state.raycaster.intersectBounds(state.scene.children as OGL.Mesh[])
+    const intersects: Instance[] = state.raycaster.intersectBounds(
+      state.scene.children.filter((child: OGL.Mesh) => child?.geometry?.attributes?.position) as OGL.Mesh[],
+    )
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -160,7 +156,7 @@ export const createEvents = (state: RootState) => {
         // Fire hover events
         if (handlers?.onHover) handlers.onHover(event)
         if (handlers?.onPointerOver) handlers.onPointerOver(event)
-      } else if (!isHoverEvent && handlers?.[type]) {
+      } else if (handlers?.[type]) {
         // Otherwise, fire its generic event
         handlers[type](event)
       }
