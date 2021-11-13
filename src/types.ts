@@ -1,5 +1,6 @@
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
+import { RENDER_MODES } from './constants'
 
 // Util funcs
 export type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : T
@@ -130,6 +131,7 @@ export type RenderProps = {
   orthographic?: boolean
   events?: EventManager
   onCreated?: (state: RootState) => any
+  mode?: keyof typeof RENDER_MODES
 }
 
 /**

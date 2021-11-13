@@ -13,7 +13,11 @@ const roots = new Map<HTMLCanvasElement, { root: Fiber; state: RootState }>()
 /**
  * Renders React elements into OGL elements.
  */
-export const render = (element: React.ReactNode, target: HTMLCanvasElement, config: RootState) => {
+export const render = (
+  element: React.ReactNode,
+  target: HTMLCanvasElement,
+  { mode = 'blocking', ...config }: RootState,
+) => {
   // Get store and init/update OGL state
   const store = roots.get(target)
   let root = store?.root
@@ -28,7 +32,7 @@ export const render = (element: React.ReactNode, target: HTMLCanvasElement, conf
     if (!state.gl) state.gl = state.renderer.gl
 
     // Create root
-    root = reconciler.createContainer(state, RENDER_MODES['blocking'], false, null)
+    root = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
 
     // Bind events
     if (state.events?.connect) state.events.connect(target, state)
