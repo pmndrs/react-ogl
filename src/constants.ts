@@ -5,13 +5,21 @@ import * as OGL from 'ogl'
  * OGL elements which must accept `gl` via constructor args.
  */
 export const GL_ELEMENTS = [
+  // Core
   OGL.Camera,
   OGL.Geometry,
   OGL.Mesh,
   OGL.Program,
+  OGL.RenderTarget,
   OGL.Texture,
-  OGL.Polyline,
+
+  // Extras
+  OGL.Flowmap,
+  OGL.GPGPU,
   OGL.NormalProgram,
+  OGL.Polyline,
+  OGL.Post,
+  OGL.Shadow,
 ] as const
 
 /**
