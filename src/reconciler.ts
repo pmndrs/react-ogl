@@ -17,9 +17,9 @@ export const extend = (objects: Catalogue) =>
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: Reconciler.Fiber) => {
-  // Get root state
-  const stateNode: RootState = props?.stateNode ?? root?.stateNode
+export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
+  // Get gl context
+  const gl = props?.gl || root?.gl
 
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
@@ -36,8 +36,6 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
   if (!object && GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
-    const gl = stateNode?.gl
-
     // Add gl to beginning of args and accept props as args
     const attrs = Object.entries(props || {}).reduce((acc, [key, value]) => {
       if (!key.includes('-')) acc[key] = value
@@ -61,7 +59,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   }
 
   // Set initial props
-  applyProps(instance, { ...props, stateNode })
+  applyProps(instance, { gl, ...props })
 
   return instance
 }
@@ -69,7 +67,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 /**
  * Switches instance to a new one, moving over children.
  */
-export const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: Reconciler.Fiber) => {
+export const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: RootState) => {
   // Create a new instance
   const newInstance = createInstance(type, props, root)
 
@@ -235,7 +233,7 @@ export const reconciler = Reconciler({
     type: string,
     oldProps: InstanceProps,
     newProps: InstanceProps,
-    root: Reconciler.Fiber,
+    root: RootState,
   ) {
     // If flagged for recreation, swap to a new instance.
     if (reconstruct) return switchInstance(instance, type, newProps, root)

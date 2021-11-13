@@ -93,7 +93,7 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
   // Cleanup on unmount
   React.useEffect(() => {
     const state = internalState.current
-    return () => state.root.unmount()
+    return () => state?.root.unmount()
   }, [])
 
   return (

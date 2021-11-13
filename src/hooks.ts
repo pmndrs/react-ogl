@@ -9,13 +9,13 @@ export const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.u
 /**
  * Internal OGL context.
  */
-export const OGLContext = React.createContext(null)
+export const OGLContext = React.createContext<RootState | null>(null)
 
 /**
  * Accesses internal OGL state.
  */
 export const useOGL = () => {
-  const state: RootState | null = React.useContext(OGLContext)
+  const state = React.useContext(OGLContext)
   // We can only access context from within the scope of a context provider.
   // If used outside, we throw an error instead of returning null for DX.
   if (!state) throw 'Hooks must used inside a canvas or OGLContext provider!'

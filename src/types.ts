@@ -98,7 +98,7 @@ export type Subscription = (state: RootState) => any
 export interface RootState {
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
-  scene: (OGL.Transform | OGL.Mesh) & { stateNode: RootState }
+  scene: OGL.Transform
   camera: OGL.Camera
   priority: number
   subscribed: Subscription[]

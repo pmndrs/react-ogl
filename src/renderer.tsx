@@ -28,7 +28,7 @@ export const render = (element: React.ReactNode, target: HTMLCanvasElement, conf
     if (!state.gl) state.gl = state.renderer.gl
 
     // Create root
-    root = reconciler.createContainer(state.scene as any, RENDER_MODES['blocking'], false, null)
+    root = reconciler.createContainer(state, RENDER_MODES['blocking'], false, null)
 
     // Bind events
     if (state.events?.connect) state.events.connect(target, state)
@@ -38,9 +38,8 @@ export const render = (element: React.ReactNode, target: HTMLCanvasElement, conf
   roots.set(target, { root, state })
 
   // Update fiber
-  state.scene.stateNode = state
   reconciler.updateContainer(
-    <OGLContext.Provider value={{ ...state }}>{element}</OGLContext.Provider>,
+    <OGLContext.Provider value={state}>{element}</OGLContext.Provider>,
     root,
     null,
     () => undefined,
