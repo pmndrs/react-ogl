@@ -201,6 +201,15 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   const gl = renderer.gl
   gl.clearColor(1, 1, 1, 0)
 
+  // Flush frame for native
+  if (renderer.gl.endFrameEXP) {
+    const renderFrame = renderer.render.bind(renderer)
+    renderer.render = ({ scene, camera }) => {
+      renderFrame({ scene, camera })
+      renderer.gl.endFrameEXP()
+    }
+  }
+
   // Create or accept camera, apply props
   const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...(props.camera as any) })
   camera.position.z = 5

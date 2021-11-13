@@ -54,6 +54,7 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
       } as HTMLCanvasElement
 
       // Bind context
+      ;(context.canvas as any) = canvas
       ;(canvas.getContext as any) = () => context
 
       // Init state
