@@ -75,6 +75,6 @@
     "test": "jest",
     "lint": "prettier . --check && eslint src/**/*.{ts,tsx}",
     "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}",
-    "publish": "npm build && npm publish dist"
+    "publish": "npm run build && npm publish dist --access public"
   }
 }
