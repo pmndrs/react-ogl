@@ -22,6 +22,8 @@
     "@swc/core": "^1.2.108",
     "@swc/helpers": "^0.2.14",
     "@swc/jest": "^0.2.5",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/react-native": "^8.0.0",
     "@types/jest": "^27.0.2",
     "@types/react": "^17.0.34",
     "@types/react-dom": "^17.0.11",
@@ -41,7 +43,9 @@
     "ogl-typescript": "^0.1.40",
     "prettier": "^2.4.1",
     "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-native": "^0.66.2",
+    "react-test-renderer": "^17.0.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4"
   },
