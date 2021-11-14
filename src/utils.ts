@@ -125,11 +125,6 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
  * Creates event handlers, returning an event handler method.
  */
 export const createEvents = (state: RootState) => {
-  // Init event state
-  state.mouse = new OGL.Vec2()
-  state.raycaster = new OGL.Raycast(state.gl)
-  state.hovered = new Map()
-
   const handleEvent = (event: PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
     state.mouse.x = (event.offsetX / state.renderer.width) * 2 - 1
@@ -239,6 +234,11 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
     if (renderPriority) priority -= 1
   }
 
+  // Init event state
+  const mouse = new OGL.Vec2()
+  const raycaster = new OGL.Raycast(gl)
+  const hovered = new Map()
+
   // Set initial state
   const state: RootState = {
     ...props,
@@ -250,6 +250,9 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
     subscribed,
     subscribe,
     unsubscribe,
+    mouse,
+    raycaster,
+    hovered,
   }
 
   // Init root
