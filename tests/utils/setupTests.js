@@ -57,29 +57,32 @@ jest.mock('react-use-measure', () => ({
 // Mock native dependencies for react-ogl/native
 jest.mock('react-native', () => ({
   StyleSheet: {},
-  View: React.forwardRef(({ onLayout }) => {
-    React.useState(() => {
-      const event = {
-        nativeEvent: {
-          layout: {
-            width: 1280,
-            height: 800,
+  View: React.memo(
+    React.forwardRef(({ onLayout, ...props }, ref) => {
+      React.useLayoutEffect(() => {
+        onLayout({
+          nativeEvent: {
+            layout: {
+              width: 1280,
+              height: 800,
+            },
           },
-        },
-      }
+        })
 
-      onLayout(event)
-    })
+        ref = { current: { props } }
+      }, [])
 
-    return null
-  }),
+      return null
+    }),
+  ),
 }))
 jest.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
 jest.mock('expo-gl', () => ({
   GLView: ({ onContextCreate }) => {
-    React.useState(() => {
-      onContextCreate(new WebGLRenderingContext({ width: 1280, height: 800 }))
-    })
+    React.useLayoutEffect(() => {
+      const gl = new WebGLRenderingContext({ width: 1280, height: 800 })
+      onContextCreate(gl)
+    }, [])
 
     return null
   },

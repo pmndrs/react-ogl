@@ -1,5 +1,4 @@
 module.exports = {
-  silent: true,
   transform: {
     '^.+\\.(mjs|jsx?)$': '<rootDir>/tests/utils/transform.js',
   },

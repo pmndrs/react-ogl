@@ -72,7 +72,7 @@
     "prebuild": "rimraf dist",
     "build": "swc src -d dist",
     "postbuild": "tsc && node patch-targets",
-    "test": "jest",
+    "test": "swc src -d dist && jest",
     "lint": "prettier . --check && eslint src/**/*.{ts,tsx}",
     "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}",
     "publish": "npm run build && npm publish dist --access public"
