@@ -62,7 +62,6 @@ export type Events = {
  */
 export type EventHandlers = {
   onClick?: (event: MouseEvent) => void
-  onHover?: (event: MouseEvent) => void
   onPointerUp?: (event: PointerEvent) => void
   onPointerDown?: (event: PointerEvent) => void
   onPointerMove?: (event: PointerEvent) => void

@@ -154,11 +154,11 @@ export const createEvents = (state: RootState) => {
         state.hovered.set(object.id, object)
 
         // Fire hover events
-        if (handlers?.onHover) handlers.onHover(event)
-        if (handlers?.onPointerOver) handlers.onPointerOver(event)
-      } else if (handlers?.[type]) {
+        handlers.onPointerMove?.(event)
+        handlers.onPointerOver?.(event)
+      } else {
         // Otherwise, fire its generic event
-        handlers[type](event)
+        handlers[type]?.(event)
       }
     })
 
