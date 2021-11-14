@@ -132,8 +132,8 @@ export const createEvents = (state: RootState) => {
 
   const handleEvent = (event: PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
-    state.mouse.x = (event.clientX / state.renderer.width) * 2 - 1
-    state.mouse.y = -(event.clientY / state.renderer.height) * 2 + 1
+    state.mouse.x = (event.offsetX / state.renderer.width) * 2 - 1
+    state.mouse.y = -(event.offsetY / state.renderer.height) * 2 + 1
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
