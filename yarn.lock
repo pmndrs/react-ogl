@@ -1298,16 +1298,6 @@
     "@swc/core-win32-ia32-msvc" "^1.2.108"
     "@swc/core-win32-x64-msvc" "^1.2.108"
 
-"@swc/helpers@^0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@swc/helpers/-/helpers-0.2.14.tgz#20288c3627442339dd3d743c944f7043ee3590f0"
-  integrity sha512-wpCQMhf5p5GhNg2MmGKXzUNwxe7zRiCsmqYsamez2beP7mKPCSiu+BjZcdN95yYSzO857kr0VfQewmGpS77nqA==
-
-"@swc/jest@^0.2.5":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@swc/jest/-/jest-0.2.5.tgz#2c9a84974208524e70192f1ff1c090cf6252c292"
-  integrity sha512-7Vb+RXuXWk47QbOPJ3hwSIMCwUVylp7JUhUITVtMe3hMoBv0IMfVCML9p6jiRhoBAzjzYDPPteKoVxSUJjFNPA==
-
 "@testing-library/dom@^8.0.0":
   version "8.11.1"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.11.1.tgz#03fa2684aa09ade589b460db46b4c7be9fc69753"
