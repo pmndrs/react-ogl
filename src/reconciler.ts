@@ -18,9 +18,6 @@ export const extend = (objects: Catalogue) =>
  * Creates an OGL element from a React node.
  */
 export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
-  // Get gl context
-  const gl = props?.gl || root?.gl
-
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -36,13 +33,23 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
   if (!object && GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
-    // Add gl to beginning of args and accept props as args
-    const attrs = Object.entries(props || {}).reduce((acc, [key, value]) => {
+    // Checks whether arg is an instance of a GL context
+    const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
+
+    // Get gl arg, use root gl as fallback
+    const gl = args?.find((arg) => isGL(arg)) ?? root.gl
+
+    // Get attribute arg
+    const attrs = args?.find((arg) => !isGL(arg)) ?? {}
+
+    // Accept props as args
+    const propAttrs = Object.entries(props || {}).reduce((acc, [key, value]) => {
       if (!key.includes('-')) acc[key] = value
       return acc
-    }, args?.[0] || {})
+    }, attrs)
 
-    args = [gl, attrs]
+    // Rebuild args
+    args = [gl, propAttrs]
   }
 
   // Create instance
@@ -59,7 +66,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   }
 
   // Set initial props
-  applyProps(instance, { gl, ...props })
+  applyProps(instance, props)
 
   return instance
 }
