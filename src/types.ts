@@ -91,7 +91,7 @@ export interface EventManager {
 /**
  * useFrame subscription.
  */
-export type Subscription = (state: RootState) => any
+export type Subscription = (state: RootState, time: number) => any
 
 /**
  * react-ogl internal state.

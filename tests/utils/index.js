@@ -4,7 +4,7 @@ import { createInternals } from '../../dist'
  * Renders JSX into OGL state.
  */
 export const render = (element, config) => {
-  // Create canvas shim
+  // Create canvas
   const canvas = document.createElement('canvas')
 
   // Init internals

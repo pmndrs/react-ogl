@@ -36,7 +36,7 @@ describe('renderer', () => {
       state = render(
         <mesh>
           <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
-          <program vertex="vertex" fragment="fragment" />
+          <normalProgram />
         </mesh>,
       )
     })
@@ -85,7 +85,7 @@ describe('renderer', () => {
     const Mesh = ({ value }) => (
       <mesh>
         <box />
-        <program vertex="vertex" fragment="fragment" uniforms={{ uniform: { value } }} />
+        <normalProgram uniforms={{ uniform: { value } }} />
       </mesh>
     )
 
@@ -105,9 +105,6 @@ describe('renderer', () => {
   it('should accept props as geometry attributes', async () => {
     let state
 
-    const vertex = 'vertex'
-    const fragment = 'fragment'
-
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
 
@@ -115,7 +112,7 @@ describe('renderer', () => {
       state = render(
         <mesh>
           <geometry position={position} uv={uv} />
-          <program vertex={vertex} fragment={fragment} />
+          <normalProgram />
         </mesh>,
       )
     })
