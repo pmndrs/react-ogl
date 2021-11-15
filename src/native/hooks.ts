@@ -5,7 +5,7 @@ import { readAsStringAsync } from 'expo-file-system'
 import { decode } from 'base64-arraybuffer'
 import { suspend } from 'suspend-react'
 import { useOGL } from '../hooks'
-import { buildGraph } from '../utils'
+import { buildGraph } from '../shared/utils'
 
 /**
  * Generates an asset based on input type.

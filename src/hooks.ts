@@ -1,13 +1,5 @@
 import * as React from 'react'
-// @ts-ignore
-import * as OGL from 'ogl'
-import { buildGraph } from './utils'
 import { RootState, Subscription } from './types'
-
-/**
- * An SSR-friendly useLayoutEffect.
- */
-export const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
 
 /**
  * Internal OGL context.
@@ -40,11 +32,4 @@ export const useFrame = (callback: Subscription, renderPriority = 0) => {
     state.subscribe(ref, renderPriority)
     return () => void state.unsubscribe(ref, renderPriority)
   }, [state, renderPriority])
-}
-
-/**
- * Creates an `ObjectMap` from an object.
- */
-export const useGraph = (object: OGL.Transform) => {
-  return React.useMemo(() => buildGraph(object), [object])
 }

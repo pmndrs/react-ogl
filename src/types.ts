@@ -133,11 +133,6 @@ export type RenderProps = {
   mode?: keyof typeof RENDER_MODES
 }
 
-export type ObjectMap = {
-  nodes: { [name: string]: OGL.Mesh }
-  programs: { [name: string]: OGL.Program }
-}
-
 /**
  *
  * OGL / JSX types

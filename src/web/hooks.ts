@@ -2,7 +2,7 @@
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import { useOGL } from '../hooks'
-import { buildGraph } from '../utils'
+import { buildGraph } from '../shared/utils'
 
 /**
  * Loads assets suspensefully.
