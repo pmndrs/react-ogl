@@ -63,10 +63,7 @@ export const useLoader = (loader: any, input: string | string[], extensions: (lo
             // Otherwise, create a localUri and a file buffer
             const { localUri } = await getAsset(url).downloadAsync()
             const arrayBuffer = await toBuffer(localUri as string)
-
-            // Unpack binaries and parse
-            const desc = localUri.endsWith('.glb') ? loader.unpackGLB(arrayBuffer) : arrayBuffer
-            data = await loader.parse(gl, desc)
+            data = await loader.parse(gl, arrayBuffer)
           }
 
           // Cleanup GLTF and build a graph
