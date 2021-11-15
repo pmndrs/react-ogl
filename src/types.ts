@@ -177,7 +177,7 @@ export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
 export type ProgramProps = Node<OGL.Program, typeof OGL.Program> & {
   vertex?: string
   fragment?: string
-  uniforms?: { [uniform: string]: { value: any; [prop: string]: string } }
+  uniforms?: { [uniform: string]: number[] | string | any }
 }
 export type RendererProps = Node<OGL.Renderer, typeof OGL.Renderer>
 export type CameraProps = TransformNode<OGL.Camera, typeof OGL.Camera>

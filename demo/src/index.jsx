@@ -53,9 +53,7 @@ const Box = (props) => {
             gl_FragColor.a = 1.0;
           }
         `}
-        uniforms={{
-          uColor: { value: hovered ? hotpink : orange },
-        }}
+        uniforms={{ uColor: hovered ? hotpink : orange }}
       />
     </mesh>
   )

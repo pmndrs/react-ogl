@@ -102,6 +102,25 @@ describe('renderer', () => {
     expect(state.scene.children[0].program.uniforms.uniform.value).toBe(true)
   })
 
+  it('should accept shorthand props as uniforms', async () => {
+    let state
+
+    await reconciler.act(async () => {
+      state = render(
+        <mesh>
+          <box />
+          <normalProgram uniforms={{ color: 'white', vector: [0, 0, 0] }} />
+        </mesh>,
+      )
+    })
+
+    const [mesh] = state.scene.children
+    const { color, vector } = mesh.program.uniforms
+
+    expect(color.value instanceof OGL.Color).toBe(true)
+    expect(vector.value instanceof OGL.Vec3).toBe(true)
+  })
+
   it('should accept props as geometry attributes', async () => {
     let state
 

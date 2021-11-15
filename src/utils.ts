@@ -3,13 +3,23 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { createRoot } from './renderer'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { RESERVED_PROPS } from './constants'
+import { COLORS, RESERVED_PROPS } from './constants'
 import { Instance, InstanceProps, RootState, EventHandlers, RenderProps, Subscription } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
  */
 export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.substring(1)
+
+/**
+ * Converts a stringified color name into a Color.
+ */
+export const toColor = (colorname: string) => new OGL.Color(COLORS[colorname] ?? colorname)
+
+/**
+ * Converts an array of integers into a Vector.
+ */
+export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...values)
 
 /**
  * Filters keys from an object.
@@ -64,6 +74,34 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
           target.set(...scalar)
         }
       } else {
+        // Allow shorthand values for uniforms
+        if (key === 'uniforms') {
+          value = Object.entries(value).reduce((acc, [uniform, entry]) => {
+            // Handle uniforms which don't have a value key set
+            if (entry.value === undefined) {
+              let value: any
+
+              if (typeof entry === 'string') {
+                // Uniform is a string, convert it into a color
+                value = toColor(entry)
+              } else if (Array.isArray(entry)) {
+                // Uniform is an array, convert it into a vector
+                value = toVector(entry)
+              } else {
+                // Uniform is something else, don't convert it
+                value = entry
+              }
+
+              entry = { value }
+            }
+
+            acc[uniform] = entry
+
+            return acc
+          }, {})
+        }
+
+        // Mutate the property directly
         root[key] = value
       }
     })
