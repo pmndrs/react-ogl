@@ -65,7 +65,7 @@ export const useLoader = (loader: any, input: string | string[], extensions: (lo
             const arrayBuffer = await toBuffer(localUri as string)
 
             // Unpack binaries and parse
-            const desc = url?.endsWith('.glb') ? loader.unpackGLB(arrayBuffer) : arrayBuffer
+            const desc = localUri.endsWith('.glb') ? loader.unpackGLB(arrayBuffer) : arrayBuffer
             data = await loader.parse(gl, desc)
           }
 
