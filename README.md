@@ -31,8 +31,8 @@ import { createRoot } from 'react-ogl'
 
 // Init rendering internals
 const renderer = new OGL.Renderer({ canvas })
-const camera = new OGL.Camera()
-const scene = new OGL.Transform()
+const camera = new OGL.Camera(renderer.gl)
+const scene = new OGL.Transform(renderer.gl)
 
 // Or you can use our own internals. This will also set up a render loop.
 // const { root, renderer, camera, scene } = createInternals(camera, config)
@@ -76,9 +76,7 @@ root.render(
           gl_FragColor.a = 1.0;
         }
       `}
-      uniforms={{
-        uColor: { value: new OGL.Color(0xf5ce54) },
-      }}
+      uniforms={{ uColor: 'white' } }}
     />
   </mesh>,
 )
@@ -111,13 +109,9 @@ npm run start
 Inside of our app, we can use the same API as @react-three/fiber but with OGL elements and methods.
 
 ```jsx
-import * as OGL from 'ogl'
 import { useRef, useState } from 'react'
 import { useFrame, Canvas } from 'react-ogl/web'
 import { render } from 'react-dom'
-
-const hotpink = new OGL.Color(0xfba2d4)
-const orange = new OGL.Color(0xf5ce54)
 
 const Box = (props) => {
   const mesh = useRef()
@@ -166,9 +160,7 @@ const Box = (props) => {
             gl_FragColor.a = 1.0;
           }
         `}
-        uniforms={{
-          uColor: { value: hovered ? hotpink : orange },
-        }}
+        uniforms={{ uColor: hovered ? 'hotpink' : 'orange' }}
       />
     </mesh>
   )
@@ -210,13 +202,9 @@ expo start
 Inside of our app, you can use the same API as web while running on native OpenGLES — no webview needed.
 
 ```js
-import * as OGL from 'ogl'
 import { useRef, useState } from 'react'
 import { useFrame, Canvas } from 'react-ogl/native'
 import { registerRootComponent } from 'expo'
-
-const hotpink = new OGL.Color(0xfba2d4)
-const orange = new OGL.Color(0xf5ce54)
 
 const Box = (props) => {
   const mesh = useRef()
@@ -265,9 +253,7 @@ const Box = (props) => {
             gl_FragColor.a = 1.0;
           }
         `}
-        uniforms={{
-          uColor: { value: hovered ? hotpink : orange },
-        }}
+        uniforms={{ uColor: hovered ? 'hotpink' : 'orange' }}
       />
     </mesh>
   )
