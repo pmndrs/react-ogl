@@ -1,3 +1,5 @@
+// @ts-ignore
+import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import { useOGL } from '../hooks'
 import { buildGraph } from '../utils'
@@ -18,6 +20,9 @@ export const useLoader = (loader: any, input: string | string[], extensions: (lo
 
       const result = await Promise.all(
         urls.map(async (url) => {
+          // OGL's loaders don't have a consistent signature
+          if (loader === OGL.TextureLoader) return loader.load(gl, { url })
+
           const data = await loader.load(gl, url)
 
           // Cleanup GLTF and build a graph
