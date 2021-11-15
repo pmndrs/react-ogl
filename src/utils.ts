@@ -169,7 +169,7 @@ export const buildGraph = (object: OGL.Mesh) => {
         data.nodes[obj.name] = obj
       }
 
-      if (obj.program && !data.programs[obj.program.gltfMaterial.name]) {
+      if (obj.program?.gltfMaterial && !data.programs[obj.program.gltfMaterial.name]) {
         data.programs[obj.program.gltfMaterial.name] = obj.program
       }
     })
