@@ -182,6 +182,9 @@ export const createEvents = (state: RootState) => {
     intersects.forEach((object) => {
       const handlers = object.__handlers
 
+      // Bail if object doesn't have handlers (managed externally)
+      if (!handlers) return
+
       if (isHoverEvent && !state.hovered.get(object.id)) {
         // Mark object as hovered and fire its hover events
         state.hovered.set(object.id, object)
@@ -244,12 +247,15 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   }
 
   // Create or accept camera, apply props
-  const camera = props.camera instanceof OGL.Camera ? props.camera : new OGL.Camera({ ...(props.camera as any) })
+  const camera =
+    props.camera instanceof OGL.Camera
+      ? props.camera
+      : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(props.camera as any) })
   camera.position.z = 5
   if (props.camera) applyProps(camera, props.camera as InstanceProps)
 
   // Create scene
-  const scene = new OGL.Transform()
+  const scene = new OGL.Transform(gl)
 
   // Init rendering internals for useFrame, keep track of subscriptions
   let priority = 0
