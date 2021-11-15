@@ -4,7 +4,7 @@ import * as OGL from 'ogl'
 import { createRoot } from './renderer'
 import { useIsomorphicLayoutEffect } from './hooks'
 import { COLORS, RESERVED_PROPS } from './constants'
-import { Instance, InstanceProps, RootState, EventHandlers, RenderProps, Subscription } from './types'
+import { Instance, InstanceProps, RootState, EventHandlers, RenderProps, Subscription, ObjectMap } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -157,6 +157,25 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
   })
 
   return changedProps
+}
+
+// Collects nodes and programs from a Mesh
+export const buildGraph = (object: OGL.Mesh) => {
+  const data: ObjectMap = { nodes: {}, programs: {} }
+
+  if (object) {
+    object.traverse((obj: any) => {
+      if (obj.name) {
+        data.nodes[obj.name] = obj
+      }
+
+      if (obj.program && !data.programs[obj.program.gltfMaterial.name]) {
+        data.programs[obj.program.gltfMaterial.name] = obj.program
+      }
+    })
+  }
+
+  return data
 }
 
 /**
