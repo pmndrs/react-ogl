@@ -17,7 +17,7 @@ export type Filter<T, O> = T extends []
 /**
  * Extended OGL namespace.
  */
-export type Catalogue = { [key: string]: OGL.Transform }
+export type Catalogue = { [key: string]: any }
 
 /**
  * Base OGL React instance.
@@ -98,7 +98,7 @@ export type Subscription = (state: RootState, time: number) => any
 export interface RootState {
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
-  scene: OGL.Transform
+  scene: Omit<OGL.Transform, 'children'> & { children: any[] }
   camera: OGL.Camera
   priority: number
   subscribed: Subscription[]
@@ -126,7 +126,7 @@ export type RenderProps = {
   renderer?: OGL.Renderer | Partial<NonFunctionKeys<OGL.Renderer>> | Partial<OGL.RendererOptions>
   gl?: OGL.OGLRenderingContext
   frameloop?: 'always' | 'never'
-  camera?: OGL.Camera | Partial<NonFunctionKeys<OGL.Camera>> | Partial<OGL.CameraOptions>
+  camera?: CameraProps | Partial<NonFunctionKeys<OGL.Camera>> | Partial<OGL.CameraOptions>
   orthographic?: boolean
   events?: EventManager
   onCreated?: (state: RootState) => any
@@ -174,7 +174,7 @@ export type PrimitiveProps = { object: any } & { [properties: string]: any }
 export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
   [attributes: string]: { data: Float32Array; size: number }
 }
-export type ProgramProps = Node<OGL.Program, typeof OGL.Program> & {
+export type ProgramProps = Omit<Node<OGL.Program, typeof OGL.Program>, 'uniforms'> & {
   vertex?: string
   fragment?: string
   uniforms?: { [uniform: string]: number[] | string | any }
@@ -210,7 +210,7 @@ export type PostProps = Node<OGL.Post, typeof OGL.Post>
 export type SkinProps = TransformNode<OGL.Skin, typeof OGL.Skin>
 export type AnimationProps = Node<OGL.Animation, typeof OGL.Animation>
 // export type TextProps = Node<OGL.Text, typeof OGL.Text>
-// export type NormalProgramProps = Node<OGL.NormalProgram, typeof OGL.NormalProgram>
+export type NormalProgramProps = Omit<ProgramProps, 'vertex' | 'fragment'>
 export type FlowmapProps = Node<OGL.Flowmap, typeof OGL.Flowmap>
 export type GPGPUProps = Node<OGL.GPGPU, typeof OGL.GPGPU>
 // export type PolylineProps = Node<OGL.Polyline, typeof OGL.Polyline>
@@ -261,7 +261,7 @@ declare global {
       skin: SkinProps
       animation: AnimationProps
       // text: TextProps
-      // normalProgram: NormalProgramProps
+      normalProgram: NormalProgramProps
       flowmap: FlowmapProps
       gPGPU: GPGPUProps
       // polyline: PolylineProps
