@@ -71,7 +71,7 @@ export const createEvents = (state: RootState) => {
     })
 
     // Cleanup stale hover events
-    if (isHoverEvent) {
+    if (isHoverEvent || type === 'onPointerDown') {
       state.hovered.forEach((object: Instance) => {
         const handlers = object.__handlers
 
