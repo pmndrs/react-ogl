@@ -199,6 +199,17 @@ npm install ogl react-ogl
 expo start
 ```
 
+We'll also need to configure `metro.config.js` to look for the mjs file extension that ogl uses.
+
+```js
+module.exports = {
+  resolver: {
+    sourceExts: ['json', 'js', 'jsx', 'ts', 'tsx', 'cjs', 'mjs'],
+    assetExts: ['glb', 'png', 'jpg'],
+  },
+}
+```
+
 Inside of our app, you can use the same API as web while running on native OpenGLES — no webview needed.
 
 ```js
