@@ -51,10 +51,10 @@ export const events: EventManager = {
     )
 
     // Create event manager
-    const manager = new Pressability()
+    const manager = new Pressability(state.events.handlers)
 
     // Mark events as connected
-    state.events.connected = manager
+    state.events.connected = manager.getEventHandlers()
   },
   /**
    * Deletes and disconnects event listeners from canvas.

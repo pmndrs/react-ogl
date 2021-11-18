@@ -30,7 +30,7 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
   const internalState = React.useRef<RootState>()
   const [{ width, height }, setSize] = React.useState({ width: 0, height: 0 })
   const [context, setContext] = React.useState<GLContext | null>()
-  const [bind, setBind] = React.useState()
+  const [bind, setBind] = React.useState<any>()
   const [block, setBlock] = React.useState<SetBlock>(false)
   const [error, setError] = React.useState<any>(false)
 
@@ -67,8 +67,8 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
 
       // Bind events
       if (internalState.current.events) {
-        const manager = internalState.current.events.connected as any
-        setBind(manager.getEventHandlers?.())
+        const listeners = internalState.current.events.connected
+        setBind(listeners)
       }
     }
 
