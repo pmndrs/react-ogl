@@ -1,11 +1,22 @@
 import * as React from 'react'
+// @ts-ignore
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { extend, reconciler } from '../dist'
+import { Node, extend, reconciler, RootState } from '../src'
+
+class CustomElement extends OGL.Transform {}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      customElement: Node<CustomElement, typeof CustomElement>
+    }
+  }
+}
 
 describe('renderer', () => {
   it('should render JSX', async () => {
-    let state
+    let state: RootState
 
     await reconciler.act(async () => {
       state = render(<transform />)
@@ -15,9 +26,7 @@ describe('renderer', () => {
   })
 
   it('should render extended elements', async () => {
-    let state
-
-    class CustomElement extends OGL.Transform {}
+    let state: RootState
 
     await reconciler.act(async () => {
       extend({ CustomElement })
@@ -30,7 +39,7 @@ describe('renderer', () => {
   })
 
   it('should set pierced props', async () => {
-    let state
+    let state: RootState
 
     await reconciler.act(async () => {
       state = render(
@@ -59,7 +68,7 @@ describe('renderer', () => {
   })
 
   it('should accept vertex and fragment as program args', async () => {
-    let state
+    let state: RootState
 
     const vertex = 'vertex'
     const fragment = 'fragment'
@@ -80,7 +89,7 @@ describe('renderer', () => {
   })
 
   it('should update program uniforms reactively', async () => {
-    let state
+    let state: RootState
 
     const Mesh = ({ value }) => (
       <mesh>
@@ -103,7 +112,7 @@ describe('renderer', () => {
   })
 
   it('should accept shorthand props as uniforms', async () => {
-    let state
+    let state: RootState
 
     await reconciler.act(async () => {
       state = render(
@@ -122,7 +131,7 @@ describe('renderer', () => {
   })
 
   it('should accept props as geometry attributes', async () => {
-    let state
+    let state: RootState
 
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
@@ -149,6 +158,7 @@ describe('renderer', () => {
     await reconciler.act(async () => {
       const state = render(<transform />, {
         events: {
+          connected: false,
           connect: () => (bind = true),
           disconnect: () => (unbind = true),
         },

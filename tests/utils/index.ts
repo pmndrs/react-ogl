@@ -1,9 +1,10 @@
-import { createInternals } from '../../dist'
+import * as React from 'react'
+import { createInternals, RenderProps, RootState } from '../../src'
 
 /**
  * Renders JSX into OGL state.
  */
-export const render = (element, config) => {
+export const render = (element: React.ReactNode, config?: RenderProps): RootState => {
   // Create canvas
   const canvas = document.createElement('canvas')
 

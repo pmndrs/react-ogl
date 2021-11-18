@@ -3,8 +3,8 @@
     "baseUrl": "src",
     "jsx": "react",
     "paths": {
-      "react-ogl": ["../../dist"],
-      "react-ogl/*": ["../../dist/*"]
+      "react-ogl": ["../../src"],
+      "react-ogl/*": ["../../src/*"]
     }
   }
 }

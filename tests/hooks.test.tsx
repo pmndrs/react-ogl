@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { render } from './utils'
-import { reconciler, OGLContext, useOGL, useFrame } from '../dist'
+import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
-    let state
+    let state: RootState
 
     const Test = () => {
       state = useOGL()
@@ -13,7 +13,7 @@ describe('useOGL', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={'test'}>
+        <OGLContext.Provider value={'test' as any}>
           <Test />
         </OGLContext.Provider>,
       )
@@ -37,11 +37,11 @@ describe('useOGL', () => {
 
 describe('useFrame', () => {
   it('should subscribe an element to the frameloop', async () => {
-    let state
-    let time
+    let state: RootState
+    let time: number
 
-    const subscribe = (callback) => {
-      callback.current('test', 1)
+    const subscribe = (callback: React.MutableRefObject<Subscription>) => {
+      callback.current('test' as any, 1)
     }
 
     const Test = () => {
@@ -54,7 +54,7 @@ describe('useFrame', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={{ subscribe }}>
+        <OGLContext.Provider value={{ subscribe } as any}>
           <Test />
         </OGLContext.Provider>,
       )
@@ -67,7 +67,7 @@ describe('useFrame', () => {
   it('should accept render priority', async () => {
     let priority = 0
 
-    const subscribe = (_, renderPriority) => {
+    const subscribe = (_: React.MutableRefObject<Subscription>, renderPriority: number) => {
       if (renderPriority) priority += renderPriority
     }
 
@@ -78,7 +78,7 @@ describe('useFrame', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={{ subscribe }}>
+        <OGLContext.Provider value={{ subscribe } as any}>
           <Test />
         </OGLContext.Provider>,
       )

@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { render } from '@testing-library/react-native'
-import { reconciler, Canvas } from '../dist/native'
+import { render, RenderResult } from '@testing-library/react'
+import { reconciler, Canvas } from '../src/web'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer
+    let renderer: RenderResult
 
     await reconciler.act(async () => {
       renderer = render(
@@ -18,7 +18,7 @@ describe('Canvas', () => {
   })
 
   it('should forward ref', async () => {
-    const ref = React.createRef()
+    const ref = React.createRef<HTMLCanvasElement>()
 
     await reconciler.act(async () => {
       render(
@@ -32,7 +32,7 @@ describe('Canvas', () => {
   })
 
   it('should correctly unmount', async () => {
-    let renderer
+    let renderer: RenderResult
 
     await reconciler.act(async () => {
       renderer = render(

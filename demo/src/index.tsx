@@ -1,15 +1,17 @@
+// @ts-ignore
 import * as OGL from 'ogl'
-import { useRef, useState } from 'react'
+import * as React from 'react'
 import { render } from 'react-dom'
-import { useFrame, Canvas } from 'react-ogl/web'
+// @ts-ignore
+import { MeshProps, useFrame, Canvas } from 'react-ogl/web'
 
 const hotpink = new OGL.Color(0xfba2d4)
 const orange = new OGL.Color(0xf5ce54)
 
-const Box = (props) => {
-  const mesh = useRef()
-  const [hovered, setHover] = useState(false)
-  const [active, setActive] = useState(false)
+const Box = (props: MeshProps) => {
+  const mesh = React.useRef<OGL.Mesh>()
+  const [hovered, setHover] = React.useState(false)
+  const [active, setActive] = React.useState(false)
 
   useFrame(() => (mesh.current.rotation.x += 0.01))
 

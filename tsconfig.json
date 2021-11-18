@@ -13,6 +13,5 @@
     "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "tests", "dist"]
+  "exclude": ["node_modules", "dist"]
 }

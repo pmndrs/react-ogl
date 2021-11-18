@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   resolve: {
     alias: {
-      'react-ogl': path.resolve('../dist'),
+      'react-ogl': path.resolve('../src'),
     },
   },
   plugins: [react()],

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import { reconciler, Canvas } from '../dist/web'
+import { reconciler, Canvas } from '../src/web'
 
 it('handles onClick', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handleOnClick = jest.fn()
 
   await reconciler.act(async () => {
@@ -18,8 +18,8 @@ it('handles onClick', async () => {
   })
 
   const event = new MouseEvent('click')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
 
   fireEvent(canvas.current, event)
 
@@ -27,7 +27,7 @@ it('handles onClick', async () => {
 })
 
 it('handles onPointerUp', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerUp = jest.fn()
 
   await reconciler.act(async () => {
@@ -42,8 +42,8 @@ it('handles onPointerUp', async () => {
   })
 
   const event = new PointerEvent('pointerup')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
 
   fireEvent(canvas.current, event)
 
@@ -51,7 +51,7 @@ it('handles onPointerUp', async () => {
 })
 
 it('handles onPointerDown', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerDown = jest.fn()
 
   await reconciler.act(async () => {
@@ -66,8 +66,8 @@ it('handles onPointerDown', async () => {
   })
 
   const event = new PointerEvent('pointerdown')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
 
   fireEvent(canvas.current, event)
 
@@ -75,7 +75,7 @@ it('handles onPointerDown', async () => {
 })
 
 it('handles onPointerMove', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerMove = jest.fn()
 
   await reconciler.act(async () => {
@@ -90,8 +90,8 @@ it('handles onPointerMove', async () => {
   })
 
   const event = new PointerEvent('pointermove')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
 
   fireEvent(canvas.current, event)
 
@@ -99,7 +99,7 @@ it('handles onPointerMove', async () => {
 })
 
 it('handles onPointerOver', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handleOnPointerOver = jest.fn()
 
   await reconciler.act(async () => {
@@ -114,8 +114,8 @@ it('handles onPointerOver', async () => {
   })
 
   const event = new PointerEvent('pointermove')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
 
   fireEvent(canvas.current, event)
 
@@ -123,7 +123,7 @@ it('handles onPointerOver', async () => {
 })
 
 it('handles onPointerOut', async () => {
-  const canvas = React.createRef()
+  const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerOut = jest.fn()
 
   await reconciler.act(async () => {
@@ -139,14 +139,14 @@ it('handles onPointerOut', async () => {
 
   // Move pointer over mesh
   const event = new PointerEvent('pointermove')
-  event.offsetX = 640
-  event.offsetY = 400
+  ;(event as any).offsetX = 640
+  ;(event as any).offsetY = 400
   fireEvent(canvas.current, event)
 
   // Move pointer away from mesh
   const event2 = new PointerEvent('pointermove')
-  event2.offsetX = 0
-  event2.offsetY = 0
+  ;(event2 as any).offsetX = 0
+  ;(event2 as any).offsetY = 0
 
   fireEvent(canvas.current, event2)
 

@@ -1,12 +1,12 @@
 module.exports = {
   transform: {
-    '^.+\\.(mjs|jsx?)$': '<rootDir>/tests/utils/transform.js',
+    '^.+\\.m?[tj]sx?$': '<rootDir>/tests/utils/transform.js',
   },
   transformIgnorePatterns: ['node_modules/(?!ogl)'],
-  testMatch: ['<rootDir>/tests/**/*.test.{js,jsx}'],
+  testMatch: ['<rootDir>/tests/**/*.test.{js,jsx,ts,tsx}'],
   testEnvironment: 'jsdom',
-  moduleFileExtensions: ['js', 'jsx'],
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
   verbose: true,
   testTimeout: 30000,
-  setupFilesAfterEnv: ['<rootDir>/tests/utils/setupTests.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/utils/setupTests.ts'],
 }

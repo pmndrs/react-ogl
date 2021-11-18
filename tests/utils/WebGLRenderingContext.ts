@@ -133,7 +133,7 @@ const functions = [
   'viewport',
 ]
 
-const enums = {
+const enums: { [key: string]: any } = {
   DEPTH_BUFFER_BIT: 256,
   STENCIL_BUFFER_BIT: 1024,
   COLOR_BUFFER_BIT: 16384,
@@ -433,7 +433,7 @@ const enums = {
   BROWSER_DEFAULT_WEBGL: 37444,
 }
 
-const extensions = {
+const extensions: { [key: string]: any } = {
   // ratified
   OES_texture_float: {},
   OES_texture_half_float: {},
@@ -483,12 +483,10 @@ const extensions = {
   },
 }
 
-const GL_VERSION = 7938
-const SCISSOR_BOX = 3088
-const VIEWPORT = 2978
-
 class WebGLRenderingContext {
-  constructor(canvas) {
+  [key: string]: any
+
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
     this.drawingBufferWidth = canvas.width
     this.drawingBufferHeight = canvas.height
@@ -510,17 +508,21 @@ class WebGLRenderingContext {
     }
   }
 
-  getParameter = (paramId) => {
+  private GL_VERSION = 7938
+  private SCISSOR_BOX = 3088
+  private VIEWPORT = 2978
+
+  getParameter = (paramId: number) => {
     switch (paramId) {
-      case GL_VERSION:
+      case this.GL_VERSION:
         return ['WebGL1']
-      case SCISSOR_BOX:
-      case VIEWPORT:
+      case this.SCISSOR_BOX:
+      case this.VIEWPORT:
         return [0, 0, 1, 1]
     }
   }
 
-  getExtension = (ext) => {
+  getExtension = (ext: string) => {
     return extensions[ext]
   }
 
@@ -529,4 +531,4 @@ class WebGLRenderingContext {
   getShaderInfoLog = () => ''
 }
 
-module.exports = WebGLRenderingContext
+export default WebGLRenderingContext
