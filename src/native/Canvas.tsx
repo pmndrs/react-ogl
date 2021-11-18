@@ -64,12 +64,6 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
         events,
         ...internalProps,
       })
-
-      // Bind events
-      if (internalState.current.events) {
-        const listeners = internalState.current.events.connected
-        setBind(listeners)
-      }
     }
 
     if (width > 0 && height > 0) {
@@ -89,6 +83,9 @@ export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest 
           <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
         </ErrorBoundary>,
       )
+
+      // Bind events
+      if (!bind) setBind(state.events.connected)
     }
   }, [width, height, context, internalProps, children])
 
