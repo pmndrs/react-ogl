@@ -7,7 +7,7 @@ import { buildGraph } from '../shared/utils'
 /**
  * Loads assets suspensefully.
  */
-export const useLoader = (loader: any, input: string | string[], extensions: (loader: any) => void) => {
+export const useLoader = (loader: any, input: string | string[], extensions?: (loader: any) => void) => {
   const { gl } = useOGL()
 
   // Put keys into an array so their contents are spread and cached with suspend
