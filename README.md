@@ -1,5 +1,10 @@
 # react-ogl
 
+[![Version](https://img.shields.io/npm/v/react-ogl?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/react-ogl)
+[![Downloads](https://img.shields.io/npm/dt/react-ogl.svg?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/react-ogl)
+[![Twitter](https://img.shields.io/twitter/follow/pmndrs?label=%40pmndrs&style=flat&colorA=000000&colorB=000000&logo=twitter&logoColor=000000)](https://twitter.com/pmndrs)
+[![Discord](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=000000)](https://discord.gg/poimandres)
+
 Declaratively create scenes with re-usable OGL components that have their own state and effects and can tap into React's infinite ecosystem.
 
 ### Installation
@@ -30,8 +35,10 @@ import * as OGL from 'ogl'
 import { createRoot } from 'react-ogl'
 
 // Init rendering internals
+const canvas = document.querySelector('canvas')
 const renderer = new OGL.Renderer({ canvas })
 const camera = new OGL.Camera(renderer.gl)
+camera.position.z = 5
 const scene = new OGL.Transform(renderer.gl)
 
 // Or you can use our own internals. This will also set up a render loop.
@@ -76,13 +83,17 @@ root.render(
           gl_FragColor.a = 1.0;
         }
       `}
-      uniforms={{ uColor: 'white' } }}
+      uniforms={{ uColor: 'white' }}
     />
   </mesh>,
 )
 
 // Render to screen
-renderer.render({ scene, camera })
+const animate = () => {
+  requestAnimationFrame(animate)
+  renderer.render({ scene, camera })
+}
+animate()
 ```
 
 react-ogl itself is super minimal, but you can use the familiar @react-three/fiber API with some helpers targeted for different platforms:
@@ -213,7 +224,7 @@ module.exports = {
 Inside of our app, you can use the same API as web while running on native OpenGLES — no webview needed.
 
 ```js
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useFrame, Canvas } from 'react-ogl/native'
 import { registerRootComponent } from 'expo'
 
