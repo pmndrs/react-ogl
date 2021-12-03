@@ -26,6 +26,7 @@
     }
   },
   "rules": {
+    "react/display-name": "off",
     "react/prop-types": "off",
     "no-console": "off",
     "no-empty-pattern": "warn",

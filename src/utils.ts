@@ -11,7 +11,7 @@ export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.s
 /**
  * Converts a stringified color name into a Color.
  */
-export const toColor = (colorname: string) => new OGL.Color(COLORS[colorname] ?? colorname)
+export const toColor = (name: keyof typeof COLORS) => new OGL.Color(COLORS[name] ?? name)
 
 /**
  * Converts an array of integers into a Vector.
@@ -80,7 +80,7 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
 
               if (typeof entry === 'string') {
                 // Uniform is a string, convert it into a color
-                value = toColor(entry)
+                value = toColor(entry as keyof typeof COLORS)
               } else if (Array.isArray(entry)) {
                 // Uniform is an array, convert it into a vector
                 value = toVector(entry)
