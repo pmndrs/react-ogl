@@ -3,13 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
-    "@vitejs/plugin-react": "^1.0.7",
-    "vite": "^2.4.3"
-  },
-  "dependencies": {
-    "ogl": "^0.0.76",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "@vitejs/plugin-react": "^1.1.4",
+    "vite": "^2.7.13"
   },
   "scripts": {
     "dev": "vite",

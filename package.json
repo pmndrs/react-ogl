@@ -1,6 +1,6 @@
 {
   "name": "react-ogl",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A barebones react renderer for OGL.",
   "bugs": {
     "url": "https://github.com/pmndrs/react-ogl/issues"
@@ -18,44 +18,47 @@
   "license": "MIT",
   "sideEffects": false,
   "devDependencies": {
-    "@swc/cli": "^0.1.52",
-    "@swc/core": "^1.2.113",
+    "@swc/cli": "^0.1.55",
+    "@swc/core": "^1.2.133",
     "@testing-library/react": "^12.1.2",
-    "@testing-library/react-native": "^8.0.0",
-    "@types/jest": "^27.0.3",
-    "@types/react": "^17.0.37",
+    "@testing-library/react-native": "^9.0.0",
+    "@types/jest": "^27.4.0",
+    "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
-    "@types/react-native": "^0.66.3",
+    "@types/react-native": "^0.66.15",
     "@types/react-reconciler": "^0.26.4",
     "@types/scheduler": "^0.16.2",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
-    "eslint": "^8.3.0",
-    "eslint-plugin-import": "^2.24.2",
-    "eslint-plugin-react": "^7.25.7",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "jest": "^27.3.1",
-    "ogl": "^0.0.76",
+    "expo-asset": "^8.4.6",
+    "expo-file-system": "^13.1.2",
+    "jest": "^27.4.7",
+    "ogl": "^0.0.81",
     "ogl-typescript": "^0.1.40",
-    "prettier": "^2.5.0",
+    "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-native": "^0.66.2",
+    "react-native": "^0.67.1",
     "react-test-renderer": "^17.0.2",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.5"
   },
   "dependencies": {
     "base64-arraybuffer": "^1.0.1",
-    "expo-asset": "^8.4.3",
-    "expo-file-system": "^13.0.3",
-    "expo-gl": "^11.0.3",
+    "expo-gl": "^11.1.1",
     "react-merge-refs": "^1.1.0",
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
     "suspend-react": "^0.0.8"
   },
   "peerDependencies": {
+    "expo": ">=43.0",
+    "expo-asset": ">=8.4",
+    "expo-file-system": ">=13.0",
     "ogl": ">=0.0.72",
     "react": ">=17.0",
     "react-dom": ">=17.0",
@@ -67,6 +70,15 @@
     },
     "react-native": {
       "optional": true
+    },
+    "expo": {
+      "optional": true
+    },
+    "expo-asset": {
+      "optional": true
+    },
+    "expo-file-system": {
+      "optional": true
     }
   },
   "scripts": {
@@ -75,7 +87,7 @@
     "build": "swc src -d dist",
     "postbuild": "tsc && node patch-targets",
     "test": "jest",
-    "lint": "prettier . --check && eslint **/*.{ts,tsx}",
+    "lint": "eslint **/*.{ts,tsx} && prettier . --check",
     "lint-fix": "prettier . --write && eslint --fix **/*.{ts,tsx}"
   }
 }
