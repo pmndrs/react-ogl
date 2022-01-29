@@ -287,6 +287,8 @@ const App = () => (
     <Box position={[1.2, 0, 0]} />
   </Canvas>
 )
+
+export default App
 ```
 
 </details>
