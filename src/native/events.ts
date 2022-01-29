@@ -34,8 +34,8 @@ export const events: EventManager = {
       event.persist()
 
       // Apply offset
-      ;(event.nativeEvent as any).offsetX = event.nativeEvent.pageX
-      ;(event.nativeEvent as any).offsetY = event.nativeEvent.pageY
+      ;(event.nativeEvent as any).offsetX = event.nativeEvent.locationX
+      ;(event.nativeEvent as any).offsetY = event.nativeEvent.locationY
 
       // Handle event
       return handleEvent(event.nativeEvent as unknown as PointerEvent, type)
@@ -49,12 +49,11 @@ export const events: EventManager = {
       }),
       {},
     )
-
     // Create event manager
     const manager = new Pressability(state.events.handlers)
-
-    // Mark events as connected
     state.events.connected = manager.getEventHandlers()
+
+    return state.events.connected
   },
   /**
    * Deletes and disconnects event listeners from canvas.
