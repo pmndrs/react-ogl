@@ -193,21 +193,22 @@ render(
 
 <br />
 
-This example uses [`expo-cli`](https://docs.expo.dev/get-started/create-a-new-app) for the sake of simplicity, but you can use your own barebones setup if you wish.
+This example uses [`expo-cli`](https://docs.expo.dev/get-started/create-a-new-app) but you can create a bare app with `react-native` CLI as well.
 
 ```bash
-# Install expo-cli, this will create our app
-npm install expo-cli -g
-
 # Create app and cd into it
-expo init my-app
+npx expo init my-app # or npx react-native init my-app
 cd my-app
 
-# Install dependencies
+# Automatically install & link expo modules
+npx install-expo-modules
+expo install expo-gl
+
+# Install NPM dependencies
 npm install ogl react-ogl
 
 # Start
-expo start
+npm run start
 ```
 
 We'll also need to configure `metro.config.js` to look for the mjs file extension that ogl uses.
@@ -216,7 +217,7 @@ We'll also need to configure `metro.config.js` to look for the mjs file extensio
 module.exports = {
   resolver: {
     sourceExts: ['json', 'js', 'jsx', 'ts', 'tsx', 'cjs', 'mjs'],
-    assetExts: ['glb', 'png', 'jpg'],
+    assetExts: ['glb', 'gltf', 'png', 'jpg'],
   },
 }
 ```
@@ -226,7 +227,6 @@ Inside of our app, you can use the same API as web while running on native OpenG
 ```js
 import React, { useRef, useState } from 'react'
 import { useFrame, Canvas } from 'react-ogl/native'
-import { registerRootComponent } from 'expo'
 
 const Box = (props) => {
   const mesh = useRef()
@@ -287,8 +287,6 @@ const App = () => (
     <Box position={[1.2, 0, 0]} />
   </Canvas>
 )
-
-registerRootComponent(App)
 ```
 
 </details>

@@ -19,7 +19,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@swc/cli": "^0.1.55",
-    "@swc/core": "^1.2.133",
+    "@swc/core": "^1.2.135",
     "@testing-library/react": "^12.1.2",
     "@testing-library/react-native": "^9.0.0",
     "@types/jest": "^27.4.0",
@@ -28,14 +28,15 @@
     "@types/react-native": "^0.66.15",
     "@types/react-reconciler": "^0.26.4",
     "@types/scheduler": "^0.16.2",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
-    "eslint": "^8.7.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.8.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "expo-asset": "^8.4.6",
     "expo-file-system": "^13.1.2",
+    "expo-gl": "^11.1.1",
     "jest": "^27.4.7",
     "ogl": "^0.0.81",
     "ogl-typescript": "^0.1.40",
@@ -49,7 +50,6 @@
   },
   "dependencies": {
     "base64-arraybuffer": "^1.0.1",
-    "expo-gl": "^11.1.1",
     "react-merge-refs": "^1.1.0",
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
@@ -59,6 +59,7 @@
     "expo": ">=43.0",
     "expo-asset": ">=8.4",
     "expo-file-system": ">=13.0",
+    "expo-gl": ">=11.0",
     "ogl": ">=0.0.72",
     "react": ">=17.0",
     "react-dom": ">=17.0",
@@ -72,6 +73,9 @@
       "optional": true
     },
     "expo": {
+      "optional": true
+    },
+    "expo-gl": {
       "optional": true
     },
     "expo-asset": {
