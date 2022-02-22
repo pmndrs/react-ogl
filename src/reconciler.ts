@@ -260,5 +260,5 @@ export const reconciler = Reconciler({
 reconciler.injectIntoDevTools({
   bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
   rendererPackageName: 'react-ogl',
-  version: '0.1.0',
+  version: '17.0.2',
 })
