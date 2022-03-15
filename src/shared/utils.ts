@@ -40,11 +40,16 @@ export const createEvents = (state: RootState) => {
     state.mouse.x = (event.offsetX / state.renderer.width) * 2 - 1
     state.mouse.y = -(event.offsetY / state.renderer.height) * 2 + 1
 
+    // Filter to interactive meshes
+    const interactive: OGL.Mesh[] = []
+    state.scene.traverse((node: OGL.Mesh) => {
+      // Mesh has a defined volume
+      if (node?.geometry?.attributes?.position) interactive.push(node)
+    })
+
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Instance[] = state.raycaster.intersectBounds(
-      state.scene.children.filter((child: OGL.Mesh) => child?.geometry?.attributes?.position) as OGL.Mesh[],
-    )
+    const intersects: Instance[] = state.raycaster.intersectBounds(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
