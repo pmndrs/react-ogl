@@ -43,8 +43,8 @@ export const createEvents = (state: RootState) => {
     // Filter to interactive meshes
     const interactive: OGL.Mesh[] = []
     state.scene.traverse((node: OGL.Mesh) => {
-      // Mesh has a defined volume
-      if (node?.geometry?.attributes?.position) interactive.push(node)
+      // Mesh has registered events and a defined volume
+      if (node.__handlers && node?.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
