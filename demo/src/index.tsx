@@ -66,7 +66,7 @@ const Box = (props: MeshProps) => {
             vec3 normal = normalize(vNormal);
             float lighting = dot(normal, normalize(vec3(10)));
 
-            gl_FragColor.rgb = vec3(vUv, 1.0) + lighting * 0.1;
+            gl_FragColor.rgb = uColor + lighting * 0.1;
             gl_FragColor.rgb = mix (vec3(0.0), gl_FragColor.rgb, step(0.01, length(uPoint - vUv)));
             gl_FragColor.a = 1.0;
           }
