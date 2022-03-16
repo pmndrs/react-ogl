@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`applyProps should diff & merge uniforms 1`] = `
+Object {
+  "a": Object {
+    "value": 0,
+  },
+  "b": Object {
+    "value": 1,
+  },
+  "c": Object {
+    "value": 2,
+  },
+}
+`;
