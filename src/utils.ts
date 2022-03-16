@@ -75,7 +75,7 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
         if (key === 'uniforms') {
           Object.entries(value).forEach(([uniform, entry]) => {
             // Handle uniforms which don't have a value key set
-            if (entry.value === undefined) {
+            if (entry?.value === undefined) {
               let value: any
 
               if (typeof entry === 'string') {
