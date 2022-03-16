@@ -1,5 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`applyProps should accept scalar shorthand 1`] = `
+Array [
+  3,
+  3,
+  3,
+]
+`;
+
+exports[`applyProps should accept shorthand uniforms 1`] = `
+Object {
+  "bar": Object {
+    "value": 1,
+  },
+  "foo": Object {
+    "value": 0,
+  },
+}
+`;
+
+exports[`applyProps should convert CSS color names to color uniforms 1`] = `
+Object {
+  "color": Object {
+    "value": Color [
+      1,
+      0,
+      0,
+    ],
+  },
+}
+`;
+
+exports[`applyProps should convert arrays into vector uniforms 1`] = `
+Object {
+  "uv": Object {
+    "value": Vec2 [
+      0,
+      1,
+    ],
+  },
+}
+`;
+
 exports[`applyProps should diff & merge uniforms 1`] = `
 Object {
   "a": Object {
@@ -12,4 +54,18 @@ Object {
     "value": 2,
   },
 }
+`;
+
+exports[`applyProps should pierce into nested properties 1`] = `
+Object {
+  "color": "red",
+}
+`;
+
+exports[`applyProps should spread array prop values 1`] = `
+Array [
+  1,
+  2,
+  3,
+]
 `;
