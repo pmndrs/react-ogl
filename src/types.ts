@@ -1,4 +1,5 @@
 import type * as OGL from 'ogl-typescript'
+import { Vec2, Vec3 } from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 import { RENDER_MODES } from './constants'
 
@@ -57,16 +58,33 @@ export type Events = {
   onPointerMove: EventListener
 }
 
+export interface IHitResult {
+  localPoint: Vec3
+  point: Vec3
+  distance: number
+
+  faceNormal?: Vec3
+  localFaceNormal?: Vec3
+  localNormal?: Vec3
+  normal?: Vec3
+
+  uv?: Vec2
+}
+
+export interface IEventPair<T> {
+  event: T
+  hit?: IHitResult
+}
 /**
  * react-ogl event handlers.
  */
 export type EventHandlers = {
-  onClick?: (event: MouseEvent) => void
-  onPointerUp?: (event: PointerEvent) => void
-  onPointerDown?: (event: PointerEvent) => void
-  onPointerMove?: (event: PointerEvent) => void
-  onPointerOver?: (event: PointerEvent) => void
-  onPointerOut?: (event: PointerEvent) => void
+  onClick?: (event: IEventPair<MouseEvent>) => void
+  onPointerUp?: (event: IEventPair<PointerEvent>) => void
+  onPointerDown?: (event: IEventPair<PointerEvent>) => void
+  onPointerMove?: (event: IEventPair<PointerEvent>) => void
+  onPointerOver?: (event: IEventPair<PointerEvent>) => void
+  onPointerOut?: (event: IEventPair<PointerEvent>) => void
 }
 
 /**
