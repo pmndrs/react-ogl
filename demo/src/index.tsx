@@ -13,14 +13,14 @@ const Box = (props: MeshProps) => {
   const [hovered, setHover] = React.useState(false)
   const [active, setActive] = React.useState(false)
 
-  const programRef = React.useRef<OGL.Program>();
+  const programRef = React.useRef<OGL.Program>()
 
-  let point = [0,0];
+  let point = [0, 0]
 
   useFrame(() => {
-    mesh.current.rotation.x += 0.01;
-    (programRef.current.uniforms as Record<string, {value: any}>).uPoint.value = point;
-  });
+    mesh.current.rotation.x += 0.01
+    ;(programRef.current.uniforms as Record<string, { value: any }>).uPoint.value = point
+  })
 
   return (
     <mesh
@@ -32,9 +32,9 @@ const Box = (props: MeshProps) => {
       onPointerOut={() => setHover(false)}
       onPointerMove={({ hit }) => hit && (point = hit.uv)}
     >
-      <box/>
+      <box />
       <program
-        ref={ programRef }
+        ref={programRef}
         vertex={`
           attribute vec3 position;
           attribute vec3 normal;
@@ -71,7 +71,7 @@ const Box = (props: MeshProps) => {
             gl_FragColor.a = 1.0;
           }
         `}
-        uniforms={{ uColor: hovered ? hotpink : orange, uPoint: [0,0] }}
+        uniforms={{ uColor: hovered ? hotpink : orange, uPoint: [0, 0] }}
       />
     </mesh>
   )
