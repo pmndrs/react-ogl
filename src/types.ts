@@ -1,5 +1,4 @@
 import type * as OGL from 'ogl-typescript'
-import { Vec2, Vec3 } from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 import { RENDER_MODES } from './constants'
 
@@ -59,16 +58,16 @@ export type Events = {
 }
 
 export interface IHitResult {
-  localPoint: Vec3
-  point: Vec3
+  localPoint: OGL.Vec3
+  point: OGL.Vec3
   distance: number
 
-  faceNormal?: Vec3
-  localFaceNormal?: Vec3
-  localNormal?: Vec3
-  normal?: Vec3
+  faceNormal?: OGL.Vec3
+  localFaceNormal?: OGL.Vec3
+  localNormal?: OGL.Vec3
+  normal?: OGL.Vec3
 
-  uv?: Vec2
+  uv?: OGL.Vec2
 }
 
 export interface IEventPair<T> {

@@ -1,6 +1,5 @@
 // @ts-ignore
 import * as OGL from 'ogl'
-import { Program } from 'ogl-typescript'
 import * as React from 'react'
 import { render } from 'react-dom'
 // @ts-ignore
@@ -14,13 +13,13 @@ const Box = (props: MeshProps) => {
   const [hovered, setHover] = React.useState(false)
   const [active, setActive] = React.useState(false)
 
-  const programRef = React.useRef<Program>();
+  const programRef = React.useRef<OGL.Program>();
 
   let point = [0,0];
 
   useFrame(() => {
     mesh.current.rotation.x += 0.01;
-    programRef.current.uniforms.uPoint.value = point;
+    (programRef.current.uniforms as Record<string, {value: any}>).uPoint.value = point;
   });
 
   return (
