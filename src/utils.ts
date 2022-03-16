@@ -73,9 +73,9 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
       } else {
         // Allow shorthand values for uniforms
         if (key === 'uniforms') {
-          value = Object.entries(value).reduce((acc, [uniform, entry]) => {
+          Object.entries(value).forEach(([uniform, entry]) => {
             // Handle uniforms which don't have a value key set
-            if (entry.value === undefined) {
+            if (entry?.value === undefined) {
               let value: any
 
               if (typeof entry === 'string') {
@@ -92,10 +92,10 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
               entry = { value }
             }
 
-            acc[uniform] = entry
-
-            return acc
-          }, {})
+            root[key][uniform] = entry
+          })
+          // we apply uniforms directly to object as patch, not need apply value
+          return
         }
 
         // Mutate the property directly
