@@ -49,7 +49,7 @@ export const createEvents = (state: RootState) => {
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Instance[] = state.raycaster.intersectBounds(interactive)
+    const intersects: Instance[] = state.raycaster.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -67,11 +67,11 @@ export const createEvents = (state: RootState) => {
         state.hovered.set(object.id, object)
 
         // Fire hover events
-        handlers.onPointerMove?.(event)
-        handlers.onPointerOver?.(event)
+        handlers.onPointerMove?.({ event, hit: object.hit })
+        handlers.onPointerOver?.({ event, hit: object.hit })
       } else {
         // Otherwise, fire its generic event
-        handlers[type]?.(event)
+        handlers[type]?.({ event, hit: object.hit })
       }
     })
 
@@ -85,7 +85,7 @@ export const createEvents = (state: RootState) => {
           state.hovered.delete(object.id)
 
           // Fire unhover event
-          if (handlers?.onPointerOut) handlers.onPointerOut(event)
+          if (handlers?.onPointerOut) handlers.onPointerOut({ event, hit: object.hit })
         }
       })
     }

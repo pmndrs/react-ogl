@@ -57,16 +57,33 @@ export type Events = {
   onPointerMove: EventListener
 }
 
+export interface IHitResult {
+  localPoint: OGL.Vec3
+  point: OGL.Vec3
+  distance: number
+
+  faceNormal?: OGL.Vec3
+  localFaceNormal?: OGL.Vec3
+  localNormal?: OGL.Vec3
+  normal?: OGL.Vec3
+
+  uv?: OGL.Vec2
+}
+
+export interface IEventPair<T> {
+  event: T
+  hit?: IHitResult
+}
 /**
  * react-ogl event handlers.
  */
 export type EventHandlers = {
-  onClick?: (event: MouseEvent) => void
-  onPointerUp?: (event: PointerEvent) => void
-  onPointerDown?: (event: PointerEvent) => void
-  onPointerMove?: (event: PointerEvent) => void
-  onPointerOver?: (event: PointerEvent) => void
-  onPointerOut?: (event: PointerEvent) => void
+  onClick?: (event: IEventPair<MouseEvent>) => void
+  onPointerUp?: (event: IEventPair<PointerEvent>) => void
+  onPointerDown?: (event: IEventPair<PointerEvent>) => void
+  onPointerMove?: (event: IEventPair<PointerEvent>) => void
+  onPointerOver?: (event: IEventPair<PointerEvent>) => void
+  onPointerOut?: (event: IEventPair<PointerEvent>) => void
 }
 
 /**
