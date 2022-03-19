@@ -104,7 +104,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   const renderer =
     props.renderer instanceof OGL.Renderer
       ? props.renderer
-      : typeof props.renderer === 'function' 
+      : typeof props.renderer === 'function'
       ? props.renderer(canvas)
       : new OGL.Renderer({
           antialias: true,
