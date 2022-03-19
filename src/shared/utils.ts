@@ -112,7 +112,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
           ...(props.renderer as any),
           canvas: canvas,
         })
-  if (props.renderer) applyProps(renderer, props.renderer as InstanceProps)
+  if (props.renderer && typeof props.renderer !== 'function') applyProps(renderer, props.renderer as InstanceProps)
   const gl = renderer.gl
   gl.clearColor(1, 1, 1, 0)
 
