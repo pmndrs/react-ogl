@@ -130,6 +130,8 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
     parentInstance[child.attach] = null;
   }
 
+  if (child.dispose) return child.dispose()
+  if (child.remove) return child.remove()
   // TODO: handle dispose
 }
 

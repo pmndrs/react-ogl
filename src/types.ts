@@ -28,6 +28,8 @@ export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach'> & {
   __attached?: Record<string, BaseInstance>;
   children: Instance[]
   attach?: string
+  remove?(): void
+  dispose?(): void
 }
 
 /**
