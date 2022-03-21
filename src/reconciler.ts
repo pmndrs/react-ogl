@@ -125,7 +125,7 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
     parentInstance?.removeChild?.(child)
   }
 
-  if (parentInstance?.__attached[child.attach]) {
+  if (parentInstance?.__attached?.[child.attach]) {
     delete parentInstance.__attached[child.attach];
     parentInstance[child.attach] = null;
   }
