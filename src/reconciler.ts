@@ -84,9 +84,14 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
     instance.children = []
   }
 
+  if (instance.__attached) {
+    Object.values(instance.__attached).forEach((attach) => appendChild(newInstance, attach))
+  }
+
+  const parent = instance.parent;
   // Replace instance in scene-graph
-  removeChild(instance.parent, instance)
-  appendChild(instance.parent, newInstance)
+  removeChild(parent, instance)
+  appendChild(parent, newInstance)
 
   return newInstance
 }
@@ -100,6 +105,8 @@ export const appendChild = (parentInstance: Instance, child: Instance) => {
   // Attach material, geometry, fog, etc.
   if (child.attach) {
     parentInstance[child.attach] = child
+    parentInstance.__attached = parentInstance.__attached || {};
+    parentInstance.__attached[child.attach] = child;
   } else {
     child.setParent?.(parentInstance)
   }
@@ -118,6 +125,13 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
     parentInstance?.removeChild?.(child)
   }
 
+  if (parentInstance?.__attached?.[child.attach]) {
+    delete parentInstance.__attached[child.attach];
+    parentInstance[child.attach] = null;
+  }
+
+  if (child.dispose) return child.dispose()
+  if (child.remove) return child.remove()
   // TODO: handle dispose
 }
 
