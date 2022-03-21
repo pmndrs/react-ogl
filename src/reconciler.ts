@@ -84,9 +84,10 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
     instance.children = []
   }
 
+  const parent = instance.parent;
   // Replace instance in scene-graph
-  removeChild(instance.parent, instance)
-  appendChild(instance.parent, newInstance)
+  removeChild(parent, instance)
+  appendChild(parent, newInstance)
 
   return newInstance
 }
