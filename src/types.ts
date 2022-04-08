@@ -167,7 +167,7 @@ export interface NodeProps<T> {
   /** Constructor arguments */
   args?: Filter<Args<T>, OGL.OGLRenderingContext>
   children?: React.ReactNode
-  ref?: React.Ref<React.ReactNode>
+  ref?: React.Ref<React.ReactNode | {}>
   key?: React.Key
 }
 
