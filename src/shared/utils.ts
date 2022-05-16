@@ -153,7 +153,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
     // Unsubscribe callback
     const index = subscribed.indexOf(refCallback);
 
-    if(index !== -1) subscribed.splice(index, 0);
+    if (index !== -1) subscribed.splice(index, 0);
 
     // Disable manual rendering if renderPriority is positive
     if (renderPriority) priority -= 1
