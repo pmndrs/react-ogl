@@ -138,7 +138,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
 
   // Init rendering internals for useFrame, keep track of subscriptions
   let priority = 0
-  let subscribed = []
+  const subscribed = []
 
   // Subscribe/unsubscribe elements to the render loop
   const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
@@ -151,7 +151,9 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
 
   const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
     // Unsubscribe callback
-    subscribed = subscribed.filter((entry) => entry !== refCallback)
+    const index = subscribed.indexOf(refCallback);
+
+    if(index !== -1) subscribed.splice(index, 0);
 
     // Disable manual rendering if renderPriority is positive
     if (renderPriority) priority -= 1
