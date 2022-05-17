@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as OGL from 'ogl'
-import { COLORS, RESERVED_PROPS } from './constants'
+import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
 import { Instance, InstanceProps } from './types'
 
 /**
@@ -33,7 +33,9 @@ export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
 export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
   // Filter identical props and reserved keys
   const identical = Object.keys(newProps).filter((key) => newProps[key] === oldProps[key])
-  const handlers = Object.keys(newProps).filter((key) => typeof newProps[key] === 'function' && key.startsWith('on'))
+  const handlers = Object.keys(newProps).filter(
+    (key) => typeof newProps[key] === 'function' && POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number]),
+  )
   const props = filterKeys(newProps, true, ...identical, ...handlers, ...RESERVED_PROPS)
 
   // Mutate our OGL element
