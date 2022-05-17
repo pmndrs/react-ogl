@@ -17,7 +17,11 @@ export const extend = (objects: Catalogue) =>
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
+export const createInstance = (
+  type: string,
+  { object, args, gl: passGL, ...props }: InstanceProps,
+  root: RootState,
+) => {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -32,7 +36,10 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  if (!object && GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
+  if (
+    !object &&
+    (passGL || GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target))
+  ) {
     // Checks whether arg is an instance of a GL context
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
 
