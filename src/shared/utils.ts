@@ -151,9 +151,9 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
 
   const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
     // Unsubscribe callback
-    const index = subscribed.indexOf(refCallback);
+    const index = subscribed.indexOf(refCallback)
 
-    if (index !== -1) subscribed.splice(index, 0);
+    if (index !== -1) subscribed.splice(index, 0)
 
     // Disable manual rendering if renderPriority is positive
     if (renderPriority) priority -= 1
