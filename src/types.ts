@@ -156,9 +156,7 @@ export type RenderProps = {
 }
 
 /**
- *
  * OGL / JSX types
- *
  */
 
 export interface NodeProps<T> {
@@ -169,6 +167,8 @@ export interface NodeProps<T> {
   children?: React.ReactNode
   ref?: React.Ref<React.ReactNode | {}>
   key?: React.Key
+  /* Whether to implicitly pass a WebGL2RenderingContext to args. Default is `true` for OGL built-in classes. */
+  gl?: boolean
 }
 
 export type Node<T, P> = Overwrite<Partial<T>, NodeProps<P>>
