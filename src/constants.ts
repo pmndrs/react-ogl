@@ -2,6 +2,18 @@
 import * as OGL from 'ogl'
 
 /**
+ * react-ogl's virtual pointer events.
+ */
+export const POINTER_EVENTS = [
+  'onClick',
+  'onPointerUp',
+  'onPointerDown',
+  'onPointerMove',
+  'onPointerOver',
+  'onPointerOut',
+] as const
+
+/**
  * OGL elements which must accept `gl` via constructor args.
  */
 export const GL_ELEMENTS = [
