@@ -88,7 +88,7 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
     Object.values(instance.__attached).forEach((attach) => appendChild(newInstance, attach))
   }
 
-  const parent = instance.parent;
+  const parent = instance.parent
   // Replace instance in scene-graph
   removeChild(parent, instance)
   appendChild(parent, newInstance)
@@ -105,8 +105,8 @@ export const appendChild = (parentInstance: Instance, child: Instance) => {
   // Attach material, geometry, fog, etc.
   if (child.attach) {
     parentInstance[child.attach] = child
-    parentInstance.__attached = parentInstance.__attached || {};
-    parentInstance.__attached[child.attach] = child;
+    parentInstance.__attached = parentInstance.__attached || {}
+    parentInstance.__attached[child.attach] = child
   } else {
     child.setParent?.(parentInstance)
   }
@@ -126,8 +126,8 @@ export const removeChild = (parentInstance: Instance, child: Instance) => {
   }
 
   if (parentInstance?.__attached?.[child.attach]) {
-    delete parentInstance.__attached[child.attach];
-    parentInstance[child.attach] = null;
+    delete parentInstance.__attached[child.attach]
+    parentInstance[child.attach] = null
   }
 
   if (child.dispose) return child.dispose()
@@ -161,8 +161,13 @@ export const insertBefore = (parentInstance: Instance, child: Instance, beforeCh
 /**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
-// @ts-ignore
 export const reconciler = Reconciler({
+  now: typeof performance !== 'undefined' ? performance.now : Date.now,
+  supportsHydration: false,
+  supportsPersistence: false,
+  scheduleTimeout: typeof setTimeout !== 'undefined' ? setTimeout : undefined,
+  cancelTimeout: typeof clearTimeout !== 'undefined' ? clearTimeout : undefined,
+  noTimeout: -1,
   // OGL elements can be updated, so we inform the renderer
   supportsMutation: true,
   // We set this to false because this can work on top of react-dom
