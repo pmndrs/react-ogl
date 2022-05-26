@@ -49,7 +49,7 @@ export const events: EventManager = {
    */
   disconnect(canvas, state) {
     // Disconnect handlers
-    Object.entries(state.events?.handlers ?? []).forEach(([name, handler]) => {
+    Object.entries(state.events.handlers ?? []).forEach(([name, handler]) => {
       canvas.removeEventListener(name, handler as any)
     })
 

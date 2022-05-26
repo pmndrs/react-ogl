@@ -43,7 +43,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
     const attrs = args?.find((arg) => !isGL(arg)) ?? {}
 
     // Accept props as args
-    const propAttrs = Object.entries(props || {}).reduce((acc, [key, value]) => {
+    const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
       if (!key.includes('-')) acc[key] = value
       return acc
     }, attrs)

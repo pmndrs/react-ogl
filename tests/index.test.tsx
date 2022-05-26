@@ -105,7 +105,7 @@ describe('renderer', () => {
     expect(state.scene.children[0].program.uniforms.uniform.value).toBe(false)
 
     await reconciler.act(async () => {
-      state = render(<Mesh value={true} />, state)
+      state = render(<Mesh value={true} />)
     })
 
     expect(state.scene.children[0].program.uniforms.uniform.value).toBe(true)

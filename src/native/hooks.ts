@@ -68,7 +68,7 @@ export const useLoader = (loader: any, input: string | string[], extensions?: (l
 
           // Cleanup GLTF and build a graph
           if (data.scene) {
-            const scene = data.scene?.length ? data.scene[0] : data.scene
+            const scene = data.scene.length ? data.scene[0] : data.scene
             const graph = buildGraph(scene)
 
             Object.assign(data, { scene, ...graph })
