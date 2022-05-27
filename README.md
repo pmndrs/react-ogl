@@ -121,7 +121,7 @@ Inside of our app, we can use the same API as @react-three/fiber but with OGL el
 
 ```jsx
 import { useRef, useState } from 'react'
-import { useFrame, Canvas } from 'react-ogl/web'
+import { useFrame, Canvas } from 'react-ogl'
 import { render } from 'react-dom'
 
 const Box = (props) => {
@@ -226,7 +226,7 @@ Inside of our app, you can use the same API as web while running on native OpenG
 
 ```js
 import React, { useRef, useState } from 'react'
-import { useFrame, Canvas } from 'react-ogl/native'
+import { useFrame, Canvas } from 'react-ogl'
 
 const Box = (props) => {
   const mesh = useRef()

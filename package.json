@@ -16,7 +16,12 @@
   ],
   "author": "Cody Bennett (https://github.com/codyjasonbennett)",
   "license": "MIT",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
   "sideEffects": false,
+  "files": [
+    "dist/*"
+  ],
   "devDependencies": {
     "@swc/cli": "^0.1.55",
     "@swc/core": "^1.2.135",
@@ -76,9 +81,7 @@
   },
   "scripts": {
     "dev": "npm run --prefix demo dev",
-    "prebuild": "rimraf dist",
-    "build": "swc src -d dist",
-    "postbuild": "tsc && node patch-targets",
+    "build": "rimraf dist && swc src -d dist && tsc",
     "test": "jest",
     "lint": "eslint **/*.{ts,tsx} && prettier . --check",
     "lint-fix": "prettier . --write && eslint --fix **/*.{ts,tsx}"

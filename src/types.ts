@@ -15,6 +15,19 @@ export type Filter<T, O> = T extends []
   : T
 
 /**
+ * Internal suspense promise type.
+ */
+export type SetBlock = false | Promise<null> | null
+
+/**
+ * A map representation of a loader result.
+ */
+export type ObjectMap = {
+  nodes: { [name: string]: OGL.Mesh }
+  programs: { [name: string]: OGL.Program }
+}
+
+/**
  * Extended OGL namespace.
  */
 export type Catalogue = { [key: string]: any }
