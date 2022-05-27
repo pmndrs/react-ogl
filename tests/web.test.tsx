@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render, RenderResult } from '@testing-library/react'
-import { reconciler, Canvas } from '../src/web'
+import { reconciler, Canvas } from '../src'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {

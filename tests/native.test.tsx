@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import { render, RenderAPI } from '@testing-library/react-native'
-import { reconciler, Canvas } from '../src/native'
+import { reconciler } from '../src'
+import { Canvas } from '../src/Canvas.native' // explicitly require native module
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {

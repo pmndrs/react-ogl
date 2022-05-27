@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import { reconciler, Canvas } from '../src/web'
+import { reconciler, Canvas } from '../src'
 
 it('handles all interactive meshes', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
