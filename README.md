@@ -222,7 +222,7 @@ module.exports = {
 }
 ```
 
-Inside of our app, you can use the same API as web while running on native OpenGLES — no webview needed.
+Inside of our app, you can use the same API as web while running on native OpenGL ES — no webview needed.
 
 ```js
 import React, { useRef, useState } from 'react'
