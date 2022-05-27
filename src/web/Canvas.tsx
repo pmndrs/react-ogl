@@ -1,7 +1,6 @@
 import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
-import mergeRefs from 'react-merge-refs'
 import { useIsomorphicLayoutEffect } from '../shared/hooks'
 import { SetBlock, ErrorBoundary, Block } from '../shared/components'
 import { createInternals } from '../shared/utils'
@@ -43,6 +42,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, Props>(
     const internalState = React.useRef<RootState>()
     const [block, setBlock] = React.useState<SetBlock>(false)
     const [error, setError] = React.useState(false)
+    React.useImperativeHandle(forwardedRef, () => canvas.current)
 
     // Suspend this component if block is a promise (2nd run)
     if (block) throw block
@@ -97,7 +97,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, Props>(
           ...style,
         }}
       >
-        <canvas ref={mergeRefs([canvas, forwardedRef])} style={{ display: 'block' }}>
+        <canvas ref={canvas} style={{ display: 'block' }}>
           {fallback}
         </canvas>
       </div>
