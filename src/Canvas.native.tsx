@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet } from 'react-native'
 import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
-import { useIsomorphicLayoutEffect } from '../shared/hooks'
-import { SetBlock, ErrorBoundary, Block } from '../shared/components'
-import { createInternals } from '../shared/utils'
-import { filterKeys } from '../utils'
+import { Block, createInternals, ErrorBoundary } from './utils'
+import { filterKeys } from './utils'
 import { events } from './events'
-import { RESERVED_PROPS } from '../constants'
-import { RenderProps, RootState } from '../types'
+import { RESERVED_PROPS } from './constants'
+import { RenderProps, RootState, SetBlock } from './types'
+import { useIsomorphicLayoutEffect } from './hooks'
+import '@expo/browser-polyfill'
 
 export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
 
-export interface Props extends Omit<RenderProps, 'dpr' | 'size'>, ViewProps {
+export interface CanvasProps extends Omit<RenderProps, 'dpr' | 'size'>, ViewProps {
   children: React.ReactNode
   style?: ViewStyle
 }
@@ -24,7 +24,7 @@ export const CANVAS_PROPS = ['renderer', 'camera', 'orthographic', 'frameloop', 
 /**
  * A resizeable canvas whose children are declarative OGL elements.
  */
-export const Canvas = React.forwardRef<View, Props>(({ children, style, ...rest }, forwardedRef) => {
+export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas({ children, style, ...rest }, forwardedRef) {
   const internalProps: RenderProps = filterKeys(rest, false, ...CANVAS_PROPS)
   const viewProps: ViewProps = filterKeys(rest, true, ...CANVAS_PROPS, ...RESERVED_PROPS)
   const internalState = React.useRef<RootState>()

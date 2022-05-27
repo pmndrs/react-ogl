@@ -1,8 +1,8 @@
 import { GestureResponderEvent } from 'react-native'
 // @ts-ignore
 import Pressability from 'react-native/Libraries/Pressability/Pressability'
-import { createEvents } from '../shared/utils'
-import { EventHandlers, EventManager } from '../types'
+import { createEvents } from './utils'
+import { EventHandlers, EventManager } from './types'
 
 /**
  * Base Pressability events and their JSX keys for native & web.

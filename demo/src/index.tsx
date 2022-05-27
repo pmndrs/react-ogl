@@ -3,7 +3,7 @@ import * as OGL from 'ogl'
 import * as React from 'react'
 import { render } from 'react-dom'
 // @ts-ignore
-import { MeshProps, useFrame, Canvas } from 'react-ogl/web'
+import { MeshProps, useFrame, Canvas } from 'react-ogl'
 
 const hotpink = new OGL.Color(0xfba2d4)
 const orange = new OGL.Color(0xf5ce54)

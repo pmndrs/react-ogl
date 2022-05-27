@@ -1,5 +1,5 @@
-import { createEvents } from '../shared/utils'
-import { EventManager } from '../types'
+import { createEvents } from './utils'
+import { EventManager } from './types'
 
 /**
  * Base DOM events and their JSX keys with passive args.

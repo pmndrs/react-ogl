@@ -2,8 +2,8 @@ import Reconciler from 'react-reconciler'
 // @ts-ignore
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { toPascalCase, applyProps, diffProps, attach, detach } from './utils'
-import { GL_ELEMENTS } from './constants'
+import { toPascalCase, applyProps, attach, detach, filterKeys } from './utils'
+import { GL_ELEMENTS, RESERVED_PROPS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
 // Custom objects that extend the OGL namespace
@@ -152,6 +152,52 @@ export const getContainer = (
   root: container?.scene ? container : container?.rootNode ?? child.rootNode,
   container: container?.scene || container,
 })
+
+/**
+ * Shallow checks objects.
+ */
+export const checkShallow = (a: any, b: any) => {
+  // If comparing arrays, shallow compare
+  if (Array.isArray(a)) {
+    // Check if types match
+    if (!Array.isArray(b)) return false
+
+    // Shallow compare for match
+    if (a == b) return true
+
+    // Sort through keys
+    if (a.every((v, i) => v === b[i])) return true
+  }
+
+  // Atomically compare
+  if (a === b) return true
+
+  return false
+}
+
+/**
+ * Prepares a set of changes to be applied to the instance.
+ */
+export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
+  // Prune reserved props
+  newProps = filterKeys(newProps, true, ...RESERVED_PROPS)
+  oldProps = filterKeys(oldProps, true, ...RESERVED_PROPS)
+
+  const changedProps: InstanceProps = {}
+
+  // Sort through props
+  Object.entries(newProps).forEach(([key, value]) => {
+    // Skip primitives
+    if (instance.isPrimitive && key === 'object') return
+    // Skip if props match
+    if (checkShallow(value, oldProps[key])) return
+
+    // Props changed, add them
+    changedProps[key] = value
+  })
+
+  return changedProps
+}
 
 /**
  * Inserts an instance between instances of a ReactNode.
