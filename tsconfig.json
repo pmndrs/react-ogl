@@ -13,5 +13,5 @@
     "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*"]
 }

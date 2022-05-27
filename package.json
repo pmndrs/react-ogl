@@ -83,7 +83,7 @@
     "dev": "npm run --prefix demo dev",
     "build": "rimraf dist && swc src -d dist && tsc",
     "test": "jest",
-    "lint": "eslint **/*.{ts,tsx} && prettier . --check",
-    "lint-fix": "prettier . --write && eslint --fix **/*.{ts,tsx}"
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}"
   }
 }

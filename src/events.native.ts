@@ -38,7 +38,7 @@ export const events: EventManager = {
       ;(event.nativeEvent as any).offsetY = event.nativeEvent.locationY
 
       // Handle event
-      return handleEvent(event.nativeEvent as unknown as PointerEvent, type)
+      return handleEvent((event.nativeEvent as unknown) as PointerEvent, type)
     }
 
     // Init handlers
