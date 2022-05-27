@@ -169,4 +169,32 @@ describe('renderer', () => {
     expect(bind).toBe(true)
     expect(unbind).toBe(true)
   })
+
+  it('will create an identical instance when reconstructing', async () => {
+    let state: RootState = null!
+
+    const Test = ({ n }: { n: number }) => (
+      // @ts-ignore args isn't a valid prop but changing it will swap
+      <transform args={[n]}>
+        <transform attach="test" />
+        <transform visible={false} />
+      </transform>
+    )
+
+    await reconciler.act(async () => {
+      state = render(<Test n={1} />)
+    })
+
+    const [oldInstance] = state.scene.children
+    oldInstance.original = true
+
+    await reconciler.act(async () => {
+      state = render(<Test n={2} />)
+    })
+
+    const [newInstance] = state.scene.children
+    expect(newInstance.original).not.toBe(true) // Created a new instance
+    expect(newInstance.children[0].visible).toBe(false) // Preserves scene hierarchy
+    expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
+  })
 })
