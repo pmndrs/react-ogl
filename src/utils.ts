@@ -28,6 +28,27 @@ export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
 }
 
 /**
+ * Attaches an instance to a parent via its `attach` prop.
+ */
+export const attach = (parent: Instance, child: Instance) => {
+  if (!child.attach) return
+
+  parent[child.attach] = child
+  parent.__attached = parent.__attached || {}
+  parent.__attached[child.attach] = child
+}
+
+/**
+ * Removes an instance from a parent via its `attach` prop.
+ */
+export const detach = (parent: Instance, child: Instance) => {
+  if (!parent?.__attached?.[child.attach]) return
+
+  delete parent.__attached[child.attach]
+  parent[child.attach] = null
+}
+
+/**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
 export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {

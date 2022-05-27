@@ -1,7 +1,8 @@
 import Reconciler from 'react-reconciler'
 // @ts-ignore
 import * as OGL from 'ogl'
-import { toPascalCase, applyProps, diffProps } from './utils'
+import * as React from 'react'
+import { toPascalCase, applyProps, diffProps, attach, detach } from './utils'
 import { GL_ELEMENTS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
@@ -17,7 +18,7 @@ export const extend = (objects: Catalogue) =>
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
+export const createInstance = (type: string, { object, args, ...props }: InstanceProps, fiber: Reconciler.Fiber) => {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -32,12 +33,13 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  if (!object && GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)) {
+  const isGLInstance = GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)
+  if (!object && isGLInstance) {
     // Checks whether arg is an instance of a GL context
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
 
     // Get gl arg, use root gl as fallback
-    const gl = args?.find((arg) => isGL(arg)) ?? root.gl
+    const gl = args?.find((arg) => isGL(arg)) ?? (fiber as unknown as RootState).gl
 
     // Get attribute arg
     const attrs = args?.find((arg) => !isGL(arg)) ?? {}
@@ -72,76 +74,81 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 }
 
 /**
- * Switches instance to a new one, moving over children.
- */
-export const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: RootState) => {
-  // Create a new instance
-  const newInstance = createInstance(type, props, root)
-
-  // Move children to new instance
-  if (!instance.isPrimitive && instance.children) {
-    instance.children.forEach((child) => appendChild(newInstance, child))
-    instance.children = []
-  }
-
-  if (instance.__attached) {
-    Object.values(instance.__attached).forEach((attach) => appendChild(newInstance, attach))
-  }
-
-  const parent = instance.parent
-  // Replace instance in scene-graph
-  removeChild(parent, instance)
-  appendChild(parent, newInstance)
-
-  return newInstance
-}
-
-/**
  * Adds elements to our scene and attaches children to their parents.
  */
-export const appendChild = (parentInstance: Instance, child: Instance) => {
+export const appendChild = (parent: Instance, child: Instance) => {
   if (!child) return
 
-  // Attach material, geometry, fog, etc.
-  if (child.attach) {
-    parentInstance[child.attach] = child
-    parentInstance.__attached = parentInstance.__attached || {}
-    parentInstance.__attached[child.attach] = child
-  } else {
-    child.setParent?.(parentInstance)
-  }
-
-  child.parent = parentInstance
+  if (!child.attach) child.setParent?.(parent)
+  child.parent = parent
 }
 
 /**
  * Removes elements from scene and disposes of them.
  */
-export const removeChild = (parentInstance: Instance, child: Instance) => {
+export const removeChild = (parent: Instance, child: Instance) => {
   if (!child) return
 
-  // Remove material, geometry, fog, etc
-  if (!child.attach && child.setParent) {
-    parentInstance?.removeChild?.(child)
+  if (child.attach) {
+    detach(parent, child)
+  } else {
+    parent?.removeChild?.(child)
   }
 
-  if (parentInstance?.__attached?.[child.attach]) {
-    delete parentInstance.__attached[child.attach]
-    parentInstance[child.attach] = null
+  child.parent = null
+  child.dispose?.()
+}
+
+/**
+ * Switches instance to a new one, moving over children.
+ */
+export const switchInstance = (instance: Instance, type: string, props: InstanceProps, fiber: Reconciler.Fiber) => {
+  // Create a new instance
+  const newInstance = createInstance(type, props, fiber)
+
+  // Move children to new instance
+  if (!instance.isPrimitive && instance.children) {
+    for (const child of instance.children) {
+      appendChild(newInstance, child)
+    }
+    instance.children = []
   }
 
-  if (child.dispose) return child.dispose()
-  if (child.remove) return child.remove()
-  // TODO: handle dispose
+  // Move over attached instances
+  if (instance.__attached) {
+    for (const attachedInstance of Object.values(instance.__attached)) {
+      attachedInstance.parent = newInstance
+      detach(instance, attachedInstance)
+      attach(newInstance, attachedInstance)
+    }
+  }
+
+  // Replace instance in scene-graph
+  removeChild(instance.parent, instance)
+  appendChild(instance.parent, newInstance)
+
+  // Switches the react-internal fiber node
+  // https://github.com/facebook/react/issues/14983
+  ;[fiber, fiber.alternate].forEach((fiber) => {
+    if (fiber !== null) {
+      fiber.stateNode = newInstance
+      if (fiber.ref) {
+        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance)
+        else (fiber.ref as Reconciler.RefObject).current = newInstance
+      }
+    }
+  })
+
+  return newInstance
 }
 
 /**
  * Gets the root store and container from a target container and child instance.
  */
 export const getContainer = (
-  container: RootState | Instance,
+  container: RootState | Instance | null,
   child: Instance,
-): { root: RootState; container: Instance } => ({
+): { root: Reconciler.Fiber; container: Instance } => ({
   root: container?.scene ? container : container?.rootNode ?? child.rootNode,
   container: container?.scene || container,
 })
@@ -149,13 +156,11 @@ export const getContainer = (
 /**
  * Inserts an instance between instances of a ReactNode.
  */
-export const insertBefore = (parentInstance: Instance, child: Instance, beforeChild: Instance) => {
+export const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) => {
   if (!child) return
 
-  child.parent = parentInstance
-
-  const index = parentInstance.children.indexOf(beforeChild)
-  parentInstance.children = [...parentInstance.children.slice(0, index), child, ...parentInstance.children.slice(index)]
+  child.parent = parent
+  parent.children.splice(parent.children.indexOf(beforeChild), 0, child)
 }
 
 /**
@@ -186,9 +191,6 @@ export const reconciler = Reconciler({
   resetAfterCommit: () => {},
   // OGL elements don't have textContent, so we skip this
   shouldSetTextContent: () => false,
-  // We can mutate elements once they're assembled into the scene graph here.
-  // applyProps removes the need for this though
-  finalizeInitialChildren: () => false,
   preparePortalMount: (container: any) => container,
   // This can modify the container and clear children.
   // Might be useful for disposing on demand later
@@ -198,29 +200,21 @@ export const reconciler = Reconciler({
   // These methods add elements to the scene
   appendChild,
   appendInitialChild: appendChild,
-  // @ts-ignore
-  appendChildToContainer(parentInstance: RootState | Instance, child: Instance) {
-    const { root, container } = getContainer(parentInstance, child)
-
-    // Update child's copy of local state
-    child.stateNode = root
-
-    // Add child to container
+  appendChildToContainer(parent: RootState | Instance, child: Instance) {
+    const { container } = getContainer(parent, child)
     appendChild(container, child)
   },
   // These methods remove elements from the scene
   removeChild,
-  // @ts-ignore
-  removeChildFromContainer(parentInstance: RootState | Instance, child: Instance) {
-    const { container } = getContainer(parentInstance, child)
+  removeChildFromContainer(parent: RootState | Instance, child: Instance) {
+    const { container } = getContainer(parent, child)
     removeChild(container, child)
   },
   // We can specify an order for children to be specified here.
   // This is useful if you want to override stuff like materials
   insertBefore,
-  // @ts-ignore
-  insertInContainerBefore(parentInstance: RootState | Instance, child: Instance, beforeChild: Instance) {
-    const { container } = getContainer(parentInstance, child)
+  insertInContainerBefore(parent: RootState | Instance, child: Instance, beforeChild: Instance) {
+    const { container } = getContainer(parent, child)
     insertBefore(container, child, beforeChild)
   },
   // Used to calculate updates in the render phase or commitUpdate.
@@ -238,8 +232,9 @@ export const reconciler = Reconciler({
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
     if (instance instanceof OGL.Geometry) {
-      const oldAttributes = Object.keys(oldProps).filter((key) => !key.startsWith('attributes-'))
-      if (oldAttributes.some((key) => oldProps[key] !== newProps[key])) return [true]
+      for (const key in oldProps) {
+        if (!key.startsWith('attributes-') && oldProps[key] !== newProps[key]) return [true]
+      }
     }
 
     // If the instance has new props or arguments, recreate it
@@ -259,25 +254,38 @@ export const reconciler = Reconciler({
     type: string,
     oldProps: InstanceProps,
     newProps: InstanceProps,
-    root: RootState,
+    fiber: Reconciler.Fiber,
   ) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps, root)
+    if (reconstruct) return switchInstance(instance, type, newProps, fiber)
 
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)
   },
   hideInstance(instance: Instance) {
-    instance.visible = false
+    if (instance instanceof OGL.Transform) instance.visible = false
   },
-  unhideInstance(instance: Instance) {
-    instance.visible = true
+  unhideInstance(instance: Instance, props: InstanceProps) {
+    if ((instance instanceof OGL.Transform && props.visible == null) || props.visible) instance.visible = true
+  },
+  finalizeInitialChildren(instance: Instance) {
+    // https://github.com/facebook/react/issues/20271
+    // Returning true will trigger commitMount
+    return !!instance.attach
+  },
+  commitMount(instance: Instance) {
+    // https://github.com/facebook/react/issues/20271
+    // This will make sure attachments are only added once to the central container through suspense
+    if (instance.attach) attach(instance.parent, instance)
   },
 })
 
 // Injects renderer meta into devtools.
 reconciler.injectIntoDevTools({
+  findFiberByHostInstance(instance: Instance) {
+    return getContainer(instance.parent, instance.child).root
+  },
   bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
+  version: React.version,
   rendererPackageName: 'react-ogl',
-  version: '17.0.2',
 })
