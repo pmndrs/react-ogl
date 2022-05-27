@@ -94,6 +94,7 @@ jest.mock('react-native', () => ({
   ),
 }))
 jest.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
+jest.mock('@expo/browser-polyfill', () => ({}))
 jest.mock('expo-gl', () => ({
   GLView: ({ onContextCreate }) => {
     React.useLayoutEffect(() => {
