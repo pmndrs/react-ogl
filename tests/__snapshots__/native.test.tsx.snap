@@ -2716,9 +2716,9 @@ ReactTestInstance {
           "lastEffect": [Circular],
           "memoizedProps": null,
           "memoizedState": Object {
-            "element": <ForwardRef>
+            "element": <ForwardRef(Canvas)>
               <transform />
-            </ForwardRef>,
+            </ForwardRef(Canvas)>,
           },
           "mode": 0,
           "nextEffect": null,
@@ -2860,9 +2860,9 @@ ReactTestInstance {
           "type": null,
           "updateQueue": Object {
             "baseState": Object {
-              "element": <ForwardRef>
+              "element": <ForwardRef(Canvas)>
                 <transform />
-              </ForwardRef>,
+              </ForwardRef(Canvas)>,
             },
             "effects": null,
             "firstBaseUpdate": null,
@@ -3676,9 +3676,9 @@ ReactTestInstance {
         "lastEffect": [Circular],
         "memoizedProps": null,
         "memoizedState": Object {
-          "element": <ForwardRef>
+          "element": <ForwardRef(Canvas)>
             <transform />
-          </ForwardRef>,
+          </ForwardRef(Canvas)>,
         },
         "mode": 0,
         "nextEffect": null,
@@ -3718,9 +3718,9 @@ ReactTestInstance {
             "lastEffect": [Circular],
             "memoizedProps": null,
             "memoizedState": Object {
-              "element": <ForwardRef>
+              "element": <ForwardRef(Canvas)>
                 <transform />
-              </ForwardRef>,
+              </ForwardRef(Canvas)>,
             },
             "mode": 0,
             "nextEffect": null,
@@ -3735,9 +3735,9 @@ ReactTestInstance {
             "type": null,
             "updateQueue": Object {
               "baseState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "effects": null,
               "firstBaseUpdate": null,
@@ -3869,9 +3869,9 @@ ReactTestInstance {
         "type": null,
         "updateQueue": Object {
           "baseState": Object {
-            "element": <ForwardRef>
+            "element": <ForwardRef(Canvas)>
               <transform />
-            </ForwardRef>,
+            </ForwardRef(Canvas)>,
           },
           "effects": null,
           "firstBaseUpdate": null,
@@ -4426,9 +4426,9 @@ ReactTestInstance {
               "lastEffect": [Circular],
               "memoizedProps": null,
               "memoizedState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "mode": 0,
               "nextEffect": null,
@@ -4570,9 +4570,9 @@ ReactTestInstance {
               "type": null,
               "updateQueue": Object {
                 "baseState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "effects": null,
                 "firstBaseUpdate": null,
@@ -4744,9 +4744,9 @@ ReactTestInstance {
             "lastEffect": [Circular],
             "memoizedProps": null,
             "memoizedState": Object {
-              "element": <ForwardRef>
+              "element": <ForwardRef(Canvas)>
                 <transform />
-              </ForwardRef>,
+              </ForwardRef(Canvas)>,
             },
             "mode": 0,
             "nextEffect": null,
@@ -4786,9 +4786,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -4803,9 +4803,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -4937,9 +4937,9 @@ ReactTestInstance {
             "type": null,
             "updateQueue": Object {
               "baseState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "effects": null,
               "firstBaseUpdate": null,
@@ -5971,9 +5971,9 @@ ReactTestInstance {
               "lastEffect": [Circular],
               "memoizedProps": null,
               "memoizedState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "mode": 0,
               "nextEffect": null,
@@ -6115,9 +6115,9 @@ ReactTestInstance {
               "type": null,
               "updateQueue": Object {
                 "baseState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "effects": null,
                 "firstBaseUpdate": null,
@@ -6289,9 +6289,9 @@ ReactTestInstance {
             "lastEffect": [Circular],
             "memoizedProps": null,
             "memoizedState": Object {
-              "element": <ForwardRef>
+              "element": <ForwardRef(Canvas)>
                 <transform />
-              </ForwardRef>,
+              </ForwardRef(Canvas)>,
             },
             "mode": 0,
             "nextEffect": null,
@@ -6331,9 +6331,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -6348,9 +6348,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -6482,9 +6482,9 @@ ReactTestInstance {
             "type": null,
             "updateQueue": Object {
               "baseState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "effects": null,
               "firstBaseUpdate": null,
@@ -6898,9 +6898,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -7042,9 +7042,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -7139,9 +7139,9 @@ ReactTestInstance {
               "lastEffect": [Circular],
               "memoizedProps": null,
               "memoizedState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "mode": 0,
               "nextEffect": null,
@@ -7181,9 +7181,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -7198,9 +7198,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -7332,9 +7332,9 @@ ReactTestInstance {
               "type": null,
               "updateQueue": Object {
                 "baseState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "effects": null,
                 "firstBaseUpdate": null,
@@ -7981,9 +7981,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -8125,9 +8125,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -8222,9 +8222,9 @@ ReactTestInstance {
               "lastEffect": [Circular],
               "memoizedProps": null,
               "memoizedState": Object {
-                "element": <ForwardRef>
+                "element": <ForwardRef(Canvas)>
                   <transform />
-                </ForwardRef>,
+                </ForwardRef(Canvas)>,
               },
               "mode": 0,
               "nextEffect": null,
@@ -8264,9 +8264,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -8281,9 +8281,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -8415,9 +8415,9 @@ ReactTestInstance {
               "type": null,
               "updateQueue": Object {
                 "baseState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "effects": null,
                 "firstBaseUpdate": null,
@@ -8688,9 +8688,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -8832,9 +8832,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -8856,9 +8856,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -8898,9 +8898,9 @@ ReactTestInstance {
                     "lastEffect": [Circular],
                     "memoizedProps": null,
                     "memoizedState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "mode": 0,
                     "nextEffect": null,
@@ -8915,9 +8915,9 @@ ReactTestInstance {
                     "type": null,
                     "updateQueue": Object {
                       "baseState": Object {
-                        "element": <ForwardRef>
+                        "element": <ForwardRef(Canvas)>
                           <transform />
-                        </ForwardRef>,
+                        </ForwardRef(Canvas)>,
                       },
                       "effects": null,
                       "firstBaseUpdate": null,
@@ -9049,9 +9049,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -9333,9 +9333,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -9477,9 +9477,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -9501,9 +9501,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -9543,9 +9543,9 @@ ReactTestInstance {
                     "lastEffect": [Circular],
                     "memoizedProps": null,
                     "memoizedState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "mode": 0,
                     "nextEffect": null,
@@ -9560,9 +9560,9 @@ ReactTestInstance {
                     "type": null,
                     "updateQueue": Object {
                       "baseState": Object {
-                        "element": <ForwardRef>
+                        "element": <ForwardRef(Canvas)>
                           <transform />
-                        </ForwardRef>,
+                        </ForwardRef(Canvas)>,
                       },
                       "effects": null,
                       "firstBaseUpdate": null,
@@ -9694,9 +9694,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -10005,9 +10005,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -10149,9 +10149,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -10173,9 +10173,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -10215,9 +10215,9 @@ ReactTestInstance {
                     "lastEffect": [Circular],
                     "memoizedProps": null,
                     "memoizedState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "mode": 0,
                     "nextEffect": null,
@@ -10232,9 +10232,9 @@ ReactTestInstance {
                     "type": null,
                     "updateQueue": Object {
                       "baseState": Object {
-                        "element": <ForwardRef>
+                        "element": <ForwardRef(Canvas)>
                           <transform />
-                        </ForwardRef>,
+                        </ForwardRef(Canvas)>,
                       },
                       "effects": null,
                       "firstBaseUpdate": null,
@@ -10366,9 +10366,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -10650,9 +10650,9 @@ ReactTestInstance {
                   "lastEffect": [Circular],
                   "memoizedProps": null,
                   "memoizedState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -10794,9 +10794,9 @@ ReactTestInstance {
                   "type": null,
                   "updateQueue": Object {
                     "baseState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "effects": null,
                     "firstBaseUpdate": null,
@@ -10818,9 +10818,9 @@ ReactTestInstance {
                 "lastEffect": [Circular],
                 "memoizedProps": null,
                 "memoizedState": Object {
-                  "element": <ForwardRef>
+                  "element": <ForwardRef(Canvas)>
                     <transform />
-                  </ForwardRef>,
+                  </ForwardRef(Canvas)>,
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -10860,9 +10860,9 @@ ReactTestInstance {
                     "lastEffect": [Circular],
                     "memoizedProps": null,
                     "memoizedState": Object {
-                      "element": <ForwardRef>
+                      "element": <ForwardRef(Canvas)>
                         <transform />
-                      </ForwardRef>,
+                      </ForwardRef(Canvas)>,
                     },
                     "mode": 0,
                     "nextEffect": null,
@@ -10877,9 +10877,9 @@ ReactTestInstance {
                     "type": null,
                     "updateQueue": Object {
                       "baseState": Object {
-                        "element": <ForwardRef>
+                        "element": <ForwardRef(Canvas)>
                           <transform />
-                        </ForwardRef>,
+                        </ForwardRef(Canvas)>,
                       },
                       "effects": null,
                       "firstBaseUpdate": null,
@@ -11011,9 +11011,9 @@ ReactTestInstance {
                 "type": null,
                 "updateQueue": Object {
                   "baseState": Object {
-                    "element": <ForwardRef>
+                    "element": <ForwardRef(Canvas)>
                       <transform />
-                    </ForwardRef>,
+                    </ForwardRef(Canvas)>,
                   },
                   "effects": null,
                   "firstBaseUpdate": null,
@@ -19202,9 +19202,9 @@ ReactTestInstance {
         },
         "memoizedProps": null,
         "memoizedState": Object {
-          "element": <ForwardRef>
+          "element": <ForwardRef(Canvas)>
             <transform />
-          </ForwardRef>,
+          </ForwardRef(Canvas)>,
         },
         "mode": 0,
         "nextEffect": null,
@@ -19346,9 +19346,9 @@ ReactTestInstance {
         "type": null,
         "updateQueue": Object {
           "baseState": Object {
-            "element": <ForwardRef>
+            "element": <ForwardRef(Canvas)>
               <transform />
-            </ForwardRef>,
+            </ForwardRef(Canvas)>,
           },
           "effects": null,
           "firstBaseUpdate": null,
@@ -19370,9 +19370,9 @@ ReactTestInstance {
       "lastEffect": [Circular],
       "memoizedProps": null,
       "memoizedState": Object {
-        "element": <ForwardRef>
+        "element": <ForwardRef(Canvas)>
           <transform />
-        </ForwardRef>,
+        </ForwardRef(Canvas)>,
       },
       "mode": 0,
       "nextEffect": null,
@@ -19514,9 +19514,9 @@ ReactTestInstance {
       "type": null,
       "updateQueue": Object {
         "baseState": Object {
-          "element": <ForwardRef>
+          "element": <ForwardRef(Canvas)>
             <transform />
-          </ForwardRef>,
+          </ForwardRef(Canvas)>,
         },
         "effects": null,
         "firstBaseUpdate": null,
