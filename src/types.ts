@@ -23,7 +23,7 @@ export type SetBlock = false | Promise<null> | null
  * A map representation of a loader result.
  */
 export type ObjectMap = {
-  nodes: { [name: string]: OGL.Mesh }
+  nodes: { [name: string]: OGL.Transform }
   programs: { [name: string]: OGL.Program }
 }
 

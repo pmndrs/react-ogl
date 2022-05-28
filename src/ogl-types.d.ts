@@ -1,6 +1,6 @@
 declare module 'ogl' {
   export class BasisManager {
-    constructor(workerSrc: any): void
+    constructor(workerSrc: any)
     getSupportedFormat(): 'astc' | 'bptc' | 's3tc' | 'etc1' | 'pvrtc' | 'none'
     initWorker(workerSrc: any): void
     onMessage(msg: { data: { id: any; error: any; image: any } }): void

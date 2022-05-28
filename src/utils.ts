@@ -147,7 +147,7 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
 /**
  * Collects nodes and programs from a Mesh.
  */
-export const buildGraph = (object: OGL.Mesh) => {
+export const buildGraph = (object: OGL.Transform) => {
   const data: ObjectMap = { nodes: {}, programs: {} }
 
   if (object) {
@@ -178,7 +178,7 @@ export const createEvents = (state: RootState) => {
     const interactive: OGL.Mesh[] = []
     state.scene.traverse((node: OGL.Mesh) => {
       // Mesh has registered events and a defined volume
-      if (node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if ((node as Instance).__handlers && node.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
@@ -235,7 +235,7 @@ export const createEvents = (state: RootState) => {
  */
 export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): RootState => {
   // Create or accept renderer, apply props
-  const renderer =
+  const renderer = (
     props.renderer instanceof OGL.Renderer
       ? props.renderer
       : typeof props.renderer === 'function'
@@ -246,16 +246,18 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
           ...(props.renderer as any),
           canvas: canvas,
         })
-  if (props.renderer && typeof props.renderer !== 'function') applyProps(renderer, props.renderer as InstanceProps)
+  ) as OGL.Renderer
+
+  if (props.renderer && typeof props.renderer !== 'function') Object.assign(renderer, props.renderer)
   const gl = renderer.gl
   gl.clearColor(1, 1, 1, 0)
 
   // Flush frame for native
-  if (renderer.gl.endFrameEXP) {
+  if ('endFrameEXP' in renderer.gl) {
     const renderFrame = renderer.render.bind(renderer)
     renderer.render = ({ scene, camera }) => {
       renderFrame({ scene, camera })
-      renderer.gl.endFrameEXP()
+      ;(renderer.gl as any).endFrameEXP()
     }
   }
 
@@ -268,7 +270,7 @@ export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): 
   if (props.camera) applyProps(camera, props.camera as InstanceProps)
 
   // Create scene
-  const scene = new OGL.Transform(gl)
+  const scene = new OGL.Transform()
 
   // Init rendering internals for useFrame, keep track of subscriptions
   let priority = 0
