@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "es6",
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["es6", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -11,7 +11,11 @@
     "skipLibCheck": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "react-ogl": ["./src"],
+      "react-ogl/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*"]
 }

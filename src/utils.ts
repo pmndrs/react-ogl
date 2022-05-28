@@ -1,5 +1,4 @@
 import * as React from 'react'
-// @ts-ignore
 import * as OGL from 'ogl'
 import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'

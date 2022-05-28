@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>react-ogl examples</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        outline: none;
+      }
+
+      html,
+      body,
+      section,
+      section > div {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      section > div {
+        position: absolute;
+      }
+
+      a {
+        position: relative;
+        font-family: Arial, sans-serif;
+        font-size: 1.4rem;
+        inset: 1rem;
+      }
+
+      .controls {
+        cursor: grab;
+      }
+
+      .controls:active {
+        cursor: grabbing;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { render } from 'react-dom'
+
+      const demos = import.meta.glob('./src/*.tsx')
+
+      const containers = Object.keys(demos).map((key) => {
+        // Remove path bits from key
+        const name = key.replace(/\.(\/src\/|\w+$)/g, '')
+
+        // Create container
+        const container = document.createElement('section')
+        container.setAttribute('id', name)
+        document.body.appendChild(container)
+
+        // Create react entrypoint
+        const root = document.createElement('div')
+        root.setAttribute('data-key', key)
+        container.appendChild(root)
+
+        // Add section label
+        const label = document.createElement('a')
+        label.textContent = name
+        label.href = `#${name}`
+        container.appendChild(label)
+
+        return container
+      })
+
+      // Lazily load examples as they come into view
+      const observer = new IntersectionObserver(async (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const root = entry.target.querySelector('div')
+            const loadDemo = demos[root.getAttribute('data-key')]
+
+            render((await loadDemo()).default, root)
+
+            entry.target.removeAttribute('data-key')
+            observer.unobserve(entry.target)
+          }
+        }
+      })
+      containers.forEach((demo) => observer.observe(demo))
+    </script>
+  </body>
+</html>

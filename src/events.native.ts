@@ -1,5 +1,4 @@
 import { GestureResponderEvent } from 'react-native'
-// @ts-ignore
 import Pressability from 'react-native/Libraries/Pressability/Pressability'
 import { createEvents } from './utils'
 import { EventHandlers, EventManager } from './types'
@@ -38,7 +37,7 @@ export const events: EventManager = {
       ;(event.nativeEvent as any).offsetY = event.nativeEvent.locationY
 
       // Handle event
-      return handleEvent((event.nativeEvent as unknown) as PointerEvent, type)
+      return handleEvent(event.nativeEvent as unknown as PointerEvent, type)
     }
 
     // Init handlers
