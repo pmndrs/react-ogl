@@ -1,4 +1,4 @@
-import type * as OGL from 'ogl-typescript'
+import * as OGL from 'ogl'
 import type { MutableRefObject } from 'react'
 import { RENDER_MODES } from './constants'
 
@@ -168,12 +168,7 @@ export type RenderProps = {
   mode?: keyof typeof RENDER_MODES
 }
 
-/**
- *
- * OGL / JSX types
- *
- */
-
+// JSX types
 export interface NodeProps<T> {
   /** Attaches this class onto the parent under the given name and nulls it on unmount */
   attach?: string
@@ -238,23 +233,23 @@ export type SphereProps = Node<OGL.Sphere, typeof OGL.Sphere>
 export type CylinderProps = Node<OGL.Cylinder, typeof OGL.Cylinder>
 export type TriangleProps = Node<OGL.Triangle, typeof OGL.Triangle>
 export type TorusProps = Node<OGL.Torus, typeof OGL.Torus>
-// export type OrbitProps = Node<OGL.Orbit, typeof OGL.Orbit>
+export type OrbitProps = Node<OGL.Orbit, typeof OGL.Orbit>
 export type RaycastProps = Node<OGL.Raycast, typeof OGL.Raycast>
 export type CurveProps = Node<OGL.Curve, typeof OGL.Curve>
 export type PostProps = Node<OGL.Post, typeof OGL.Post>
 export type SkinProps = TransformNode<OGL.Skin, typeof OGL.Skin>
 export type AnimationProps = Node<OGL.Animation, typeof OGL.Animation>
-// export type TextProps = Node<OGL.Text, typeof OGL.Text>
+export type TextProps = Node<OGL.Text, typeof OGL.Text>
 export type NormalProgramProps = Omit<ProgramProps, 'vertex' | 'fragment'>
 export type FlowmapProps = Node<OGL.Flowmap, typeof OGL.Flowmap>
 export type GPGPUProps = Node<OGL.GPGPU, typeof OGL.GPGPU>
-// export type PolylineProps = Node<OGL.Polyline, typeof OGL.Polyline>
+export type PolylineProps = Node<OGL.Polyline, typeof OGL.Polyline>
 export type ShadowProps = Node<OGL.Shadow, typeof OGL.Shadow>
-// export type KTKTextureProps = Node<OGL.KTKTexture, typeof OGL.KTKTexture>
+export type KTXTextureProps = Node<OGL.KTXTexture, typeof OGL.KTXTexture>
 export type TextureLoaderProps = Node<OGL.TextureLoader, typeof OGL.TextureLoader>
 export type GLTFLoaderProps = Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
 export type GLTFSkinProps = TransformNode<OGL.GLTFSkin, typeof OGL.GLTFSkin>
-// export type BasisManagerProps = Node<OGL.BasisManager, typeof OGL.BasisManager>
+export type BasisManagerProps = Node<OGL.BasisManager, typeof OGL.BasisManager>
 
 declare global {
   namespace JSX {
@@ -289,7 +284,7 @@ declare global {
       cylinder: CylinderProps
       triangle: TriangleProps
       torus: TorusProps
-      // orbit: OrbitProps
+      orbit: OrbitProps
       raycast: RaycastProps
       curve: CurveProps
       post: PostProps
@@ -301,11 +296,11 @@ declare global {
       gPGPU: GPGPUProps
       // polyline: PolylineProps
       shadow: ShadowProps
-      // kTXTexture: KTKTextureProps
+      kTXTexture: KTXTextureProps
       textureLoader: TextureLoaderProps
       gLTFLoader: GLTFLoaderProps
       gLTFSkin: GLTFSkinProps
-      // basisManager: BasisManagerProps
+      basisManager: BasisManagerProps
     }
   }
 }
