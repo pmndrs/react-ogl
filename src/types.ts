@@ -207,7 +207,7 @@ export type PrimitiveProps = { object: any } & { [properties: string]: any }
 
 // Core
 export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
-  [attributes: string]: { data: Float32Array; size: number }
+  [attributes: string]: { data: ArrayBufferView; size?: number }
 }
 export type ProgramProps = Omit<Node<OGL.Program, typeof OGL.Program>, 'uniforms'> & {
   vertex?: string
