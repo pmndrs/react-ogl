@@ -1,5 +1,4 @@
 import Reconciler from 'react-reconciler'
-// @ts-ignore
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, filterKeys } from './utils'
@@ -39,7 +38,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
 
     // Get gl arg, use root gl as fallback
-    const gl = args?.find((arg) => isGL(arg)) ?? ((fiber as unknown) as RootState).gl
+    const gl = args?.find((arg) => isGL(arg)) ?? (fiber as unknown as RootState).gl
 
     // Get attribute arg
     const attrs = args?.find((arg) => !isGL(arg)) ?? {}
@@ -133,7 +132,7 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
-        if (typeof fiber.ref === 'function') ((fiber as unknown) as any).ref(newInstance)
+        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance)
         else (fiber.ref as Reconciler.RefObject).current = newInstance
       }
     }

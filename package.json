@@ -79,7 +79,7 @@
     }
   },
   "scripts": {
-    "dev": "npm run --prefix demo dev",
+    "dev": "npm run --prefix examples dev",
     "build": "rimraf dist && swc src -d dist && tsc && node patch-targets",
     "test": "jest",
     "lint": "eslint src/**/*.{ts,tsx}",

@@ -1,5 +1,4 @@
 import * as React from 'react'
-// @ts-ignore
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import { RootState, Subscription } from './types'

@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { Fiber } from 'react-reconciler'
