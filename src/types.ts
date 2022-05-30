@@ -32,17 +32,18 @@ export type ObjectMap = {
  */
 export type Catalogue = { [key: string]: any }
 
+export type Attach = string | ((parent: Instance, self: Instance) => () => void)
+
 /**
  * Base OGL React instance.
  */
 export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach'> & {
   isPrimitive?: boolean
   __handlers?: EventHandlers
-  __attached?: Record<string, BaseInstance>
+  __attached?: BaseInstance[]
+  __previousAttach?: any
   children: Instance[]
-  attach?: string
-  remove?(): void
-  dispose?(): void
+  attach?: Attach
 }
 
 /**
@@ -60,7 +61,7 @@ export type InstanceProps = {
   object?: object
   visible?: boolean
   dispose?: null
-  attach?: string
+  attach?: Attach
 }
 
 /**
@@ -176,7 +177,7 @@ export type RenderProps = {
 
 export interface NodeProps<T> {
   /** Attaches this class onto the parent under the given name and nulls it on unmount */
-  attach?: string
+  attach?: Attach
   /** Constructor arguments */
   args?: Filter<Args<T>, OGL.OGLRenderingContext>
   children?: React.ReactNode

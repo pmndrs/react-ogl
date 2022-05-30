@@ -39,24 +39,62 @@ export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
 }
 
 /**
+ * Resolves a stringified attach type against an `Instance`.
+ */
+export const resolveAttach = (instance: Instance, key: string) => {
+  let target = instance
+  if (key.includes('-')) {
+    const entries = key.split('-')
+    const last = entries.pop() as string
+    target = entries.reduce((acc, key) => acc[key], instance)
+    return { target, key: last }
+  } else return { target, key }
+}
+
+// Checks if a dash-cased string ends with an integer
+const INDEX_REGEX = /-\d+$/
+
+/**
  * Attaches an instance to a parent via its `attach` prop.
  */
 export const attach = (parent: Instance, child: Instance) => {
   if (!child.attach) return
 
-  parent[child.attach] = child
-  parent.__attached = parent.__attached || {}
-  parent.__attached[child.attach] = child
+  parent.__attached = parent.__attached ?? []
+  parent.__attached.push(child)
+
+  if (typeof child.attach === 'string') {
+    // If attaching into an array (foo-0), create one
+    if (INDEX_REGEX.test(child.attach)) {
+      const root = child.attach.replace(INDEX_REGEX, '')
+      const { target, key } = resolveAttach(parent, root)
+      if (!Array.isArray(target[key])) target[key] = []
+    }
+
+    const { target, key } = resolveAttach(parent, child.attach)
+    child.__previousAttach = target[key]
+    target[key] = child
+  } else {
+    child.__previousAttach = child.attach(parent, child)
+  }
 }
 
 /**
  * Removes an instance from a parent via its `attach` prop.
  */
 export const detach = (parent: Instance, child: Instance) => {
-  if (!parent?.__attached?.[child.attach]) return
+  const attachIndex = parent?.__attached?.indexOf(child)
+  if (typeof attachIndex !== 'number' || attachIndex === -1) return
 
-  delete parent.__attached[child.attach]
-  parent[child.attach] = null
+  child.__previousAttach = undefined
+  parent.__attached.splice(attachIndex, 1)
+
+  if (typeof child.attach === 'string') {
+    const { target, key } = resolveAttach(parent, child.attach)
+    target[key] = child.__r3f.previousAttach
+  } else {
+    child.__previousAttach?.(parent, child)
+  }
 }
 
 /**
