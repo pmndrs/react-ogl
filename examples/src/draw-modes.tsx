@@ -49,7 +49,7 @@ const Program = () => {
 }
 
 const Modes = () => {
-  const { gl } = useOGL()
+  const gl = useOGL((state) => state.gl)
 
   return (
     <>
