@@ -7,8 +7,8 @@ describe('applyProps', () => {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2')
     const program = new OGL.Program(gl, {
-      vertex: '',
-      fragment: '',
+      vertex: ' ',
+      fragment: ' ',
       uniforms: {},
     })
 
@@ -26,8 +26,8 @@ describe('applyProps', () => {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2')
     const program = new OGL.Program(gl, {
-      vertex: '',
-      fragment: '',
+      vertex: ' ',
+      fragment: ' ',
       uniforms: {},
     })
 
@@ -44,8 +44,8 @@ describe('applyProps', () => {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2')
     const program = new OGL.Program(gl, {
-      vertex: '',
-      fragment: '',
+      vertex: ' ',
+      fragment: ' ',
       uniforms: {},
     })
 
@@ -62,8 +62,8 @@ describe('applyProps', () => {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2')
     const program = new OGL.Program(gl, {
-      vertex: '',
-      fragment: '',
+      vertex: ' ',
+      fragment: ' ',
       uniforms: {},
     })
 
@@ -83,8 +83,8 @@ describe('applyProps', () => {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2')
     const program = new OGL.Program(gl, {
-      vertex: '',
-      fragment: '',
+      vertex: ' ',
+      fragment: ' ',
       uniforms: {},
     })
 
@@ -96,7 +96,7 @@ describe('applyProps', () => {
   })
 
   it('should prefer to copy from external props', async () => {
-    const target = ({ color: new OGL.Color() } as unknown) as Instance
+    const target = { color: new OGL.Color() } as unknown as Instance
     target.color.copy = jest.fn()
 
     applyProps(target, {
@@ -108,7 +108,7 @@ describe('applyProps', () => {
   })
 
   it('should spread array prop values', async () => {
-    const target = ({ position: new OGL.Vec3() } as unknown) as Instance
+    const target = { position: new OGL.Vec3() } as unknown as Instance
 
     applyProps(target, {
       position: [1, 2, 3],
@@ -119,7 +119,7 @@ describe('applyProps', () => {
   })
 
   it('should accept scalar shorthand', async () => {
-    const target = ({ position: new OGL.Vec3() } as unknown) as Instance
+    const target = { position: new OGL.Vec3() } as unknown as Instance
 
     applyProps(target, {
       position: 3,
