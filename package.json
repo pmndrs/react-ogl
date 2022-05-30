@@ -59,7 +59,7 @@
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
     "suspend-react": "^0.0.8",
-    "zustand": "^3.7.2"
+    "zustand": "3.7.1"
   },
   "peerDependencies": {
     "expo": ">=43.0",
