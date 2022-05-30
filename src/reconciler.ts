@@ -2,17 +2,42 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, filterKeys } from './utils'
-import { GL_ELEMENTS, RESERVED_PROPS } from './constants'
+import { RESERVED_PROPS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue: Catalogue = {}
 
+// Effectful catalogue elements that require a `WebGLRenderingContext`.
+const catalogueGL: any[] = [
+  // Core
+  OGL.Camera,
+  OGL.Geometry,
+  OGL.Mesh,
+  OGL.Program,
+  OGL.RenderTarget,
+  OGL.Texture,
+
+  // Extras
+  OGL.Flowmap,
+  OGL.GPGPU,
+  OGL.NormalProgram,
+  OGL.Polyline,
+  OGL.Post,
+  OGL.Shadow,
+]
+
 /**
  * Extends the OGL namespace, accepting an object of keys pointing to external classes.
+ * `passGL` will flag the element to receive a `WebGLRenderingContext` on creation.
  */
-export const extend = (objects: Catalogue) =>
-  Object.entries(objects).forEach(([key, value]) => (catalogue[key] = value))
+export const extend = (objects: Catalogue, passGL = false) => {
+  for (const key in objects) {
+    const value = objects[key]
+    catalogue[key] = value
+    if (passGL) catalogueGL.push(value)
+  }
+}
 
 /**
  * Creates an OGL element from a React node.
@@ -32,7 +57,9 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  const isGLInstance = GL_ELEMENTS.some((elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target)
+  const isGLInstance = Object.values(catalogueGL).some(
+    (elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target,
+  )
   if (!object && isGLInstance) {
     // Checks whether arg is an instance of a GL context
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext

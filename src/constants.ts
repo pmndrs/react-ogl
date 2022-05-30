@@ -1,5 +1,3 @@
-import * as OGL from 'ogl'
-
 /**
  * react-ogl's virtual pointer events.
  */
@@ -10,27 +8,6 @@ export const POINTER_EVENTS = [
   'onPointerMove',
   'onPointerOver',
   'onPointerOut',
-] as const
-
-/**
- * OGL elements which must accept `gl` via constructor args.
- */
-export const GL_ELEMENTS = [
-  // Core
-  OGL.Camera,
-  OGL.Geometry,
-  OGL.Mesh,
-  OGL.Program,
-  OGL.RenderTarget,
-  OGL.Texture,
-
-  // Extras
-  OGL.Flowmap,
-  OGL.GPGPU,
-  OGL.NormalProgram,
-  OGL.Polyline,
-  OGL.Post,
-  OGL.Shadow,
 ] as const
 
 /**
