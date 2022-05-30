@@ -561,7 +561,7 @@ declare module 'ogl' {
     updateMatrix(): void
     traverse(callback: (node: Transform) => boolean | void): void
     decompose(): void
-    lookAt<T extends number[]>(target: T, invert?: boolean): void
+    lookAt(target: Vec3, invert?: boolean): void
   }
 
   export interface AnimationOptions {
