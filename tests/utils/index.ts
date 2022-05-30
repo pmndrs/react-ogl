@@ -12,7 +12,7 @@ export const render = (element: React.ReactNode, config?: RenderProps): RootStat
   const { root } = createInternals(canvas, config || {}).getState()
 
   // Render and get output state
-  const state = root.render(element)
+  const state = root.render(element).getState()
 
   return { ...state, root }
 }
