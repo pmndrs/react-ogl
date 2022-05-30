@@ -175,7 +175,7 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
 /**
  * Collects nodes and programs from a Mesh.
  */
-export const buildGraph = (object: OGL.Mesh) => {
+export const buildGraph = (object: OGL.Transform) => {
   const data: ObjectMap = { nodes: {}, programs: {} }
 
   if (object) {
@@ -206,7 +206,7 @@ export const createEvents = (state: RootState) => {
     const interactive: OGL.Mesh[] = []
     state.scene.traverse((node: OGL.Mesh) => {
       // Mesh has registered events and a defined volume
-      if (node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if ((node as Instance).__handlers && node.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer

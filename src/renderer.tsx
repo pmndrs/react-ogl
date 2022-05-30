@@ -57,7 +57,7 @@ export const render = (
     if (config.camera) applyProps(camera, config.camera as InstanceProps)
 
     // Create scene
-    const scene = new OGL.Transform(gl)
+    const scene = new OGL.Transform()
 
     // Init rendering internals for useFrame, keep track of subscriptions
     let priority = 0

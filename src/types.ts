@@ -24,7 +24,7 @@ export type SetBlock = false | Promise<null> | null
  * A map representation of a loader result.
  */
 export type ObjectMap = {
-  nodes: { [name: string]: OGL.Mesh }
+  nodes: { [name: string]: OGL.Transform }
   programs: { [name: string]: OGL.Program }
 }
 
@@ -259,7 +259,7 @@ export type FlowmapProps = Node<OGL.Flowmap, typeof OGL.Flowmap>
 export type GPGPUProps = Node<OGL.GPGPU, typeof OGL.GPGPU>
 // export type PolylineProps = Node<OGL.Polyline, typeof OGL.Polyline>
 export type ShadowProps = Node<OGL.Shadow, typeof OGL.Shadow>
-// export type KTKTextureProps = Node<OGL.KTKTexture, typeof OGL.KTKTexture>
+// export type KTXTextureProps = Node<OGL.KTXTexture, typeof OGL.KTXTexture>
 export type TextureLoaderProps = Node<OGL.TextureLoader, typeof OGL.TextureLoader>
 export type GLTFLoaderProps = Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
 export type GLTFSkinProps = TransformNode<OGL.GLTFSkin, typeof OGL.GLTFSkin>
@@ -310,7 +310,7 @@ declare global {
       gPGPU: GPGPUProps
       // polyline: PolylineProps
       shadow: ShadowProps
-      // kTXTexture: KTKTextureProps
+      // kTXTexture: KTXTextureProps
       textureLoader: TextureLoaderProps
       gLTFLoader: GLTFLoaderProps
       gLTFSkin: GLTFSkinProps
