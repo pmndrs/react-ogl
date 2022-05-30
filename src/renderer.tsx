@@ -112,23 +112,6 @@ export const render = (
     // Handle callback
     config.onCreated?.(state)
 
-    // Animate
-    const animate = (time?: number) => {
-      // Cancel animation if frameloop is set, otherwise keep looping
-      if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
-      state.animation = requestAnimationFrame(animate)
-
-      // Call subscribed elements
-      state.subscribed.forEach((ref) => ref.current?.(state, time))
-
-      // If rendering manually, skip render
-      if (state.priority) return
-
-      // Render to screen
-      state.renderer.render({ scene: state.scene, camera: state.camera })
-    }
-    if (state.frameloop !== 'never') animate()
-
     // Create root fiber
     const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
 
