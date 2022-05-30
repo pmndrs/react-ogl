@@ -1,10 +1,18 @@
 declare module 'ogl' {
+  type BasisImage = (Uint8Array | Uint16Array) & {
+    width: number
+    height: number
+    isCompressedTexture: true
+    internalFormat: number
+    isBasis: true
+  }
+
   export class BasisManager {
-    constructor(workerSrc: any)
+    constructor(workerSrc: string | URL)
     getSupportedFormat(): 'astc' | 'bptc' | 's3tc' | 'etc1' | 'pvrtc' | 'none'
-    initWorker(workerSrc: any): void
-    onMessage(msg: { data: { id: any; error: any; image: any } }): void
-    parseTexture(buffer): Promise<any>
+    initWorker(workerSrc: string | URL): void
+    onMessage(msg: { data: { id: number; error: string; image: BasisImage } }): void
+    parseTexture(buffer: ArrayBuffer): Promise<BasisImage>
   }
 
   export type CameraOptions = {
@@ -57,12 +65,12 @@ declare module 'ogl' {
       zoom?: number
     }): this
     updateMatrixWorld(): this
-    lookAt<T extends number[]>(target: T): this
-    project(v: any): this
-    unproject(v: any): this
+    lookAt(target: Vec3): this
+    project(v: Vec3): this
+    unproject(v: Vec3): this
     updateFrustum(): void
-    frustumIntersectsMesh(node: any): boolean
-    frustumIntersectsSphere(center: any, radius: any): boolean
+    frustumIntersectsMesh(node: Mesh): boolean
+    frustumIntersectsSphere(center: Vec3, radius: number): boolean
   }
 
   export type AttributeMap = {
@@ -78,11 +86,10 @@ declare module 'ogl' {
     id?: number
     buffer?: WebGLBuffer
     stride: number
+    offset: number
     count?: number
     divisor?: number
     needsUpdate?: boolean
-    min?: any
-    max?: any
     usage?: number
   }
   export type Bounds = {
@@ -96,7 +103,9 @@ declare module 'ogl' {
     gl: OGLRenderingContext
     id: number
     attributes: AttributeMap
-    VAOs: {}
+    VAOs: {
+      [programKey: string]: WebGLVertexArrayObject
+    }
     drawRange: {
       start: number
       count: number
@@ -105,7 +114,7 @@ declare module 'ogl' {
     glState: RenderState
     isInstanced: boolean
     bounds: Bounds
-    raycast: 'sphere' | 'box'
+    raycast?: 'sphere' | 'box'
     constructor(
       gl: OGLRenderingContext,
       attributes?: {
@@ -113,7 +122,7 @@ declare module 'ogl' {
       },
     )
     addAttribute(key: string, attr: Partial<Attribute>): number
-    updateAttribute(attr: any): void
+    updateAttribute(attr: Partial<Attribute>): void
     setIndex(value: Attribute): void
     setDrawRange(start: number, count: number): void
     setInstancedCount(value: number): void
@@ -121,8 +130,8 @@ declare module 'ogl' {
     bindAttributes(program: Program): void
     draw({ program, mode }: { program: any; mode?: number }): void
     getPosition(): true | Partial<Attribute>
-    computeBoundingBox(attr?: any): void
-    computeBoundingSphere(attr?: any): void
+    computeBoundingBox(attr?: Partial<Attribute>): void
+    computeBoundingSphere(attr?: Partial<Attribute>): void
     computeVertexNormals(): void
     normalizeNormals(): void
     remove(): void
@@ -138,9 +147,10 @@ declare module 'ogl' {
   export interface DrawOptions {
     camera: Camera
   }
+  export type MeshRenderCallback = (renderInfo: { mesh: Mesh; camera?: Camera }) => any
   export class Mesh extends Transform {
     name: string
-    numInstances: any
+    numInstances?: number
     gl: OGLRenderingContext
     id: number
     geometry: Geometry
@@ -150,8 +160,8 @@ declare module 'ogl' {
     renderOrder: number
     modelViewMatrix: Mat4
     normalMatrix: Mat3
-    beforeRenderCallbacks: Array<any>
-    afterRenderCallbacks: Array<any>
+    beforeRenderCallbacks: Array<MeshRenderCallback>
+    afterRenderCallbacks: Array<MeshRenderCallback>
     hit: Partial<{
       localPoint: Vec3
       distance: number
@@ -163,9 +173,9 @@ declare module 'ogl' {
       normal: Vec3
     }>
     constructor(gl: OGLRenderingContext, { geometry, program, mode, frustumCulled, renderOrder }?: Partial<MeshOptions>)
-    onBeforeRender(f: any): this
-    onAfterRender(f: any): this
-    draw({ camera }?: Partial<DrawOptions>): void
+    onBeforeRender(f: MeshRenderCallback): this
+    onAfterRender(f: MeshRenderCallback): this
+    draw({ camera }?: { camera?: Camera }): void
   }
 
   export type ProgramOptions = {
@@ -217,10 +227,10 @@ declare module 'ogl' {
     blendFunc: BlendFunc
     blendEquation: BlendEquation
     program: WebGLProgram
-    uniformLocations: Map<any, any>
-    attributeLocations: Map<any, any>
+    uniformLocations: Map<any, WebGLUniformLocation>
+    attributeLocations: Map<WebGLActiveInfo, GLint>
     attributeOrder: string
-    gltfMaterial: any
+    gltfMaterial?: any
     constructor(
       gl: OGLRenderingContext,
       {
@@ -236,7 +246,7 @@ declare module 'ogl' {
       }?: Partial<ProgramOptions>,
     )
     setBlendFunc(src: number, dst: number, srcAlpha?: number, dstAlpha?: number): void
-    setBlendEquation(modeRGB: any, modeAlpha: any): void
+    setBlendEquation(modeRGB: GLenum, modeAlpha: GLenum): void
     applyState(): void
     use({ flipFaces }?: { flipFaces?: boolean }): void
     remove(): void
@@ -269,12 +279,12 @@ declare module 'ogl' {
     blendFunc?: {
       src: GLenum
       dst: GLenum
-      srcAlpha?: any
-      dstAlpha?: any
+      srcAlpha?: GLenum
+      dstAlpha?: GLenum
     }
     blendEquation?: {
       modeRGB: GLenum
-      modeAlpha?: any
+      modeAlpha?: GLenum
     }
     cullFace?: number
     frontFace?: number
@@ -291,8 +301,8 @@ declare module 'ogl' {
     }
     textureUnits?: Array<number>
     activeTextureUnit?: number
-    framebuffer?: any
-    boundBuffer?: any
+    framebuffer?: WebGLFramebuffer
+    boundBuffer?: WebGLBuffer
     uniformLocations?: Map<number, WebGLUniformLocation>
     currentProgram: number | null
   }
@@ -352,7 +362,7 @@ declare module 'ogl' {
     setDepthMask(value: GLboolean): void
     setDepthFunc(value: GLenum): void
     activeTexture(value: number): void
-    bindFramebuffer({ target, buffer }?: { target?: number; buffer?: any }): void
+    bindFramebuffer({ target, buffer }?: { target?: number; buffer?: WebGLFramebuffer }): void
     getExtension(extension: string, webgl2Func?: keyof WebGL2RenderingContext, extFunc?: string): any
     sortOpaque(a: any, b: any): number
     sortTransparent(a: any, b: any): number
@@ -424,10 +434,10 @@ declare module 'ogl' {
         width,
         height,
         target,
-        color, // number of color attachments
+        color,
         depth,
         stencil,
-        depthTexture, // note - stencil breaks
+        depthTexture,
         wrapS,
         wrapT,
         minFilter,
@@ -522,7 +532,7 @@ declare module 'ogl' {
         flipY,
         anisotropy,
         level,
-        width, // used for RenderTargets or Data Textures
+        width,
         height,
       }?: Partial<TextureOptions>,
     )
@@ -652,16 +662,7 @@ declare module 'ogl' {
     mouse: Vec2
     velocity: Vec2
     mesh: Mesh
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        size, // default size of the render targets
-        falloff, // size of the stamp, percentage of the size
-        alpha, // opacity of the stamp
-        dissipation, // affects the speed that the stamp fades. Closer to 1 is slower
-        type,
-      }?: Partial<FlowmapOptions>,
-    )
+    constructor(gl: OGLRenderingContext, { size, falloff, alpha, dissipation, type }?: Partial<FlowmapOptions>)
     update(): void
   }
 
@@ -718,13 +719,13 @@ declare module 'ogl' {
     static resolveURI(uri: any, dir: any): string
     static loadBuffers(desc: any, dir: any): Promise<any[]>
     static parseBufferViews(gl: any, desc: any, buffers: any): any
-    static async parseImages(gl: any, desc: any, dir: any, bufferViews: any): any
+    static async parseImages(gl: any, desc: any, dir: any, bufferViews: any): Promise<any>
     static parseTextures(gl: any, desc: any, images: any): any
     static createTexture(
       gl: any,
       desc: any,
       images: any,
-      { sample: any, source: any, name: any, extensions: any, extras: any },
+      opts: { sample: any; source: any; name: any; extensions: any; extras: any },
     )
     static parseMaterials(gl: any, desc: any, textures: any): any
     static parseSkins(gl: any, desc: any, bufferViews: any): any
@@ -876,7 +877,7 @@ declare module 'ogl' {
     constructor(
       object: Transform & {
         fov: number
-      }, // TODO: fov property only be used in pan()
+      },
       {
         element,
         enabled,
@@ -971,16 +972,7 @@ declare module 'ogl' {
     }
     program: Program
     mesh: Mesh
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        points, // Array of Vec3s
-        vertex,
-        fragment,
-        uniforms,
-        attributes,
-      }: Partial<PolylineOptions>,
-    )
+    constructor(gl: OGLRenderingContext, { points, vertex, fragment, uniforms, attributes }: Partial<PolylineOptions>)
     updateGeometry(): void
     resize(): void
   }
@@ -1259,7 +1251,7 @@ declare module 'ogl' {
     static load<T extends Texture>(
       gl: OGLRenderingContext,
       {
-        src, // string or object of extension:src key-values
+        src,
         wrapS,
         wrapT,
         anisotropy,
