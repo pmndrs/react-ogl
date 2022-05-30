@@ -55,6 +55,35 @@ describe('renderer', () => {
     expect(Object.keys(element.geometry.attributes)).toStrictEqual(['test'])
   })
 
+  it('should handle attach', async () => {
+    let state: RootState
+
+    await reconciler.act(async () => {
+      state = render(
+        <>
+          <mesh>
+            <geometry />
+            <normalProgram attach="program" />
+          </mesh>
+          <mesh>
+            <geometry />
+            <normalProgram
+              attach={(parent, self) => {
+                parent.program = self
+                return () => (parent.program = undefined)
+              }}
+            />
+          </mesh>
+        </>,
+      )
+    })
+
+    const [element1, element2] = state.scene.children
+
+    expect(element1.program).not.toBe(undefined)
+    expect(element2.program).not.toBe(undefined)
+  })
+
   it('should pass gl to args', async () => {
     let crashed = false
 
