@@ -9,22 +9,23 @@ import { Catalogue, Instance, InstanceProps, RootState } from './types'
 const catalogue: Catalogue = {}
 
 // Effectful catalogue elements that require a `WebGLRenderingContext`.
-const catalogueGL: Catalogue = {
-  Camera: OGL.Camera,
-  Geometry: OGL.Geometry,
-  Mesh: OGL.Mesh,
-  Program: OGL.Program,
-  RenderTarget: OGL.RenderTarget,
-  Texture: OGL.Texture,
+const catalogueGL: any[] = [
+  // Core
+  OGL.Camera,
+  OGL.Geometry,
+  OGL.Mesh,
+  OGL.Program,
+  OGL.RenderTarget,
+  OGL.Texture,
 
   // Extras
-  Flowmap: OGL.Flowmap,
-  GPGPU: OGL.GPGPU,
-  NormalProgram: OGL.NormalProgram,
-  Polyline: OGL.Polyline,
-  Post: OGL.Post,
-  Shadow: OGL.Shadow,
-}
+  OGL.Flowmap,
+  OGL.GPGPU,
+  OGL.NormalProgram,
+  OGL.Polyline,
+  OGL.Post,
+  OGL.Shadow,
+]
 
 /**
  * Extends the OGL namespace, accepting an object of keys pointing to external classes.
@@ -34,7 +35,7 @@ export const extend = (objects: Catalogue, passGL: boolean = false) => {
   for (const key in objects) {
     const value = objects[key]
     catalogue[key] = value
-    if (passGL) catalogueGL[key] = value
+    if (passGL) catalogueGL.push(value)
   }
 }
 
@@ -56,8 +57,10 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  const passGL = !object && catalogueGL[name]
-  if (passGL) {
+  const isGLInstance = Object.values(catalogueGL).some(
+    (elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target,
+  )
+  if (!object && isGLInstance) {
     // Checks whether arg is an instance of a GL context
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
 
