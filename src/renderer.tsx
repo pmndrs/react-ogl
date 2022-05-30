@@ -5,7 +5,8 @@ import create, { SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext } from './hooks'
-import { Root, RootState, RootStore } from './types'
+import { InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
+import { applyProps } from './utils'
 
 // Store roots here since we can render to multiple targets
 const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
@@ -16,23 +17,117 @@ const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
 export const render = (
   element: React.ReactNode,
   target: HTMLCanvasElement,
-  { mode = 'blocking', ...config }: Partial<RootState>,
+  { mode = 'blocking', ...config }: RenderProps = {},
 ) => {
   // Check for existing root, create on first run
   let root = roots.get(target)
   if (!root) {
+    // Create renderer
+    const renderer =
+      config.renderer instanceof OGL.Renderer
+        ? config.renderer
+        : typeof config.renderer === 'function'
+        ? config.renderer(target)
+        : new OGL.Renderer({
+            antialias: true,
+            powerPreference: 'high-performance',
+            ...(config.renderer as any),
+            canvas: target,
+          })
+    if (config.renderer && typeof config.renderer !== 'function') applyProps(renderer, config.renderer as InstanceProps)
+
+    const gl = renderer.gl
+    gl.clearColor(1, 1, 1, 0)
+
+    // Flush frame for native
+    if ((gl as any).endFrameEXP) {
+      const renderFrame = renderer.render.bind(renderer)
+      renderer.render = ({ scene, camera }) => {
+        renderFrame({ scene, camera })
+        ;(gl as any).endFrameEXP()
+      }
+    }
+
+    // Create or accept camera, apply props
+    const camera =
+      config.camera instanceof OGL.Camera
+        ? config.camera
+        : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(config.camera as any) })
+    camera.position.z = 5
+    if (config.camera) applyProps(camera, config.camera as InstanceProps)
+
+    // Create scene
+    const scene = new OGL.Transform(gl)
+
+    // Init rendering internals for useFrame, keep track of subscriptions
+    let priority = 0
+    const subscribed = []
+
+    // Subscribe/unsubscribe elements to the render loop
+    const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
+      // Subscribe callback
+      subscribed.push(refCallback)
+
+      // Enable manual rendering if renderPriority is positive
+      if (renderPriority) priority += 1
+    }
+
+    const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
+      // Unsubscribe callback
+      const index = subscribed.indexOf(refCallback)
+
+      if (index !== -1) subscribed.splice(index, 0)
+
+      // Disable manual rendering if renderPriority is positive
+      if (renderPriority) priority -= 1
+    }
+
+    // Init event state
+    const mouse = new OGL.Vec2()
+    const raycaster = new OGL.Raycast(gl)
+    const hovered = new Map()
+
     // Create root store
     const store = create((set: SetState<RootState>, get: SetState<RootState>) => ({
-      scene: new OGL.Transform(),
-      gl: config.renderer?.gl,
-      ...(config as RootState),
+      renderer,
+      gl,
+      camera,
+      scene,
+      priority,
+      subscribed,
+      subscribe,
+      unsubscribe,
+      mouse,
+      raycaster,
+      hovered,
+      events: config.events,
       set,
       get,
-    }))
+    })) as RootStore
 
     // Bind events
     const state = store.getState()
     if (state.events?.connect && !state.events?.connected) state.events.connect(target, state)
+
+    // Handle callback
+    config.onCreated?.(state)
+
+    // Animate
+    const animate = (time?: number) => {
+      // Cancel animation if frameloop is set, otherwise keep looping
+      if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
+      state.animation = requestAnimationFrame(animate)
+
+      // Call subscribed elements
+      state.subscribed.forEach((ref) => ref.current?.(state, time))
+
+      // If rendering manually, skip render
+      if (state.priority) return
+
+      // Render to screen
+      state.renderer.render({ scene: state.scene, camera: state.camera })
+    }
+    if (state.frameloop !== 'never') animate()
 
     // Create root fiber
     const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
@@ -78,7 +173,7 @@ export const unmountComponentAtNode = (target: HTMLCanvasElement) => {
 /**
  * Creates a root to safely render/unmount.
  */
-export const createRoot = (target: HTMLCanvasElement, config: RootState): Root => ({
+export const createRoot = (target: HTMLCanvasElement, config?: RenderProps): Root => ({
   render: (element) => render(element, target, config),
   unmount: () => unmountComponentAtNode(target),
 })

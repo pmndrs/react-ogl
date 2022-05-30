@@ -138,7 +138,7 @@ export interface RootState {
   scene: Omit<OGL.Transform, 'children'> & { children: any[] }
   camera: OGL.Camera
   priority: number
-  subscribed: Subscription[]
+  subscribed: React.MutableRefObject<Subscription>[]
   subscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   unsubscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   animation?: number

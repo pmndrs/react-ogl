@@ -2,18 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { createRoot } from './renderer'
-import {
-  EventHandlers,
-  Instance,
-  InstanceProps,
-  ObjectMap,
-  RenderProps,
-  RootState,
-  SetBlock,
-  Subscription,
-} from './types'
-import create, { UseBoundStore, SetState } from 'zustand'
+import { EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -268,119 +257,6 @@ export const createEvents = (state: RootState) => {
 
   return { handleEvent }
 }
-
-/**
- * Configures rendering internals akin to R3F.
- */
-export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): UseBoundStore<RootState> =>
-  create((set: SetState<RootState>, get: SetState<RootState>) => {
-    // Create or accept renderer, apply props
-    const renderer =
-      props.renderer instanceof OGL.Renderer
-        ? props.renderer
-        : typeof props.renderer === 'function'
-        ? props.renderer(canvas)
-        : new OGL.Renderer({
-            antialias: true,
-            powerPreference: 'high-performance',
-            ...(props.renderer as any),
-            canvas: canvas,
-          })
-    if (props.renderer && typeof props.renderer !== 'function') applyProps(renderer, props.renderer as InstanceProps)
-    const gl = renderer.gl
-    gl.clearColor(1, 1, 1, 0)
-
-    // Flush frame for native
-    if (renderer.gl.endFrameEXP) {
-      const renderFrame = renderer.render.bind(renderer)
-      renderer.render = ({ scene, camera }) => {
-        renderFrame({ scene, camera })
-        renderer.gl.endFrameEXP()
-      }
-    }
-
-    // Create or accept camera, apply props
-    const camera =
-      props.camera instanceof OGL.Camera
-        ? props.camera
-        : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(props.camera as any) })
-    camera.position.z = 5
-    if (props.camera) applyProps(camera, props.camera as InstanceProps)
-
-    // Create scene
-    const scene = new OGL.Transform(gl)
-
-    // Init rendering internals for useFrame, keep track of subscriptions
-    let priority = 0
-    const subscribed = []
-
-    // Subscribe/unsubscribe elements to the render loop
-    const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-      // Subscribe callback
-      subscribed.push(refCallback)
-
-      // Enable manual rendering if renderPriority is positive
-      if (renderPriority) priority += 1
-    }
-
-    const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-      // Unsubscribe callback
-      const index = subscribed.indexOf(refCallback)
-
-      if (index !== -1) subscribed.splice(index, 0)
-
-      // Disable manual rendering if renderPriority is positive
-      if (renderPriority) priority -= 1
-    }
-
-    // Init event state
-    const mouse = new OGL.Vec2()
-    const raycaster = new OGL.Raycast(gl)
-    const hovered = new Map()
-
-    // Set initial state
-    const state: RootState = {
-      ...props,
-      set,
-      get,
-      renderer,
-      gl,
-      camera,
-      scene,
-      priority,
-      subscribed,
-      subscribe,
-      unsubscribe,
-      mouse,
-      raycaster,
-      hovered,
-    }
-
-    // Init root
-    const root = createRoot(canvas, state)
-
-    // Handle callback
-    if (props.onCreated) props.onCreated(state)
-
-    // Animate
-    const animate = (time?: number) => {
-      // Cancel animation if frameloop is set, otherwise keep looping
-      if (props.frameloop === 'never') return cancelAnimationFrame(state.animation)
-      state.animation = requestAnimationFrame(animate)
-
-      // Call subscribed elements
-      subscribed.forEach((ref) => ref.current?.(state, time))
-
-      // If rendering manually, skip render
-      if (priority) return
-
-      // Render to screen
-      renderer.render({ scene, camera })
-    }
-    if (props.frameloop !== 'never') animate()
-
-    return { ...state, root }
-  })
 
 /**
  * Used to block rendering via its `set` prop. Useful for suspenseful effects.

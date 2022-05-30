@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet } from 'react-native'
+import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet, LayoutChangeEvent } from 'react-native'
 import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
-import { Block, createInternals, ErrorBoundary, filterKeys } from './utils'
-import { events } from './events'
-import { RESERVED_PROPS } from './constants'
-import { RenderProps, RootState, SetBlock } from './types'
-import { useIsomorphicLayoutEffect } from './hooks'
+import { Block, ErrorBoundary } from './utils'
+import { events as createTouchEvents } from './events'
+import { RenderProps, SetBlock } from './types'
+import { render, unmountComponentAtNode } from './renderer'
 import '@expo/browser-polyfill'
 
 export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
@@ -16,19 +15,14 @@ export interface CanvasProps extends Omit<RenderProps, 'dpr' | 'size'>, ViewProp
 }
 
 /**
- * A list of custom Canvas props.
- */
-export const CANVAS_PROPS = ['renderer', 'camera', 'orthographic', 'frameloop', 'events', 'onCreated'] as const
-
-/**
  * A resizeable canvas whose children are declarative OGL elements.
  */
-export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas({ children, style, ...rest }, forwardedRef) {
-  const internalProps: RenderProps = filterKeys(rest, false, ...CANVAS_PROPS)
-  const viewProps: ViewProps = filterKeys(rest, true, ...CANVAS_PROPS, ...RESERVED_PROPS)
-  const internalState = React.useRef<RootState>()
+export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
+  { children, style, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
+  forwardedRef,
+) {
   const [{ width, height }, setSize] = React.useState({ width: 0, height: 0 })
-  const [context, setContext] = React.useState<GLContext | null>()
+  const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null)
   const [bind, setBind] = React.useState<any>()
   const [block, setBlock] = React.useState<SetBlock>(false)
   const [error, setError] = React.useState<any>(false)
@@ -38,74 +32,64 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas({ chil
   // Throw exception outwards if anything within Canvas throws
   if (error) throw error
 
-  // Execute JSX in the reconciler as a layout-effect
-  useIsomorphicLayoutEffect(() => {
-    if (!context) return
+  const onLayout = React.useCallback((e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout
+    setSize({ width, height })
+  }, [])
 
-    // If first run, create default state & bind events
-    if (!internalState.current) {
-      // Create canvas shim
-      const canvas = {
-        width: context.drawingBufferWidth,
-        height: context.drawingBufferHeight,
-        style: {},
-        addEventListener: (() => {}) as any,
-        removeEventListener: (() => {}) as any,
-        clientHeight: context.drawingBufferHeight,
-      } as HTMLCanvasElement
+  const onContextCreate = React.useCallback((context: ExpoWebGLRenderingContext) => {
+    const canvasShim = {
+      width: context.drawingBufferWidth,
+      height: context.drawingBufferHeight,
+      style: {},
+      addEventListener: (() => {}) as any,
+      removeEventListener: (() => {}) as any,
+      clientHeight: context.drawingBufferHeight,
+      getContext: (() => context) as any,
+    } as HTMLCanvasElement
 
-      // Bind context
-      ;(context.canvas as any) = canvas
-      ;(canvas.getContext as any) = () => context
+    setCanvas(canvasShim)
+  }, [])
 
-      // Init state
-      internalState.current = createInternals(canvas, {
+  if (canvas && width > 0 && height > 0) {
+    // Render to screen
+    const state = render(
+      <ErrorBoundary set={setError}>
+        <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
+      </ErrorBoundary>,
+      canvas,
+      {
+        renderer,
+        camera,
+        orthographic,
+        frameloop,
         events,
-        ...internalProps,
-      }).getState()
-    }
+        onCreated,
+      },
+    ).getState()
 
-    if (width > 0 && height > 0) {
-      const state = internalState.current
+    // Set dpr, handle resize
+    state.renderer.dpr = PixelRatio.get()
+    state.renderer.setSize(width, height)
 
-      // Set dpr, handle resize
-      state.renderer.dpr = PixelRatio.get()
-      state.renderer.setSize(width, height)
+    // Update projection
+    const projection = orthographic ? 'orthographic' : 'perspective'
+    state.camera[projection]({ aspect: width / height })
 
-      // Update projection
-      const projection = internalProps.orthographic ? 'orthographic' : 'perspective'
-      state.camera[projection]({ aspect: width / height })
-
-      // Render to screen
-      state.root.render(
-        <ErrorBoundary set={setError}>
-          <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
-        </ErrorBoundary>,
-      )
-
-      // Bind events
-      if (!bind) setBind(state.events.connected)
-    }
-  }, [width, height, context, internalProps, children])
+    // Bind events
+    if (!bind) setBind(state.events.connected)
+  }
 
   // Cleanup on unmount
   React.useEffect(() => {
-    const state = internalState.current
-    return () => state?.root.unmount()
-  }, [])
+    if (canvas) {
+      return () => unmountComponentAtNode(canvas)
+    }
+  }, [canvas])
 
   return (
-    <View
-      {...viewProps}
-      ref={forwardedRef}
-      onLayout={(event) => {
-        const { width, height } = event.nativeEvent.layout
-        setSize({ width, height })
-      }}
-      style={{ flex: 1, ...style }}
-      {...bind}
-    >
-      {width > 0 && <GLView onContextCreate={setContext} style={StyleSheet.absoluteFill} />}
+    <View {...props} ref={forwardedRef} onLayout={onLayout} style={{ flex: 1, ...style }} {...bind}>
+      {width > 0 && <GLView onContextCreate={onContextCreate} style={StyleSheet.absoluteFill} />}
     </View>
   )
 })
