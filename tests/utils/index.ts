@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createInternals, RenderProps, RootState } from '../../src'
+import { createRoot, RenderProps, RootState } from '../../src'
 
 /**
  * Renders JSX into OGL state.
@@ -9,10 +9,10 @@ export const render = (element: React.ReactNode, config?: RenderProps): RootStat
   const canvas = document.createElement('canvas')
 
   // Init internals
-  const { root } = createInternals(canvas, config || {})
+  const root = createRoot(canvas, config)
 
   // Render and get output state
-  const state = root.render(element)
+  const state = root.render(element).getState()
 
   return { ...state, root }
 }

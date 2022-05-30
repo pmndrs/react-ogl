@@ -4,13 +4,13 @@ exports[`Canvas should correctly mount 1`] = `
 ReactTestInstance {
   "_fiber": FiberNode {
     "_debugHookTypes": Array [
-      "useRef",
       "useState",
       "useState",
       "useState",
       "useState",
       "useState",
-      "useLayoutEffect",
+      "useCallback",
+      "useCallback",
       "useEffect",
     ],
     "_debugID": 3,
@@ -21,13 +21,13 @@ ReactTestInstance {
     "actualStartTime": -1,
     "alternate": FiberNode {
       "_debugHookTypes": Array [
-        "useRef",
         "useState",
         "useState",
         "useState",
         "useState",
         "useState",
-        "useLayoutEffect",
+        "useCallback",
+        "useCallback",
         "useEffect",
       ],
       "_debugID": 3,
@@ -2549,91 +2549,67 @@ ReactTestInstance {
         "children": <transform />,
       },
       "memoizedState": Object {
-        "baseQueue": null,
-        "baseState": null,
+        "baseQueue": Object {
+          "action": Object {
+            "height": 800,
+            "width": 1280,
+          },
+          "eagerReducer": [Function],
+          "eagerState": Object {
+            "height": 800,
+            "width": 1280,
+          },
+          "lane": 1,
+          "next": [Circular],
+        },
+        "baseState": Object {
+          "height": 0,
+          "width": 0,
+        },
         "memoizedState": Object {
-          "current": undefined,
+          "height": 0,
+          "width": 0,
         },
         "next": Object {
-          "baseQueue": Object {
-            "action": Object {
-              "height": 800,
-              "width": 1280,
-            },
-            "eagerReducer": [Function],
-            "eagerState": Object {
-              "height": 800,
-              "width": 1280,
-            },
-            "lane": 1,
-            "next": [Circular],
-          },
-          "baseState": Object {
-            "height": 0,
-            "width": 0,
-          },
-          "memoizedState": Object {
-            "height": 0,
-            "width": 0,
-          },
+          "baseQueue": null,
+          "baseState": null,
+          "memoizedState": null,
           "next": Object {
             "baseQueue": null,
             "baseState": undefined,
             "memoizedState": undefined,
             "next": Object {
               "baseQueue": null,
-              "baseState": undefined,
-              "memoizedState": undefined,
+              "baseState": false,
+              "memoizedState": false,
               "next": Object {
                 "baseQueue": null,
                 "baseState": false,
                 "memoizedState": false,
                 "next": Object {
                   "baseQueue": null,
-                  "baseState": false,
-                  "memoizedState": false,
+                  "baseState": null,
+                  "memoizedState": Array [
+                    [Function],
+                    Array [],
+                  ],
                   "next": Object {
                     "baseQueue": null,
                     "baseState": null,
-                    "memoizedState": Object {
-                      "create": [Function],
-                      "deps": Array [
-                        0,
-                        0,
-                        undefined,
-                        Object {},
-                        <transform />,
-                      ],
-                      "destroy": undefined,
-                      "next": Object {
-                        "create": [Function],
-                        "deps": Array [],
-                        "destroy": [Function],
-                        "next": [Circular],
-                        "tag": 5,
-                      },
-                      "tag": 3,
-                    },
+                    "memoizedState": Array [
+                      [Function],
+                      Array [],
+                    ],
                     "next": Object {
                       "baseQueue": null,
                       "baseState": null,
                       "memoizedState": Object {
                         "create": [Function],
-                        "deps": Array [],
-                        "destroy": [Function],
-                        "next": Object {
-                          "create": [Function],
-                          "deps": Array [
-                            0,
-                            0,
-                            undefined,
-                            Object {},
-                            <transform />,
-                          ],
-                          "destroy": undefined,
-                          "next": [Circular],
-                          "tag": 3,
-                        },
+                        "deps": Array [
+                          null,
+                        ],
+                        "destroy": undefined,
+                        "next": [Circular],
                         "tag": 5,
                       },
                       "next": null,
@@ -2641,12 +2617,7 @@ ReactTestInstance {
                     },
                     "queue": null,
                   },
-                  "queue": Object {
-                    "dispatch": [Function],
-                    "lastRenderedReducer": [Function],
-                    "lastRenderedState": false,
-                    "pending": null,
-                  },
+                  "queue": null,
                 },
                 "queue": Object {
                   "dispatch": [Function],
@@ -2658,7 +2629,7 @@ ReactTestInstance {
               "queue": Object {
                 "dispatch": [Function],
                 "lastRenderedReducer": [Function],
-                "lastRenderedState": undefined,
+                "lastRenderedState": false,
                 "pending": null,
               },
             },
@@ -2672,14 +2643,19 @@ ReactTestInstance {
           "queue": Object {
             "dispatch": [Function],
             "lastRenderedReducer": [Function],
-            "lastRenderedState": Object {
-              "height": 800,
-              "width": 1280,
-            },
+            "lastRenderedState": null,
             "pending": null,
           },
         },
-        "queue": null,
+        "queue": Object {
+          "dispatch": [Function],
+          "lastRenderedReducer": [Function],
+          "lastRenderedState": Object {
+            "height": 800,
+            "width": 1280,
+          },
+          "pending": null,
+        },
       },
       "mode": 0,
       "nextEffect": null,
@@ -2708,12 +2684,12 @@ ReactTestInstance {
           "childLanes": 0,
           "dependencies": null,
           "elementType": null,
-          "firstEffect": [Circular],
+          "firstEffect": null,
           "flags": 0,
           "index": 0,
           "key": null,
           "lanes": 0,
-          "lastEffect": [Circular],
+          "lastEffect": null,
           "memoizedProps": null,
           "memoizedState": Object {
             "element": <ForwardRef(Canvas)>
@@ -3710,12 +3686,12 @@ ReactTestInstance {
             "childLanes": 0,
             "dependencies": null,
             "elementType": null,
-            "firstEffect": [Circular],
+            "firstEffect": null,
             "flags": 0,
             "index": 0,
             "key": null,
             "lanes": 0,
-            "lastEffect": [Circular],
+            "lastEffect": null,
             "memoizedProps": null,
             "memoizedState": Object {
               "element": <ForwardRef(Canvas)>
@@ -3893,21 +3869,11 @@ ReactTestInstance {
       "updateQueue": Object {
         "lastEffect": Object {
           "create": [Function],
-          "deps": Array [],
-          "destroy": [Function],
-          "next": Object {
-            "create": [Function],
-            "deps": Array [
-              0,
-              0,
-              undefined,
-              Object {},
-              <transform />,
-            ],
-            "destroy": undefined,
-            "next": [Circular],
-            "tag": 3,
-          },
+          "deps": Array [
+            null,
+          ],
+          "destroy": undefined,
+          "next": [Circular],
           "tag": 5,
         },
       },
@@ -3926,13 +3892,13 @@ ReactTestInstance {
         "_debugNeedsRemount": false,
         "_debugOwner": FiberNode {
           "_debugHookTypes": Array [
-            "useRef",
             "useState",
             "useState",
             "useState",
             "useState",
             "useState",
-            "useLayoutEffect",
+            "useCallback",
+            "useCallback",
             "useEffect",
           ],
           "_debugID": 3,
@@ -4259,91 +4225,67 @@ ReactTestInstance {
             "children": <transform />,
           },
           "memoizedState": Object {
-            "baseQueue": null,
-            "baseState": null,
+            "baseQueue": Object {
+              "action": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "eagerReducer": [Function],
+              "eagerState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "lane": 1,
+              "next": [Circular],
+            },
+            "baseState": Object {
+              "height": 0,
+              "width": 0,
+            },
             "memoizedState": Object {
-              "current": undefined,
+              "height": 0,
+              "width": 0,
             },
             "next": Object {
-              "baseQueue": Object {
-                "action": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "eagerReducer": [Function],
-                "eagerState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "lane": 1,
-                "next": [Circular],
-              },
-              "baseState": Object {
-                "height": 0,
-                "width": 0,
-              },
-              "memoizedState": Object {
-                "height": 0,
-                "width": 0,
-              },
+              "baseQueue": null,
+              "baseState": null,
+              "memoizedState": null,
               "next": Object {
                 "baseQueue": null,
                 "baseState": undefined,
                 "memoizedState": undefined,
                 "next": Object {
                   "baseQueue": null,
-                  "baseState": undefined,
-                  "memoizedState": undefined,
+                  "baseState": false,
+                  "memoizedState": false,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": false,
                     "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": false,
-                      "memoizedState": false,
+                      "baseState": null,
+                      "memoizedState": Array [
+                        [Function],
+                        Array [],
+                      ],
                       "next": Object {
                         "baseQueue": null,
                         "baseState": null,
-                        "memoizedState": Object {
-                          "create": [Function],
-                          "deps": Array [
-                            0,
-                            0,
-                            undefined,
-                            Object {},
-                            <transform />,
-                          ],
-                          "destroy": undefined,
-                          "next": Object {
-                            "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": [Circular],
-                            "tag": 5,
-                          },
-                          "tag": 3,
-                        },
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
                           "memoizedState": Object {
                             "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": [Circular],
-                              "tag": 3,
-                            },
+                            "deps": Array [
+                              null,
+                            ],
+                            "destroy": undefined,
+                            "next": [Circular],
                             "tag": 5,
                           },
                           "next": null,
@@ -4351,12 +4293,7 @@ ReactTestInstance {
                         },
                         "queue": null,
                       },
-                      "queue": Object {
-                        "dispatch": [Function],
-                        "lastRenderedReducer": [Function],
-                        "lastRenderedState": false,
-                        "pending": null,
-                      },
+                      "queue": null,
                     },
                     "queue": Object {
                       "dispatch": [Function],
@@ -4368,7 +4305,7 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": undefined,
+                    "lastRenderedState": false,
                     "pending": null,
                   },
                 },
@@ -4382,14 +4319,19 @@ ReactTestInstance {
               "queue": Object {
                 "dispatch": [Function],
                 "lastRenderedReducer": [Function],
-                "lastRenderedState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
+                "lastRenderedState": null,
                 "pending": null,
               },
             },
-            "queue": null,
+            "queue": Object {
+              "dispatch": [Function],
+              "lastRenderedReducer": [Function],
+              "lastRenderedState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "pending": null,
+            },
           },
           "mode": 0,
           "nextEffect": null,
@@ -4418,12 +4360,12 @@ ReactTestInstance {
               "childLanes": 0,
               "dependencies": null,
               "elementType": null,
-              "firstEffect": [Circular],
+              "firstEffect": null,
               "flags": 0,
               "index": 0,
               "key": null,
               "lanes": 0,
-              "lastEffect": [Circular],
+              "lastEffect": null,
               "memoizedProps": null,
               "memoizedState": Object {
                 "element": <ForwardRef(Canvas)>
@@ -4778,12 +4720,12 @@ ReactTestInstance {
                 "childLanes": 0,
                 "dependencies": null,
                 "elementType": null,
-                "firstEffect": [Circular],
+                "firstEffect": null,
                 "flags": 0,
                 "index": 0,
                 "key": null,
                 "lanes": 0,
-                "lastEffect": [Circular],
+                "lastEffect": null,
                 "memoizedProps": null,
                 "memoizedState": Object {
                   "element": <ForwardRef(Canvas)>
@@ -4961,21 +4903,11 @@ ReactTestInstance {
           "updateQueue": Object {
             "lastEffect": Object {
               "create": [Function],
-              "deps": Array [],
-              "destroy": [Function],
-              "next": Object {
-                "create": [Function],
-                "deps": Array [
-                  0,
-                  0,
-                  undefined,
-                  Object {},
-                  <transform />,
-                ],
-                "destroy": undefined,
-                "next": [Circular],
-                "tag": 3,
-              },
+              "deps": Array [
+                null,
+              ],
+              "destroy": undefined,
+              "next": [Circular],
               "tag": 5,
             },
           },
@@ -5471,13 +5403,13 @@ ReactTestInstance {
         "ref": null,
         "return": FiberNode {
           "_debugHookTypes": Array [
-            "useRef",
             "useState",
             "useState",
             "useState",
             "useState",
             "useState",
-            "useLayoutEffect",
+            "useCallback",
+            "useCallback",
             "useEffect",
           ],
           "_debugID": 3,
@@ -5804,91 +5736,67 @@ ReactTestInstance {
             "children": <transform />,
           },
           "memoizedState": Object {
-            "baseQueue": null,
-            "baseState": null,
+            "baseQueue": Object {
+              "action": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "eagerReducer": [Function],
+              "eagerState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "lane": 1,
+              "next": [Circular],
+            },
+            "baseState": Object {
+              "height": 0,
+              "width": 0,
+            },
             "memoizedState": Object {
-              "current": undefined,
+              "height": 0,
+              "width": 0,
             },
             "next": Object {
-              "baseQueue": Object {
-                "action": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "eagerReducer": [Function],
-                "eagerState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "lane": 1,
-                "next": [Circular],
-              },
-              "baseState": Object {
-                "height": 0,
-                "width": 0,
-              },
-              "memoizedState": Object {
-                "height": 0,
-                "width": 0,
-              },
+              "baseQueue": null,
+              "baseState": null,
+              "memoizedState": null,
               "next": Object {
                 "baseQueue": null,
                 "baseState": undefined,
                 "memoizedState": undefined,
                 "next": Object {
                   "baseQueue": null,
-                  "baseState": undefined,
-                  "memoizedState": undefined,
+                  "baseState": false,
+                  "memoizedState": false,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": false,
                     "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": false,
-                      "memoizedState": false,
+                      "baseState": null,
+                      "memoizedState": Array [
+                        [Function],
+                        Array [],
+                      ],
                       "next": Object {
                         "baseQueue": null,
                         "baseState": null,
-                        "memoizedState": Object {
-                          "create": [Function],
-                          "deps": Array [
-                            0,
-                            0,
-                            undefined,
-                            Object {},
-                            <transform />,
-                          ],
-                          "destroy": undefined,
-                          "next": Object {
-                            "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": [Circular],
-                            "tag": 5,
-                          },
-                          "tag": 3,
-                        },
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
                           "memoizedState": Object {
                             "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": [Circular],
-                              "tag": 3,
-                            },
+                            "deps": Array [
+                              null,
+                            ],
+                            "destroy": undefined,
+                            "next": [Circular],
                             "tag": 5,
                           },
                           "next": null,
@@ -5896,12 +5804,7 @@ ReactTestInstance {
                         },
                         "queue": null,
                       },
-                      "queue": Object {
-                        "dispatch": [Function],
-                        "lastRenderedReducer": [Function],
-                        "lastRenderedState": false,
-                        "pending": null,
-                      },
+                      "queue": null,
                     },
                     "queue": Object {
                       "dispatch": [Function],
@@ -5913,7 +5816,7 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": undefined,
+                    "lastRenderedState": false,
                     "pending": null,
                   },
                 },
@@ -5927,14 +5830,19 @@ ReactTestInstance {
               "queue": Object {
                 "dispatch": [Function],
                 "lastRenderedReducer": [Function],
-                "lastRenderedState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
+                "lastRenderedState": null,
                 "pending": null,
               },
             },
-            "queue": null,
+            "queue": Object {
+              "dispatch": [Function],
+              "lastRenderedReducer": [Function],
+              "lastRenderedState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "pending": null,
+            },
           },
           "mode": 0,
           "nextEffect": null,
@@ -5963,12 +5871,12 @@ ReactTestInstance {
               "childLanes": 0,
               "dependencies": null,
               "elementType": null,
-              "firstEffect": [Circular],
+              "firstEffect": null,
               "flags": 0,
               "index": 0,
               "key": null,
               "lanes": 0,
-              "lastEffect": [Circular],
+              "lastEffect": null,
               "memoizedProps": null,
               "memoizedState": Object {
                 "element": <ForwardRef(Canvas)>
@@ -6323,12 +6231,12 @@ ReactTestInstance {
                 "childLanes": 0,
                 "dependencies": null,
                 "elementType": null,
-                "firstEffect": [Circular],
+                "firstEffect": null,
                 "flags": 0,
                 "index": 0,
                 "key": null,
                 "lanes": 0,
-                "lastEffect": [Circular],
+                "lastEffect": null,
                 "memoizedProps": null,
                 "memoizedState": Object {
                   "element": <ForwardRef(Canvas)>
@@ -6506,21 +6414,11 @@ ReactTestInstance {
           "updateQueue": Object {
             "lastEffect": Object {
               "create": [Function],
-              "deps": Array [],
-              "destroy": [Function],
-              "next": Object {
-                "create": [Function],
-                "deps": Array [
-                  0,
-                  0,
-                  undefined,
-                  Object {},
-                  <transform />,
-                ],
-                "destroy": undefined,
-                "next": [Circular],
-                "tag": 3,
-              },
+              "deps": Array [
+                null,
+              ],
+              "destroy": undefined,
+              "next": [Circular],
               "tag": 5,
             },
           },
@@ -6552,13 +6450,13 @@ ReactTestInstance {
           "_debugNeedsRemount": false,
           "_debugOwner": FiberNode {
             "_debugHookTypes": Array [
-              "useRef",
               "useState",
               "useState",
               "useState",
               "useState",
               "useState",
-              "useLayoutEffect",
+              "useCallback",
+              "useCallback",
               "useEffect",
             ],
             "_debugID": 3,
@@ -6731,91 +6629,67 @@ ReactTestInstance {
               "children": <transform />,
             },
             "memoizedState": Object {
-              "baseQueue": null,
-              "baseState": null,
+              "baseQueue": Object {
+                "action": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "eagerReducer": [Function],
+                "eagerState": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "lane": 1,
+                "next": [Circular],
+              },
+              "baseState": Object {
+                "height": 0,
+                "width": 0,
+              },
               "memoizedState": Object {
-                "current": undefined,
+                "height": 0,
+                "width": 0,
               },
               "next": Object {
-                "baseQueue": Object {
-                  "action": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
-                  "eagerReducer": [Function],
-                  "eagerState": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
-                  "lane": 1,
-                  "next": [Circular],
-                },
-                "baseState": Object {
-                  "height": 0,
-                  "width": 0,
-                },
-                "memoizedState": Object {
-                  "height": 0,
-                  "width": 0,
-                },
+                "baseQueue": null,
+                "baseState": null,
+                "memoizedState": null,
                 "next": Object {
                   "baseQueue": null,
                   "baseState": undefined,
                   "memoizedState": undefined,
                   "next": Object {
                     "baseQueue": null,
-                    "baseState": undefined,
-                    "memoizedState": undefined,
+                    "baseState": false,
+                    "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
                       "baseState": false,
                       "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
-                        "baseState": false,
-                        "memoizedState": false,
+                        "baseState": null,
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
-                          "memoizedState": Object {
-                            "create": [Function],
-                            "deps": Array [
-                              0,
-                              0,
-                              undefined,
-                              Object {},
-                              <transform />,
-                            ],
-                            "destroy": undefined,
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [],
-                              "destroy": [Function],
-                              "next": [Circular],
-                              "tag": 5,
-                            },
-                            "tag": 3,
-                          },
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
                             "memoizedState": Object {
                               "create": [Function],
-                              "deps": Array [],
-                              "destroy": [Function],
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [
-                                  0,
-                                  0,
-                                  undefined,
-                                  Object {},
-                                  <transform />,
-                                ],
-                                "destroy": undefined,
-                                "next": [Circular],
-                                "tag": 3,
-                              },
+                              "deps": Array [
+                                null,
+                              ],
+                              "destroy": undefined,
+                              "next": [Circular],
                               "tag": 5,
                             },
                             "next": null,
@@ -6823,12 +6697,7 @@ ReactTestInstance {
                           },
                           "queue": null,
                         },
-                        "queue": Object {
-                          "dispatch": [Function],
-                          "lastRenderedReducer": [Function],
-                          "lastRenderedState": false,
-                          "pending": null,
-                        },
+                        "queue": null,
                       },
                       "queue": Object {
                         "dispatch": [Function],
@@ -6840,7 +6709,7 @@ ReactTestInstance {
                     "queue": Object {
                       "dispatch": [Function],
                       "lastRenderedReducer": [Function],
-                      "lastRenderedState": undefined,
+                      "lastRenderedState": false,
                       "pending": null,
                     },
                   },
@@ -6854,14 +6723,19 @@ ReactTestInstance {
                 "queue": Object {
                   "dispatch": [Function],
                   "lastRenderedReducer": [Function],
-                  "lastRenderedState": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
+                  "lastRenderedState": null,
                   "pending": null,
                 },
               },
-              "queue": null,
+              "queue": Object {
+                "dispatch": [Function],
+                "lastRenderedReducer": [Function],
+                "lastRenderedState": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "pending": null,
+              },
             },
             "mode": 0,
             "nextEffect": null,
@@ -6890,12 +6764,12 @@ ReactTestInstance {
                 "childLanes": 0,
                 "dependencies": null,
                 "elementType": null,
-                "firstEffect": [Circular],
+                "firstEffect": null,
                 "flags": 0,
                 "index": 0,
                 "key": null,
                 "lanes": 0,
-                "lastEffect": [Circular],
+                "lastEffect": null,
                 "memoizedProps": null,
                 "memoizedState": Object {
                   "element": <ForwardRef(Canvas)>
@@ -7173,12 +7047,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -7356,21 +7230,11 @@ ReactTestInstance {
             "updateQueue": Object {
               "lastEffect": Object {
                 "create": [Function],
-                "deps": Array [],
-                "destroy": [Function],
-                "next": Object {
-                  "create": [Function],
-                  "deps": Array [
-                    0,
-                    0,
-                    undefined,
-                    Object {},
-                    <transform />,
-                  ],
-                  "destroy": undefined,
-                  "next": [Circular],
-                  "tag": 3,
-                },
+                "deps": Array [
+                  null,
+                ],
+                "destroy": undefined,
+                "next": [Circular],
                 "tag": 5,
               },
             },
@@ -7635,13 +7499,13 @@ ReactTestInstance {
           "ref": null,
           "return": FiberNode {
             "_debugHookTypes": Array [
-              "useRef",
               "useState",
               "useState",
               "useState",
               "useState",
               "useState",
-              "useLayoutEffect",
+              "useCallback",
+              "useCallback",
               "useEffect",
             ],
             "_debugID": 3,
@@ -7814,91 +7678,67 @@ ReactTestInstance {
               "children": <transform />,
             },
             "memoizedState": Object {
-              "baseQueue": null,
-              "baseState": null,
+              "baseQueue": Object {
+                "action": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "eagerReducer": [Function],
+                "eagerState": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "lane": 1,
+                "next": [Circular],
+              },
+              "baseState": Object {
+                "height": 0,
+                "width": 0,
+              },
               "memoizedState": Object {
-                "current": undefined,
+                "height": 0,
+                "width": 0,
               },
               "next": Object {
-                "baseQueue": Object {
-                  "action": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
-                  "eagerReducer": [Function],
-                  "eagerState": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
-                  "lane": 1,
-                  "next": [Circular],
-                },
-                "baseState": Object {
-                  "height": 0,
-                  "width": 0,
-                },
-                "memoizedState": Object {
-                  "height": 0,
-                  "width": 0,
-                },
+                "baseQueue": null,
+                "baseState": null,
+                "memoizedState": null,
                 "next": Object {
                   "baseQueue": null,
                   "baseState": undefined,
                   "memoizedState": undefined,
                   "next": Object {
                     "baseQueue": null,
-                    "baseState": undefined,
-                    "memoizedState": undefined,
+                    "baseState": false,
+                    "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
                       "baseState": false,
                       "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
-                        "baseState": false,
-                        "memoizedState": false,
+                        "baseState": null,
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
-                          "memoizedState": Object {
-                            "create": [Function],
-                            "deps": Array [
-                              0,
-                              0,
-                              undefined,
-                              Object {},
-                              <transform />,
-                            ],
-                            "destroy": undefined,
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [],
-                              "destroy": [Function],
-                              "next": [Circular],
-                              "tag": 5,
-                            },
-                            "tag": 3,
-                          },
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
                             "memoizedState": Object {
                               "create": [Function],
-                              "deps": Array [],
-                              "destroy": [Function],
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [
-                                  0,
-                                  0,
-                                  undefined,
-                                  Object {},
-                                  <transform />,
-                                ],
-                                "destroy": undefined,
-                                "next": [Circular],
-                                "tag": 3,
-                              },
+                              "deps": Array [
+                                null,
+                              ],
+                              "destroy": undefined,
+                              "next": [Circular],
                               "tag": 5,
                             },
                             "next": null,
@@ -7906,12 +7746,7 @@ ReactTestInstance {
                           },
                           "queue": null,
                         },
-                        "queue": Object {
-                          "dispatch": [Function],
-                          "lastRenderedReducer": [Function],
-                          "lastRenderedState": false,
-                          "pending": null,
-                        },
+                        "queue": null,
                       },
                       "queue": Object {
                         "dispatch": [Function],
@@ -7923,7 +7758,7 @@ ReactTestInstance {
                     "queue": Object {
                       "dispatch": [Function],
                       "lastRenderedReducer": [Function],
-                      "lastRenderedState": undefined,
+                      "lastRenderedState": false,
                       "pending": null,
                     },
                   },
@@ -7937,14 +7772,19 @@ ReactTestInstance {
                 "queue": Object {
                   "dispatch": [Function],
                   "lastRenderedReducer": [Function],
-                  "lastRenderedState": Object {
-                    "height": 800,
-                    "width": 1280,
-                  },
+                  "lastRenderedState": null,
                   "pending": null,
                 },
               },
-              "queue": null,
+              "queue": Object {
+                "dispatch": [Function],
+                "lastRenderedReducer": [Function],
+                "lastRenderedState": Object {
+                  "height": 800,
+                  "width": 1280,
+                },
+                "pending": null,
+              },
             },
             "mode": 0,
             "nextEffect": null,
@@ -7973,12 +7813,12 @@ ReactTestInstance {
                 "childLanes": 0,
                 "dependencies": null,
                 "elementType": null,
-                "firstEffect": [Circular],
+                "firstEffect": null,
                 "flags": 0,
                 "index": 0,
                 "key": null,
                 "lanes": 0,
-                "lastEffect": [Circular],
+                "lastEffect": null,
                 "memoizedProps": null,
                 "memoizedState": Object {
                   "element": <ForwardRef(Canvas)>
@@ -8256,12 +8096,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -8439,21 +8279,11 @@ ReactTestInstance {
             "updateQueue": Object {
               "lastEffect": Object {
                 "create": [Function],
-                "deps": Array [],
-                "destroy": [Function],
-                "next": Object {
-                  "create": [Function],
-                  "deps": Array [
-                    0,
-                    0,
-                    undefined,
-                    Object {},
-                    <transform />,
-                  ],
-                  "destroy": undefined,
-                  "next": [Circular],
-                  "tag": 3,
-                },
+                "deps": Array [
+                  null,
+                ],
+                "destroy": undefined,
+                "next": [Circular],
                 "tag": 5,
               },
             },
@@ -8488,13 +8318,13 @@ ReactTestInstance {
             "_debugNeedsRemount": false,
             "_debugOwner": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -8521,91 +8351,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -8613,12 +8419,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -8630,7 +8431,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -8644,14 +8445,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -8680,12 +8486,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -8890,12 +8696,12 @@ ReactTestInstance {
                     "childLanes": 0,
                     "dependencies": null,
                     "elementType": null,
-                    "firstEffect": [Circular],
+                    "firstEffect": null,
                     "flags": 0,
                     "index": 0,
                     "key": null,
                     "lanes": 0,
-                    "lastEffect": [Circular],
+                    "lastEffect": null,
                     "memoizedProps": null,
                     "memoizedState": Object {
                       "element": <ForwardRef(Canvas)>
@@ -9073,21 +8879,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -9133,13 +8929,13 @@ ReactTestInstance {
             "ref": null,
             "return": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -9166,91 +8962,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -9258,12 +9030,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -9275,7 +9042,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -9289,14 +9056,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -9325,12 +9097,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -9535,12 +9307,12 @@ ReactTestInstance {
                     "childLanes": 0,
                     "dependencies": null,
                     "elementType": null,
-                    "firstEffect": [Circular],
+                    "firstEffect": null,
                     "flags": 0,
                     "index": 0,
                     "key": null,
                     "lanes": 0,
-                    "lastEffect": [Circular],
+                    "lastEffect": null,
                     "memoizedProps": null,
                     "memoizedState": Object {
                       "element": <ForwardRef(Canvas)>
@@ -9718,21 +9490,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -9805,13 +9567,13 @@ ReactTestInstance {
             "_debugNeedsRemount": false,
             "_debugOwner": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -9838,91 +9600,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -9930,12 +9668,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -9947,7 +9680,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -9961,14 +9694,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -9997,12 +9735,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -10207,12 +9945,12 @@ ReactTestInstance {
                     "childLanes": 0,
                     "dependencies": null,
                     "elementType": null,
-                    "firstEffect": [Circular],
+                    "firstEffect": null,
                     "flags": 0,
                     "index": 0,
                     "key": null,
                     "lanes": 0,
-                    "lastEffect": [Circular],
+                    "lastEffect": null,
                     "memoizedProps": null,
                     "memoizedState": Object {
                       "element": <ForwardRef(Canvas)>
@@ -10390,21 +10128,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -10450,13 +10178,13 @@ ReactTestInstance {
             "ref": null,
             "return": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -10483,91 +10211,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -10575,12 +10279,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -10592,7 +10291,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -10606,14 +10305,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -10642,12 +10346,12 @@ ReactTestInstance {
                   "childLanes": 0,
                   "dependencies": null,
                   "elementType": null,
-                  "firstEffect": [Circular],
+                  "firstEffect": null,
                   "flags": 0,
                   "index": 0,
                   "key": null,
                   "lanes": 0,
-                  "lastEffect": [Circular],
+                  "lastEffect": null,
                   "memoizedProps": null,
                   "memoizedState": Object {
                     "element": <ForwardRef(Canvas)>
@@ -10852,12 +10556,12 @@ ReactTestInstance {
                     "childLanes": 0,
                     "dependencies": null,
                     "elementType": null,
-                    "firstEffect": [Circular],
+                    "firstEffect": null,
                     "flags": 0,
                     "index": 0,
                     "key": null,
                     "lanes": 0,
-                    "lastEffect": [Circular],
+                    "lastEffect": null,
                     "memoizedProps": null,
                     "memoizedState": Object {
                       "element": <ForwardRef(Canvas)>
@@ -11035,21 +10739,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -11216,7 +10910,7 @@ ReactTestInstance {
       "render": [Function],
     },
     "firstEffect": null,
-    "flags": 5,
+    "flags": 1,
     "index": 0,
     "key": null,
     "lanes": 0,
@@ -11226,78 +10920,54 @@ ReactTestInstance {
     },
     "memoizedState": Object {
       "baseQueue": null,
-      "baseState": null,
+      "baseState": Object {
+        "height": 800,
+        "width": 1280,
+      },
       "memoizedState": Object {
-        "current": undefined,
+        "height": 800,
+        "width": 1280,
       },
       "next": Object {
         "baseQueue": null,
-        "baseState": Object {
-          "height": 800,
-          "width": 1280,
-        },
-        "memoizedState": Object {
-          "height": 800,
-          "width": 1280,
-        },
+        "baseState": null,
+        "memoizedState": null,
         "next": Object {
           "baseQueue": null,
           "baseState": undefined,
           "memoizedState": undefined,
           "next": Object {
             "baseQueue": null,
-            "baseState": undefined,
-            "memoizedState": undefined,
+            "baseState": false,
+            "memoizedState": false,
             "next": Object {
               "baseQueue": null,
               "baseState": false,
               "memoizedState": false,
               "next": Object {
                 "baseQueue": null,
-                "baseState": false,
-                "memoizedState": false,
+                "baseState": null,
+                "memoizedState": Array [
+                  [Function],
+                  Array [],
+                ],
                 "next": Object {
                   "baseQueue": null,
                   "baseState": null,
-                  "memoizedState": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      1280,
-                      800,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": Object {
-                      "create": [Function],
-                      "deps": Array [],
-                      "destroy": [Function],
-                      "next": [Circular],
-                      "tag": 4,
-                    },
-                    "tag": 3,
-                  },
+                  "memoizedState": Array [
+                    [Function],
+                    Array [],
+                  ],
                   "next": Object {
                     "baseQueue": null,
                     "baseState": null,
                     "memoizedState": Object {
                       "create": [Function],
-                      "deps": Array [],
-                      "destroy": [Function],
-                      "next": Object {
-                        "create": [Function],
-                        "deps": Array [
-                          0,
-                          0,
-                          undefined,
-                          Object {},
-                          <transform />,
-                        ],
-                        "destroy": undefined,
-                        "next": [Circular],
-                        "tag": 3,
-                      },
+                      "deps": Array [
+                        null,
+                      ],
+                      "destroy": undefined,
+                      "next": [Circular],
                       "tag": 5,
                     },
                     "next": null,
@@ -11305,12 +10975,7 @@ ReactTestInstance {
                   },
                   "queue": null,
                 },
-                "queue": Object {
-                  "dispatch": [Function],
-                  "lastRenderedReducer": [Function],
-                  "lastRenderedState": false,
-                  "pending": null,
-                },
+                "queue": null,
               },
               "queue": Object {
                 "dispatch": [Function],
@@ -11322,7 +10987,7 @@ ReactTestInstance {
             "queue": Object {
               "dispatch": [Function],
               "lastRenderedReducer": [Function],
-              "lastRenderedState": undefined,
+              "lastRenderedState": false,
               "pending": null,
             },
           },
@@ -11336,14 +11001,19 @@ ReactTestInstance {
         "queue": Object {
           "dispatch": [Function],
           "lastRenderedReducer": [Function],
-          "lastRenderedState": Object {
-            "height": 800,
-            "width": 1280,
-          },
+          "lastRenderedState": null,
           "pending": null,
         },
       },
-      "queue": null,
+      "queue": Object {
+        "dispatch": [Function],
+        "lastRenderedReducer": [Function],
+        "lastRenderedState": Object {
+          "height": 800,
+          "width": 1280,
+        },
+        "pending": null,
+      },
     },
     "mode": 0,
     "nextEffect": null,
@@ -11370,13 +11040,13 @@ ReactTestInstance {
         "alternate": [Circular],
         "child": FiberNode {
           "_debugHookTypes": Array [
-            "useRef",
             "useState",
             "useState",
             "useState",
             "useState",
             "useState",
-            "useLayoutEffect",
+            "useCallback",
+            "useCallback",
             "useEffect",
           ],
           "_debugID": 3,
@@ -13898,91 +13568,67 @@ ReactTestInstance {
             "children": <transform />,
           },
           "memoizedState": Object {
-            "baseQueue": null,
-            "baseState": null,
+            "baseQueue": Object {
+              "action": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "eagerReducer": [Function],
+              "eagerState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "lane": 1,
+              "next": [Circular],
+            },
+            "baseState": Object {
+              "height": 0,
+              "width": 0,
+            },
             "memoizedState": Object {
-              "current": undefined,
+              "height": 0,
+              "width": 0,
             },
             "next": Object {
-              "baseQueue": Object {
-                "action": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "eagerReducer": [Function],
-                "eagerState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "lane": 1,
-                "next": [Circular],
-              },
-              "baseState": Object {
-                "height": 0,
-                "width": 0,
-              },
-              "memoizedState": Object {
-                "height": 0,
-                "width": 0,
-              },
+              "baseQueue": null,
+              "baseState": null,
+              "memoizedState": null,
               "next": Object {
                 "baseQueue": null,
                 "baseState": undefined,
                 "memoizedState": undefined,
                 "next": Object {
                   "baseQueue": null,
-                  "baseState": undefined,
-                  "memoizedState": undefined,
+                  "baseState": false,
+                  "memoizedState": false,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": false,
                     "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": false,
-                      "memoizedState": false,
+                      "baseState": null,
+                      "memoizedState": Array [
+                        [Function],
+                        Array [],
+                      ],
                       "next": Object {
                         "baseQueue": null,
                         "baseState": null,
-                        "memoizedState": Object {
-                          "create": [Function],
-                          "deps": Array [
-                            0,
-                            0,
-                            undefined,
-                            Object {},
-                            <transform />,
-                          ],
-                          "destroy": undefined,
-                          "next": Object {
-                            "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": [Circular],
-                            "tag": 5,
-                          },
-                          "tag": 3,
-                        },
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
                           "memoizedState": Object {
                             "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": [Circular],
-                              "tag": 3,
-                            },
+                            "deps": Array [
+                              null,
+                            ],
+                            "destroy": undefined,
+                            "next": [Circular],
                             "tag": 5,
                           },
                           "next": null,
@@ -13990,12 +13636,7 @@ ReactTestInstance {
                         },
                         "queue": null,
                       },
-                      "queue": Object {
-                        "dispatch": [Function],
-                        "lastRenderedReducer": [Function],
-                        "lastRenderedState": false,
-                        "pending": null,
-                      },
+                      "queue": null,
                     },
                     "queue": Object {
                       "dispatch": [Function],
@@ -14007,7 +13648,7 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": undefined,
+                    "lastRenderedState": false,
                     "pending": null,
                   },
                 },
@@ -14021,14 +13662,19 @@ ReactTestInstance {
               "queue": Object {
                 "dispatch": [Function],
                 "lastRenderedReducer": [Function],
-                "lastRenderedState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
+                "lastRenderedState": null,
                 "pending": null,
               },
             },
-            "queue": null,
+            "queue": Object {
+              "dispatch": [Function],
+              "lastRenderedReducer": [Function],
+              "lastRenderedState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "pending": null,
+            },
           },
           "mode": 0,
           "nextEffect": null,
@@ -14049,21 +13695,11 @@ ReactTestInstance {
           "updateQueue": Object {
             "lastEffect": Object {
               "create": [Function],
-              "deps": Array [],
-              "destroy": [Function],
-              "next": Object {
-                "create": [Function],
-                "deps": Array [
-                  0,
-                  0,
-                  undefined,
-                  Object {},
-                  <transform />,
-                ],
-                "destroy": undefined,
-                "next": [Circular],
-                "tag": 3,
-              },
+              "deps": Array [
+                null,
+              ],
+              "destroy": undefined,
+              "next": [Circular],
               "tag": 5,
             },
           },
@@ -14083,13 +13719,13 @@ ReactTestInstance {
             "_debugNeedsRemount": false,
             "_debugOwner": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -14116,91 +13752,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -14208,12 +13820,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -14225,7 +13832,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -14239,14 +13846,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -14267,21 +13879,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -14467,13 +14069,13 @@ ReactTestInstance {
             "ref": null,
             "return": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -14500,91 +14102,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -14592,12 +14170,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -14609,7 +14182,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -14623,14 +14196,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -14651,21 +14229,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -14700,13 +14268,13 @@ ReactTestInstance {
               "_debugNeedsRemount": false,
               "_debugOwner": FiberNode {
                 "_debugHookTypes": Array [
-                  "useRef",
                   "useState",
                   "useState",
                   "useState",
                   "useState",
                   "useState",
-                  "useLayoutEffect",
+                  "useCallback",
+                  "useCallback",
                   "useEffect",
                 ],
                 "_debugID": 3,
@@ -14733,91 +14301,67 @@ ReactTestInstance {
                   "children": <transform />,
                 },
                 "memoizedState": Object {
-                  "baseQueue": null,
-                  "baseState": null,
+                  "baseQueue": Object {
+                    "action": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "eagerReducer": [Function],
+                    "eagerState": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "lane": 1,
+                    "next": [Circular],
+                  },
+                  "baseState": Object {
+                    "height": 0,
+                    "width": 0,
+                  },
                   "memoizedState": Object {
-                    "current": undefined,
+                    "height": 0,
+                    "width": 0,
                   },
                   "next": Object {
-                    "baseQueue": Object {
-                      "action": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
-                      "eagerReducer": [Function],
-                      "eagerState": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
-                      "lane": 1,
-                      "next": [Circular],
-                    },
-                    "baseState": Object {
-                      "height": 0,
-                      "width": 0,
-                    },
-                    "memoizedState": Object {
-                      "height": 0,
-                      "width": 0,
-                    },
+                    "baseQueue": null,
+                    "baseState": null,
+                    "memoizedState": null,
                     "next": Object {
                       "baseQueue": null,
                       "baseState": undefined,
                       "memoizedState": undefined,
                       "next": Object {
                         "baseQueue": null,
-                        "baseState": undefined,
-                        "memoizedState": undefined,
+                        "baseState": false,
+                        "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
                           "baseState": false,
                           "memoizedState": false,
                           "next": Object {
                             "baseQueue": null,
-                            "baseState": false,
-                            "memoizedState": false,
+                            "baseState": null,
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
-                              "memoizedState": Object {
-                                "create": [Function],
-                                "deps": Array [
-                                  0,
-                                  0,
-                                  undefined,
-                                  Object {},
-                                  <transform />,
-                                ],
-                                "destroy": undefined,
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [],
-                                  "destroy": [Function],
-                                  "next": [Circular],
-                                  "tag": 5,
-                                },
-                                "tag": 3,
-                              },
+                              "memoizedState": Array [
+                                [Function],
+                                Array [],
+                              ],
                               "next": Object {
                                 "baseQueue": null,
                                 "baseState": null,
                                 "memoizedState": Object {
                                   "create": [Function],
-                                  "deps": Array [],
-                                  "destroy": [Function],
-                                  "next": Object {
-                                    "create": [Function],
-                                    "deps": Array [
-                                      0,
-                                      0,
-                                      undefined,
-                                      Object {},
-                                      <transform />,
-                                    ],
-                                    "destroy": undefined,
-                                    "next": [Circular],
-                                    "tag": 3,
-                                  },
+                                  "deps": Array [
+                                    null,
+                                  ],
+                                  "destroy": undefined,
+                                  "next": [Circular],
                                   "tag": 5,
                                 },
                                 "next": null,
@@ -14825,12 +14369,7 @@ ReactTestInstance {
                               },
                               "queue": null,
                             },
-                            "queue": Object {
-                              "dispatch": [Function],
-                              "lastRenderedReducer": [Function],
-                              "lastRenderedState": false,
-                              "pending": null,
-                            },
+                            "queue": null,
                           },
                           "queue": Object {
                             "dispatch": [Function],
@@ -14842,7 +14381,7 @@ ReactTestInstance {
                         "queue": Object {
                           "dispatch": [Function],
                           "lastRenderedReducer": [Function],
-                          "lastRenderedState": undefined,
+                          "lastRenderedState": false,
                           "pending": null,
                         },
                       },
@@ -14856,14 +14395,19 @@ ReactTestInstance {
                     "queue": Object {
                       "dispatch": [Function],
                       "lastRenderedReducer": [Function],
-                      "lastRenderedState": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
+                      "lastRenderedState": null,
                       "pending": null,
                     },
                   },
-                  "queue": null,
+                  "queue": Object {
+                    "dispatch": [Function],
+                    "lastRenderedReducer": [Function],
+                    "lastRenderedState": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "pending": null,
+                  },
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -14884,21 +14428,11 @@ ReactTestInstance {
                 "updateQueue": Object {
                   "lastEffect": Object {
                     "create": [Function],
-                    "deps": Array [],
-                    "destroy": [Function],
-                    "next": Object {
-                      "create": [Function],
-                      "deps": Array [
-                        0,
-                        0,
-                        undefined,
-                        Object {},
-                        <transform />,
-                      ],
-                      "destroy": undefined,
-                      "next": [Circular],
-                      "tag": 3,
-                    },
+                    "deps": Array [
+                      null,
+                    ],
+                    "destroy": undefined,
+                    "next": [Circular],
                     "tag": 5,
                   },
                 },
@@ -15007,13 +14541,13 @@ ReactTestInstance {
               "ref": null,
               "return": FiberNode {
                 "_debugHookTypes": Array [
-                  "useRef",
                   "useState",
                   "useState",
                   "useState",
                   "useState",
                   "useState",
-                  "useLayoutEffect",
+                  "useCallback",
+                  "useCallback",
                   "useEffect",
                 ],
                 "_debugID": 3,
@@ -15040,91 +14574,67 @@ ReactTestInstance {
                   "children": <transform />,
                 },
                 "memoizedState": Object {
-                  "baseQueue": null,
-                  "baseState": null,
+                  "baseQueue": Object {
+                    "action": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "eagerReducer": [Function],
+                    "eagerState": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "lane": 1,
+                    "next": [Circular],
+                  },
+                  "baseState": Object {
+                    "height": 0,
+                    "width": 0,
+                  },
                   "memoizedState": Object {
-                    "current": undefined,
+                    "height": 0,
+                    "width": 0,
                   },
                   "next": Object {
-                    "baseQueue": Object {
-                      "action": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
-                      "eagerReducer": [Function],
-                      "eagerState": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
-                      "lane": 1,
-                      "next": [Circular],
-                    },
-                    "baseState": Object {
-                      "height": 0,
-                      "width": 0,
-                    },
-                    "memoizedState": Object {
-                      "height": 0,
-                      "width": 0,
-                    },
+                    "baseQueue": null,
+                    "baseState": null,
+                    "memoizedState": null,
                     "next": Object {
                       "baseQueue": null,
                       "baseState": undefined,
                       "memoizedState": undefined,
                       "next": Object {
                         "baseQueue": null,
-                        "baseState": undefined,
-                        "memoizedState": undefined,
+                        "baseState": false,
+                        "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
                           "baseState": false,
                           "memoizedState": false,
                           "next": Object {
                             "baseQueue": null,
-                            "baseState": false,
-                            "memoizedState": false,
+                            "baseState": null,
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
-                              "memoizedState": Object {
-                                "create": [Function],
-                                "deps": Array [
-                                  0,
-                                  0,
-                                  undefined,
-                                  Object {},
-                                  <transform />,
-                                ],
-                                "destroy": undefined,
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [],
-                                  "destroy": [Function],
-                                  "next": [Circular],
-                                  "tag": 5,
-                                },
-                                "tag": 3,
-                              },
+                              "memoizedState": Array [
+                                [Function],
+                                Array [],
+                              ],
                               "next": Object {
                                 "baseQueue": null,
                                 "baseState": null,
                                 "memoizedState": Object {
                                   "create": [Function],
-                                  "deps": Array [],
-                                  "destroy": [Function],
-                                  "next": Object {
-                                    "create": [Function],
-                                    "deps": Array [
-                                      0,
-                                      0,
-                                      undefined,
-                                      Object {},
-                                      <transform />,
-                                    ],
-                                    "destroy": undefined,
-                                    "next": [Circular],
-                                    "tag": 3,
-                                  },
+                                  "deps": Array [
+                                    null,
+                                  ],
+                                  "destroy": undefined,
+                                  "next": [Circular],
                                   "tag": 5,
                                 },
                                 "next": null,
@@ -15132,12 +14642,7 @@ ReactTestInstance {
                               },
                               "queue": null,
                             },
-                            "queue": Object {
-                              "dispatch": [Function],
-                              "lastRenderedReducer": [Function],
-                              "lastRenderedState": false,
-                              "pending": null,
-                            },
+                            "queue": null,
                           },
                           "queue": Object {
                             "dispatch": [Function],
@@ -15149,7 +14654,7 @@ ReactTestInstance {
                         "queue": Object {
                           "dispatch": [Function],
                           "lastRenderedReducer": [Function],
-                          "lastRenderedState": undefined,
+                          "lastRenderedState": false,
                           "pending": null,
                         },
                       },
@@ -15163,14 +14668,19 @@ ReactTestInstance {
                     "queue": Object {
                       "dispatch": [Function],
                       "lastRenderedReducer": [Function],
-                      "lastRenderedState": Object {
-                        "height": 800,
-                        "width": 1280,
-                      },
+                      "lastRenderedState": null,
                       "pending": null,
                     },
                   },
-                  "queue": null,
+                  "queue": Object {
+                    "dispatch": [Function],
+                    "lastRenderedReducer": [Function],
+                    "lastRenderedState": Object {
+                      "height": 800,
+                      "width": 1280,
+                    },
+                    "pending": null,
+                  },
                 },
                 "mode": 0,
                 "nextEffect": null,
@@ -15191,21 +14701,11 @@ ReactTestInstance {
                 "updateQueue": Object {
                   "lastEffect": Object {
                     "create": [Function],
-                    "deps": Array [],
-                    "destroy": [Function],
-                    "next": Object {
-                      "create": [Function],
-                      "deps": Array [
-                        0,
-                        0,
-                        undefined,
-                        Object {},
-                        <transform />,
-                      ],
-                      "destroy": undefined,
-                      "next": [Circular],
-                      "tag": 3,
-                    },
+                    "deps": Array [
+                      null,
+                    ],
+                    "destroy": undefined,
+                    "next": [Circular],
                     "tag": 5,
                   },
                 },
@@ -15290,13 +14790,13 @@ ReactTestInstance {
                 "_debugNeedsRemount": false,
                 "_debugOwner": FiberNode {
                   "_debugHookTypes": Array [
-                    "useRef",
                     "useState",
                     "useState",
                     "useState",
                     "useState",
                     "useState",
-                    "useLayoutEffect",
+                    "useCallback",
+                    "useCallback",
                     "useEffect",
                   ],
                   "_debugID": 3,
@@ -15323,91 +14823,67 @@ ReactTestInstance {
                     "children": <transform />,
                   },
                   "memoizedState": Object {
-                    "baseQueue": null,
-                    "baseState": null,
+                    "baseQueue": Object {
+                      "action": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "eagerReducer": [Function],
+                      "eagerState": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "lane": 1,
+                      "next": [Circular],
+                    },
+                    "baseState": Object {
+                      "height": 0,
+                      "width": 0,
+                    },
                     "memoizedState": Object {
-                      "current": undefined,
+                      "height": 0,
+                      "width": 0,
                     },
                     "next": Object {
-                      "baseQueue": Object {
-                        "action": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
-                        "eagerReducer": [Function],
-                        "eagerState": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
-                        "lane": 1,
-                        "next": [Circular],
-                      },
-                      "baseState": Object {
-                        "height": 0,
-                        "width": 0,
-                      },
-                      "memoizedState": Object {
-                        "height": 0,
-                        "width": 0,
-                      },
+                      "baseQueue": null,
+                      "baseState": null,
+                      "memoizedState": null,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": undefined,
                         "memoizedState": undefined,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": undefined,
-                          "memoizedState": undefined,
+                          "baseState": false,
+                          "memoizedState": false,
                           "next": Object {
                             "baseQueue": null,
                             "baseState": false,
                             "memoizedState": false,
                             "next": Object {
                               "baseQueue": null,
-                              "baseState": false,
-                              "memoizedState": false,
+                              "baseState": null,
+                              "memoizedState": Array [
+                                [Function],
+                                Array [],
+                              ],
                               "next": Object {
                                 "baseQueue": null,
                                 "baseState": null,
-                                "memoizedState": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": Object {
-                                    "create": [Function],
-                                    "deps": Array [],
-                                    "destroy": [Function],
-                                    "next": [Circular],
-                                    "tag": 5,
-                                  },
-                                  "tag": 3,
-                                },
+                                "memoizedState": Array [
+                                  [Function],
+                                  Array [],
+                                ],
                                 "next": Object {
                                   "baseQueue": null,
                                   "baseState": null,
                                   "memoizedState": Object {
                                     "create": [Function],
-                                    "deps": Array [],
-                                    "destroy": [Function],
-                                    "next": Object {
-                                      "create": [Function],
-                                      "deps": Array [
-                                        0,
-                                        0,
-                                        undefined,
-                                        Object {},
-                                        <transform />,
-                                      ],
-                                      "destroy": undefined,
-                                      "next": [Circular],
-                                      "tag": 3,
-                                    },
+                                    "deps": Array [
+                                      null,
+                                    ],
+                                    "destroy": undefined,
+                                    "next": [Circular],
                                     "tag": 5,
                                   },
                                   "next": null,
@@ -15415,12 +14891,7 @@ ReactTestInstance {
                                 },
                                 "queue": null,
                               },
-                              "queue": Object {
-                                "dispatch": [Function],
-                                "lastRenderedReducer": [Function],
-                                "lastRenderedState": false,
-                                "pending": null,
-                              },
+                              "queue": null,
                             },
                             "queue": Object {
                               "dispatch": [Function],
@@ -15432,7 +14903,7 @@ ReactTestInstance {
                           "queue": Object {
                             "dispatch": [Function],
                             "lastRenderedReducer": [Function],
-                            "lastRenderedState": undefined,
+                            "lastRenderedState": false,
                             "pending": null,
                           },
                         },
@@ -15446,14 +14917,19 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
+                        "lastRenderedState": null,
                         "pending": null,
                       },
                     },
-                    "queue": null,
+                    "queue": Object {
+                      "dispatch": [Function],
+                      "lastRenderedReducer": [Function],
+                      "lastRenderedState": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "pending": null,
+                    },
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -15474,21 +14950,11 @@ ReactTestInstance {
                   "updateQueue": Object {
                     "lastEffect": Object {
                       "create": [Function],
-                      "deps": Array [],
-                      "destroy": [Function],
-                      "next": Object {
-                        "create": [Function],
-                        "deps": Array [
-                          0,
-                          0,
-                          undefined,
-                          Object {},
-                          <transform />,
-                        ],
-                        "destroy": undefined,
-                        "next": [Circular],
-                        "tag": 3,
-                      },
+                      "deps": Array [
+                        null,
+                      ],
+                      "destroy": undefined,
+                      "next": [Circular],
                       "tag": 5,
                     },
                   },
@@ -15534,13 +15000,13 @@ ReactTestInstance {
                 "ref": null,
                 "return": FiberNode {
                   "_debugHookTypes": Array [
-                    "useRef",
                     "useState",
                     "useState",
                     "useState",
                     "useState",
                     "useState",
-                    "useLayoutEffect",
+                    "useCallback",
+                    "useCallback",
                     "useEffect",
                   ],
                   "_debugID": 3,
@@ -15567,91 +15033,67 @@ ReactTestInstance {
                     "children": <transform />,
                   },
                   "memoizedState": Object {
-                    "baseQueue": null,
-                    "baseState": null,
+                    "baseQueue": Object {
+                      "action": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "eagerReducer": [Function],
+                      "eagerState": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "lane": 1,
+                      "next": [Circular],
+                    },
+                    "baseState": Object {
+                      "height": 0,
+                      "width": 0,
+                    },
                     "memoizedState": Object {
-                      "current": undefined,
+                      "height": 0,
+                      "width": 0,
                     },
                     "next": Object {
-                      "baseQueue": Object {
-                        "action": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
-                        "eagerReducer": [Function],
-                        "eagerState": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
-                        "lane": 1,
-                        "next": [Circular],
-                      },
-                      "baseState": Object {
-                        "height": 0,
-                        "width": 0,
-                      },
-                      "memoizedState": Object {
-                        "height": 0,
-                        "width": 0,
-                      },
+                      "baseQueue": null,
+                      "baseState": null,
+                      "memoizedState": null,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": undefined,
                         "memoizedState": undefined,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": undefined,
-                          "memoizedState": undefined,
+                          "baseState": false,
+                          "memoizedState": false,
                           "next": Object {
                             "baseQueue": null,
                             "baseState": false,
                             "memoizedState": false,
                             "next": Object {
                               "baseQueue": null,
-                              "baseState": false,
-                              "memoizedState": false,
+                              "baseState": null,
+                              "memoizedState": Array [
+                                [Function],
+                                Array [],
+                              ],
                               "next": Object {
                                 "baseQueue": null,
                                 "baseState": null,
-                                "memoizedState": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": Object {
-                                    "create": [Function],
-                                    "deps": Array [],
-                                    "destroy": [Function],
-                                    "next": [Circular],
-                                    "tag": 5,
-                                  },
-                                  "tag": 3,
-                                },
+                                "memoizedState": Array [
+                                  [Function],
+                                  Array [],
+                                ],
                                 "next": Object {
                                   "baseQueue": null,
                                   "baseState": null,
                                   "memoizedState": Object {
                                     "create": [Function],
-                                    "deps": Array [],
-                                    "destroy": [Function],
-                                    "next": Object {
-                                      "create": [Function],
-                                      "deps": Array [
-                                        0,
-                                        0,
-                                        undefined,
-                                        Object {},
-                                        <transform />,
-                                      ],
-                                      "destroy": undefined,
-                                      "next": [Circular],
-                                      "tag": 3,
-                                    },
+                                    "deps": Array [
+                                      null,
+                                    ],
+                                    "destroy": undefined,
+                                    "next": [Circular],
                                     "tag": 5,
                                   },
                                   "next": null,
@@ -15659,12 +15101,7 @@ ReactTestInstance {
                                 },
                                 "queue": null,
                               },
-                              "queue": Object {
-                                "dispatch": [Function],
-                                "lastRenderedReducer": [Function],
-                                "lastRenderedState": false,
-                                "pending": null,
-                              },
+                              "queue": null,
                             },
                             "queue": Object {
                               "dispatch": [Function],
@@ -15676,7 +15113,7 @@ ReactTestInstance {
                           "queue": Object {
                             "dispatch": [Function],
                             "lastRenderedReducer": [Function],
-                            "lastRenderedState": undefined,
+                            "lastRenderedState": false,
                             "pending": null,
                           },
                         },
@@ -15690,14 +15127,19 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": Object {
-                          "height": 800,
-                          "width": 1280,
-                        },
+                        "lastRenderedState": null,
                         "pending": null,
                       },
                     },
-                    "queue": null,
+                    "queue": Object {
+                      "dispatch": [Function],
+                      "lastRenderedReducer": [Function],
+                      "lastRenderedState": Object {
+                        "height": 800,
+                        "width": 1280,
+                      },
+                      "pending": null,
+                    },
                   },
                   "mode": 0,
                   "nextEffect": null,
@@ -15718,21 +15160,11 @@ ReactTestInstance {
                   "updateQueue": Object {
                     "lastEffect": Object {
                       "create": [Function],
-                      "deps": Array [],
-                      "destroy": [Function],
-                      "next": Object {
-                        "create": [Function],
-                        "deps": Array [
-                          0,
-                          0,
-                          undefined,
-                          Object {},
-                          <transform />,
-                        ],
-                        "destroy": undefined,
-                        "next": [Circular],
-                        "tag": 3,
-                      },
+                      "deps": Array [
+                        null,
+                      ],
+                      "destroy": undefined,
+                      "next": [Circular],
                       "tag": 5,
                     },
                   },
@@ -15875,13 +15307,13 @@ ReactTestInstance {
             "_debugNeedsRemount": false,
             "_debugOwner": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -15908,91 +15340,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -16000,12 +15408,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -16017,7 +15420,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -16031,14 +15434,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -16059,21 +15467,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -16259,13 +15657,13 @@ ReactTestInstance {
             "ref": null,
             "return": FiberNode {
               "_debugHookTypes": Array [
-                "useRef",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
                 "useState",
-                "useLayoutEffect",
+                "useCallback",
+                "useCallback",
                 "useEffect",
               ],
               "_debugID": 3,
@@ -16292,91 +15690,67 @@ ReactTestInstance {
                 "children": <transform />,
               },
               "memoizedState": Object {
-                "baseQueue": null,
-                "baseState": null,
+                "baseQueue": Object {
+                  "action": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "eagerReducer": [Function],
+                  "eagerState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "lane": 1,
+                  "next": [Circular],
+                },
+                "baseState": Object {
+                  "height": 0,
+                  "width": 0,
+                },
                 "memoizedState": Object {
-                  "current": undefined,
+                  "height": 0,
+                  "width": 0,
                 },
                 "next": Object {
-                  "baseQueue": Object {
-                    "action": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "eagerReducer": [Function],
-                    "eagerState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
-                    "lane": 1,
-                    "next": [Circular],
-                  },
-                  "baseState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
-                  "memoizedState": Object {
-                    "height": 0,
-                    "width": 0,
-                  },
+                  "baseQueue": null,
+                  "baseState": null,
+                  "memoizedState": null,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": undefined,
                     "memoizedState": undefined,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": undefined,
-                      "memoizedState": undefined,
+                      "baseState": false,
+                      "memoizedState": false,
                       "next": Object {
                         "baseQueue": null,
                         "baseState": false,
                         "memoizedState": false,
                         "next": Object {
                           "baseQueue": null,
-                          "baseState": false,
-                          "memoizedState": false,
+                          "baseState": null,
+                          "memoizedState": Array [
+                            [Function],
+                            Array [],
+                          ],
                           "next": Object {
                             "baseQueue": null,
                             "baseState": null,
-                            "memoizedState": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": Object {
-                                "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": [Circular],
-                                "tag": 5,
-                              },
-                              "tag": 3,
-                            },
+                            "memoizedState": Array [
+                              [Function],
+                              Array [],
+                            ],
                             "next": Object {
                               "baseQueue": null,
                               "baseState": null,
                               "memoizedState": Object {
                                 "create": [Function],
-                                "deps": Array [],
-                                "destroy": [Function],
-                                "next": Object {
-                                  "create": [Function],
-                                  "deps": Array [
-                                    0,
-                                    0,
-                                    undefined,
-                                    Object {},
-                                    <transform />,
-                                  ],
-                                  "destroy": undefined,
-                                  "next": [Circular],
-                                  "tag": 3,
-                                },
+                                "deps": Array [
+                                  null,
+                                ],
+                                "destroy": undefined,
+                                "next": [Circular],
                                 "tag": 5,
                               },
                               "next": null,
@@ -16384,12 +15758,7 @@ ReactTestInstance {
                             },
                             "queue": null,
                           },
-                          "queue": Object {
-                            "dispatch": [Function],
-                            "lastRenderedReducer": [Function],
-                            "lastRenderedState": false,
-                            "pending": null,
-                          },
+                          "queue": null,
                         },
                         "queue": Object {
                           "dispatch": [Function],
@@ -16401,7 +15770,7 @@ ReactTestInstance {
                       "queue": Object {
                         "dispatch": [Function],
                         "lastRenderedReducer": [Function],
-                        "lastRenderedState": undefined,
+                        "lastRenderedState": false,
                         "pending": null,
                       },
                     },
@@ -16415,14 +15784,19 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": Object {
-                      "height": 800,
-                      "width": 1280,
-                    },
+                    "lastRenderedState": null,
                     "pending": null,
                   },
                 },
-                "queue": null,
+                "queue": Object {
+                  "dispatch": [Function],
+                  "lastRenderedReducer": [Function],
+                  "lastRenderedState": Object {
+                    "height": 800,
+                    "width": 1280,
+                  },
+                  "pending": null,
+                },
               },
               "mode": 0,
               "nextEffect": null,
@@ -16443,21 +15817,11 @@ ReactTestInstance {
               "updateQueue": Object {
                 "lastEffect": Object {
                   "create": [Function],
-                  "deps": Array [],
-                  "destroy": [Function],
-                  "next": Object {
-                    "create": [Function],
-                    "deps": Array [
-                      0,
-                      0,
-                      undefined,
-                      Object {},
-                      <transform />,
-                    ],
-                    "destroy": undefined,
-                    "next": [Circular],
-                    "tag": 3,
-                  },
+                  "deps": Array [
+                    null,
+                  ],
+                  "destroy": undefined,
+                  "next": [Circular],
                   "tag": 5,
                 },
               },
@@ -16502,13 +15866,13 @@ ReactTestInstance {
         "lanes": 0,
         "lastEffect": FiberNode {
           "_debugHookTypes": Array [
-            "useRef",
             "useState",
             "useState",
             "useState",
             "useState",
             "useState",
-            "useLayoutEffect",
+            "useCallback",
+            "useCallback",
             "useEffect",
           ],
           "_debugID": 3,
@@ -19030,91 +18394,67 @@ ReactTestInstance {
             "children": <transform />,
           },
           "memoizedState": Object {
-            "baseQueue": null,
-            "baseState": null,
+            "baseQueue": Object {
+              "action": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "eagerReducer": [Function],
+              "eagerState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "lane": 1,
+              "next": [Circular],
+            },
+            "baseState": Object {
+              "height": 0,
+              "width": 0,
+            },
             "memoizedState": Object {
-              "current": undefined,
+              "height": 0,
+              "width": 0,
             },
             "next": Object {
-              "baseQueue": Object {
-                "action": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "eagerReducer": [Function],
-                "eagerState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
-                "lane": 1,
-                "next": [Circular],
-              },
-              "baseState": Object {
-                "height": 0,
-                "width": 0,
-              },
-              "memoizedState": Object {
-                "height": 0,
-                "width": 0,
-              },
+              "baseQueue": null,
+              "baseState": null,
+              "memoizedState": null,
               "next": Object {
                 "baseQueue": null,
                 "baseState": undefined,
                 "memoizedState": undefined,
                 "next": Object {
                   "baseQueue": null,
-                  "baseState": undefined,
-                  "memoizedState": undefined,
+                  "baseState": false,
+                  "memoizedState": false,
                   "next": Object {
                     "baseQueue": null,
                     "baseState": false,
                     "memoizedState": false,
                     "next": Object {
                       "baseQueue": null,
-                      "baseState": false,
-                      "memoizedState": false,
+                      "baseState": null,
+                      "memoizedState": Array [
+                        [Function],
+                        Array [],
+                      ],
                       "next": Object {
                         "baseQueue": null,
                         "baseState": null,
-                        "memoizedState": Object {
-                          "create": [Function],
-                          "deps": Array [
-                            0,
-                            0,
-                            undefined,
-                            Object {},
-                            <transform />,
-                          ],
-                          "destroy": undefined,
-                          "next": Object {
-                            "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": [Circular],
-                            "tag": 5,
-                          },
-                          "tag": 3,
-                        },
+                        "memoizedState": Array [
+                          [Function],
+                          Array [],
+                        ],
                         "next": Object {
                           "baseQueue": null,
                           "baseState": null,
                           "memoizedState": Object {
                             "create": [Function],
-                            "deps": Array [],
-                            "destroy": [Function],
-                            "next": Object {
-                              "create": [Function],
-                              "deps": Array [
-                                0,
-                                0,
-                                undefined,
-                                Object {},
-                                <transform />,
-                              ],
-                              "destroy": undefined,
-                              "next": [Circular],
-                              "tag": 3,
-                            },
+                            "deps": Array [
+                              null,
+                            ],
+                            "destroy": undefined,
+                            "next": [Circular],
                             "tag": 5,
                           },
                           "next": null,
@@ -19122,12 +18462,7 @@ ReactTestInstance {
                         },
                         "queue": null,
                       },
-                      "queue": Object {
-                        "dispatch": [Function],
-                        "lastRenderedReducer": [Function],
-                        "lastRenderedState": false,
-                        "pending": null,
-                      },
+                      "queue": null,
                     },
                     "queue": Object {
                       "dispatch": [Function],
@@ -19139,7 +18474,7 @@ ReactTestInstance {
                   "queue": Object {
                     "dispatch": [Function],
                     "lastRenderedReducer": [Function],
-                    "lastRenderedState": undefined,
+                    "lastRenderedState": false,
                     "pending": null,
                   },
                 },
@@ -19153,14 +18488,19 @@ ReactTestInstance {
               "queue": Object {
                 "dispatch": [Function],
                 "lastRenderedReducer": [Function],
-                "lastRenderedState": Object {
-                  "height": 800,
-                  "width": 1280,
-                },
+                "lastRenderedState": null,
                 "pending": null,
               },
             },
-            "queue": null,
+            "queue": Object {
+              "dispatch": [Function],
+              "lastRenderedReducer": [Function],
+              "lastRenderedState": Object {
+                "height": 800,
+                "width": 1280,
+              },
+              "pending": null,
+            },
           },
           "mode": 0,
           "nextEffect": null,
@@ -19181,21 +18521,11 @@ ReactTestInstance {
           "updateQueue": Object {
             "lastEffect": Object {
               "create": [Function],
-              "deps": Array [],
-              "destroy": [Function],
-              "next": Object {
-                "create": [Function],
-                "deps": Array [
-                  0,
-                  0,
-                  undefined,
-                  Object {},
-                  <transform />,
-                ],
-                "destroy": undefined,
-                "next": [Circular],
-                "tag": 3,
-              },
+              "deps": Array [
+                null,
+              ],
+              "destroy": undefined,
+              "next": [Circular],
               "tag": 5,
             },
           },
@@ -19362,12 +18692,12 @@ ReactTestInstance {
       "childLanes": 0,
       "dependencies": null,
       "elementType": null,
-      "firstEffect": [Circular],
+      "firstEffect": null,
       "flags": 0,
       "index": 0,
       "key": null,
       "lanes": 0,
-      "lastEffect": [Circular],
+      "lastEffect": null,
       "memoizedProps": null,
       "memoizedState": Object {
         "element": <ForwardRef(Canvas)>
@@ -19538,21 +18868,11 @@ ReactTestInstance {
     "updateQueue": Object {
       "lastEffect": Object {
         "create": [Function],
-        "deps": Array [],
-        "destroy": [Function],
-        "next": Object {
-          "create": [Function],
-          "deps": Array [
-            1280,
-            800,
-            undefined,
-            Object {},
-            <transform />,
-          ],
-          "destroy": undefined,
-          "next": [Circular],
-          "tag": 3,
-        },
+        "deps": Array [
+          null,
+        ],
+        "destroy": undefined,
+        "next": [Circular],
         "tag": 4,
       },
     },
