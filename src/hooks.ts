@@ -47,7 +47,8 @@ export function useGraph(object: OGL.Transform) {
  * Subscribe an element into a shared render loop.
  */
 export function useFrame(callback: Subscription, renderPriority = 0) {
-  const state = useOGL()
+  const subscribe = useOGL((state) => state.subscribe)
+  const unsubscribe = useOGL((state) => state.unsubscribe)
   // Store frame callback in a ref so we can pass a mutable reference.
   // This allows the callback to dynamically update without blocking
   // the render loop.
@@ -55,9 +56,9 @@ export function useFrame(callback: Subscription, renderPriority = 0) {
   React.useLayoutEffect(() => void (ref.current = callback), [callback])
   // Subscribe on mount and unsubscribe on unmount
   React.useLayoutEffect(() => {
-    state.subscribe(ref, renderPriority)
-    return () => void state.unsubscribe(ref, renderPriority)
-  }, [state, renderPriority])
+    subscribe(ref, renderPriority)
+    return () => void unsubscribe(ref, renderPriority)
+  }, [subscribe, unsubscribe, renderPriority])
 }
 
 /**
