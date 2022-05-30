@@ -30,22 +30,17 @@ export const render = (
       get,
     }))
 
+    // Bind events
+    const state = store.getState()
+    if (state.events?.connect && !state.events?.connected) state.events.connect(target, state)
+
     // Create root fiber
-    const fiber = reconciler.createContainer(
-      store.getState(),
-      RENDER_MODES[mode] ?? RENDER_MODES['blocking'],
-      false,
-      null,
-    )
+    const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
 
     // Set root
     root = { fiber, store }
     roots.set(target, root)
   }
-
-  // Bind events
-  const state = root.store.getState()
-  if (state.events?.connect && !state.events.connected) state.events.connect(target, state)
 
   // Update fiber
   reconciler.updateContainer(
