@@ -31,7 +31,7 @@ const catalogueGL: any[] = [
  * Extends the OGL namespace, accepting an object of keys pointing to external classes.
  * `passGL` will flag the element to receive a `WebGLRenderingContext` on creation.
  */
-export const extend = (objects: Catalogue, passGL: boolean = false) => {
+export const extend = (objects: Catalogue, passGL = false) => {
   for (const key in objects) {
     const value = objects[key]
     catalogue[key] = value
