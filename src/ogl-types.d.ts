@@ -128,7 +128,7 @@ declare module 'ogl' {
     setInstancedCount(value: number): void
     createVAO(program: Program): void
     bindAttributes(program: Program): void
-    draw({ program, mode }: { program: any; mode?: number }): void
+    draw({ program, mode }: { program: Program; mode?: number }): void
     getPosition(): true | Partial<Attribute>
     computeBoundingBox(attr?: Partial<Attribute>): void
     computeBoundingSphere(attr?: Partial<Attribute>): void
@@ -309,6 +309,9 @@ declare module 'ogl' {
   export type RenderExtensions = {
     [key: string]: any
   }
+  export interface RendererSortable extends Mesh {
+    zDepth: number
+  }
   export class Renderer {
     dpr: number
     alpha: boolean
@@ -364,9 +367,9 @@ declare module 'ogl' {
     activeTexture(value: number): void
     bindFramebuffer({ target, buffer }?: { target?: number; buffer?: WebGLFramebuffer }): void
     getExtension(extension: string, webgl2Func?: keyof WebGL2RenderingContext, extFunc?: string): any
-    sortOpaque(a: any, b: any): number
-    sortTransparent(a: any, b: any): number
-    sortUI(a: any, b: any): number
+    sortOpaque(a: RendererSortable, b: RendererSortable): number
+    sortTransparent(a: RendererSortable, b: RendererSortable): number
+    sortUI(a: RendererSortable, b: RendererSortable): number
     getRenderList({
       scene,
       camera,
@@ -377,7 +380,7 @@ declare module 'ogl' {
       camera: Camera
       frustumCull: boolean
       sort: boolean
-    }): any[]
+    }): Mesh[]
     render({
       scene,
       camera,
@@ -478,12 +481,18 @@ declare module 'ogl' {
     width: number
     height: number
   }[]
+  export type ImageRepresentation =
+    | HTMLImageElement
+    | HTMLVideoElement
+    | HTMLImageElement[]
+    | ArrayBufferView
+    | CompressedImage
   export class Texture {
     ext: string
     gl: OGLRenderingContext
     id: number
     name: string
-    image: HTMLImageElement | HTMLVideoElement | HTMLImageElement[] | ArrayBufferView | CompressedImage
+    image: ImageRepresentation
     target: number
     type: number
     format: number
@@ -502,7 +511,7 @@ declare module 'ogl' {
     anisotropy: number
     texture: WebGLTexture
     store: {
-      image: any
+      image: ImageRepresentation
     }
     glState: RenderState
     state: {
@@ -554,7 +563,7 @@ declare module 'ogl' {
     quaternion: Quat
     rotation: Euler
     constructor()
-    setParent(parent: any, notifyParent?: boolean): void
+    setParent(parent: Transform, notifyParent?: boolean): void
     addChild(child: Transform, notifyChild?: boolean): void
     removeChild(child: Transform, notifyChild?: boolean): void
     updateMatrixWorld(force?: boolean): void
@@ -564,18 +573,26 @@ declare module 'ogl' {
     lookAt(target: Vec3, invert?: boolean): void
   }
 
+  export interface AnimationFrame {
+    position: Vec3
+    quaternion: Quat
+    scale: Vec3
+  }
+  export interface AnimationData {
+    frames: AnimationFrame[]
+  }
   export interface AnimationOptions {
     objects: BoneTransform[]
-    data: any
+    data: AnimationData
   }
   export class Animation {
     objects: BoneTransform[]
-    data: any
+    data: AnimationData
     elapsed: number
     weight: number
     duration: number
     constructor({ objects, data }: AnimationOptions)
-    update(totalWeight: number, isSet: any): void
+    update(totalWeight: number, isSet: boolean): void
   }
 
   export type BoxOptions = {
@@ -654,8 +671,8 @@ declare module 'ogl' {
       value: any
     }
     mask: {
-      read: any
-      write: any
+      read: RenderTarget
+      write: RenderTarget
       swap: () => void
     }
     aspect: number
@@ -666,17 +683,24 @@ declare module 'ogl' {
     update(): void
   }
 
+  export interface GLTFAnimationData {
+    node: any
+    transform: any
+    interpolation: any
+    times: any
+    values: any
+  }
   export class GLTFAnimation {
-    private data
-    private elapsed
-    private weight
-    private loop
-    private duration
-    private startTime
-    private endTime
-    constructor(data: any, weight?: number)
-    update(totalWeight: number, isSet: any): void
-    cubicSplineInterpolate(t: any, prevVal: any, prevTan: any, nextTan: any, nextVal: any): any
+    private data: GLTFAnimationData[]
+    private elapsed: number
+    private weight: number
+    private loop: boolean
+    private duration: number
+    private startTime: number
+    private endTime: number
+    constructor(data: GLTFAnimationData[], weight?: number)
+    update(totalWeight: number, isSet: boolean): void
+    cubicSplineInterpolate(t: number, prevVal: any, prevTan: any, nextTan: any, nextVal: any): any
   }
 
   export class GLTFLoader {
@@ -763,18 +787,20 @@ declare module 'ogl' {
   }
 
   export interface GLTFSkinOptions {
-    skeleton: any
-    geometry: any
-    program: any
-    mode: any
+    skeleton: {
+      joints: { worldMatrix: Mat4; bindInverse: Mat4 }[]
+    }
+    geometry: Geometry
+    program: Program
+    mode: Mesh['mode']
   }
   export class GLTFSkin extends Mesh {
-    skeleton: any
-    animations: any
+    skeleton: GLTFSkinOptions['skeleton']
+    animations: Animation[]
     boneMatrices: Float32Array
     boneTextureSize: number
     boneTexture: Texture
-    constructor(gl: any, { skeleton, geometry, program, mode }?: Partial<GLTFSkinOptions>)
+    constructor(gl: OGLRenderingContext, { skeleton, geometry, program, mode }?: Partial<GLTFSkinOptions>)
     createBoneTexture(): void
     updateUniforms(): void
     draw({ camera }?: { camera?: Camera }): void
@@ -783,9 +809,11 @@ declare module 'ogl' {
   export interface GPGPUpass {
     mesh: Mesh
     program: Program
-    uniforms: any
-    enabled: any
-    textureUniform: any
+    uniforms: {
+      [name: string]: any
+    }
+    enabled: boolean
+    textureUniform: string
   }
   export class GPGPU {
     gl: OGLRenderingContext
@@ -811,7 +839,7 @@ declare module 'ogl' {
       }: {
         data?: Float32Array
         geometry?: Triangle
-        type?: any
+        type?: Texture['type']
       },
     )
     addPass({
@@ -846,11 +874,14 @@ declare module 'ogl' {
     magFilter: number
   }
   export class KTXTexture extends Texture {
-    constructor(gl: any, { buffer, wrapS, wrapT, anisotropy, minFilter, magFilter }?: Partial<KTXTextureOptions>)
+    constructor(
+      gl: OGLRenderingContext,
+      { buffer, wrapS, wrapT, anisotropy, minFilter, magFilter }?: Partial<KTXTextureOptions>,
+    )
     parseBuffer(buffer: ArrayBuffer): void
   }
 
-  export function NormalProgram(gl: any): Program
+  export function NormalProgram(gl: OGLRenderingContext): Program
 
   export type OrbitOptions = {
     element: HTMLElement
@@ -944,7 +975,7 @@ declare module 'ogl' {
       }
     }
     attributes: {
-      [key: string]: any
+      [key: string]: Partial<Attribute>
     }
   }
   export class Polyline {
@@ -986,14 +1017,16 @@ declare module 'ogl' {
     minFilter: GLenum
     magFilter: GLenum
     geometry: Triangle
-    targetOnly: any
+    targetOnly: boolean
   }
   export interface Pass {
     mesh: Mesh
     program: Program
-    uniforms: any
+    uniforms: {
+      [name: string]: any
+    }
     enabled: boolean
-    textureUniform: any
+    textureUniform: string
     vertex?: string
     fragment?: string
   }
@@ -1024,7 +1057,9 @@ declare module 'ogl' {
     addPass({ vertex, fragment, uniforms, textureUniform, enabled }?: Partial<Pass>): {
       mesh: Mesh
       program: Program
-      uniforms: any
+      uniforms: {
+        [name: string]: any
+      }
       enabled: boolean
       textureUniform: string
     }
@@ -1167,7 +1202,7 @@ declare module 'ogl' {
     constructor(gl: OGLRenderingContext, { rig, geometry, program, mode }?: Partial<SkinOptions>)
     createBones(rig: SkinRig): void
     createBoneTexture(): void
-    addAnimation(data: any): Animation
+    addAnimation(data: Animation['data']): Animation
     update(): void
     draw({ camera }?: { camera?: Camera }): void
   }
@@ -1198,6 +1233,31 @@ declare module 'ogl' {
     )
   }
 
+  export interface TextFontChar {
+    char: string
+    xoffset: number
+    yoffset: number
+    width: number
+    height: number
+    x: number
+    y: number
+    xadvance: number
+  }
+  export interface TextFontKerning {
+    first: number
+    second: number
+    amount: number
+  }
+  export interface TextFont {
+    chars: TextFontChar[]
+    kernings: TextFontKerning[]
+    common: {
+      lineHeight: number
+      base: number
+      scaleW: number
+      scaleH: number
+    }
+  }
   export class Text {
     constructor({
       font,
@@ -1211,7 +1271,7 @@ declare module 'ogl' {
       wordBreak,
     }: {
       font: any
-      text: any
+      text: string
       width?: number
       align?: 'left' | 'right' | 'center'
       size?: number
@@ -1265,7 +1325,7 @@ declare module 'ogl' {
         flipY,
       }?: Partial<TextureLoaderOptions>,
     ): T
-    static getSupportedExtensions(gl: OGLRenderingContext): any[]
+    static getSupportedExtensions(gl: OGLRenderingContext): string[]
     static loadKTX(src: string, texture: KTXTexture): Promise<void>
     static loadImage(gl: OGLRenderingContext, src: string, texture: Texture, flipY: boolean): Promise<HTMLImageElement>
     static clearCache(): void
