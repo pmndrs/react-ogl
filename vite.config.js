@@ -2,12 +2,11 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import includeAll from 'rollup-include-all'
 
-const root = path.resolve('/').replace(/\\+/g, '/')
-const external = (id) => !id.startsWith('.') && !id.startsWith(root)
+const LIBRARY_MODE = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
-  plugins: [includeAll()],
-  logLevel: process.env.NODE_ENV === 'production' ? 'warn' : 'info',
+  plugins: [LIBRARY_MODE && includeAll()].filter(Boolean),
+  logLevel: LIBRARY_MODE ? 'warn' : 'info',
   root: 'examples',
   resolve: {
     alias: {
@@ -25,7 +24,7 @@ export default defineConfig({
       fileName: (format) => (format === 'es' ? '[name].mjs' : '[name].js'),
     },
     rollupOptions: {
-      external,
+      external: (id) => !id.startsWith('.') && !path.isAbsolute(id),
       output: {
         preserveModules: true,
         preserveModulesRoot: path.resolve(process.cwd(), 'src'),
