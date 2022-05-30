@@ -1,13 +1,14 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { Fiber } from 'react-reconciler'
+import create, { SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext } from './hooks'
-import { Root, RootState } from './types'
+import { Root, RootState, RootStore } from './types'
 
 // Store roots here since we can render to multiple targets
-const roots = new Map<HTMLCanvasElement, { root: Fiber; state: RootState }>()
+const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
 
 /**
  * Renders React elements into OGL elements.
@@ -15,55 +16,61 @@ const roots = new Map<HTMLCanvasElement, { root: Fiber; state: RootState }>()
 export const render = (
   element: React.ReactNode,
   target: HTMLCanvasElement,
-  { mode = 'blocking', ...config }: RootState,
+  { mode = 'blocking', ...config }: Partial<RootState>,
 ) => {
-  // Get store and init/update OGL state
-  const store = roots.get(target)
-  let root = store?.root
-  const state = Object.assign(store?.state || {}, config)
-
-  // Init
+  // Check for existing root, create on first run
+  let root = roots.get(target)
   if (!root) {
-    // Create scene if one isn't provided
-    if (!state.scene) state.scene = new OGL.Transform()
+    // Create root store
+    const store = create((set: SetState<RootState>, get: SetState<RootState>) => ({
+      scene: new OGL.Transform(),
+      gl: config.renderer?.gl,
+      ...(config as RootState),
+      set,
+      get,
+    }))
 
-    // Add gl to state if not aliased
-    if (!state.gl) state.gl = state.renderer.gl
+    // Create root fiber
+    const fiber = reconciler.createContainer(
+      store.getState(),
+      RENDER_MODES[mode] ?? RENDER_MODES['blocking'],
+      false,
+      null,
+    )
 
-    // Create root
-    root = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
-
-    // Bind events
-    if (state.events?.connect) state.events.connect(target, state)
+    // Set root
+    root = { fiber, store }
+    roots.set(target, root)
   }
 
-  // Update root
-  roots.set(target, { root, state })
+  // Bind events
+  const state = root.store.getState()
+  if (state.events?.connect && !state.events.connected) state.events.connect(target, state)
 
   // Update fiber
   reconciler.updateContainer(
-    <OGLContext.Provider value={state}>{element}</OGLContext.Provider>,
-    root,
+    <OGLContext.Provider value={root.store}>{element}</OGLContext.Provider>,
+    root.fiber,
     null,
     () => undefined,
   )
 
-  return state
+  return root.store
 }
 
 /**
  * Removes and cleans up internals on unmount.
  */
 export const unmountComponentAtNode = (target: HTMLCanvasElement) => {
-  const store = roots.get(target)
-  if (!store) return
-
-  const { root, state } = store
+  const root = roots.get(target)
+  if (!root) return
 
   // Clear container
-  reconciler.updateContainer(null, root, null, () => {
+  reconciler.updateContainer(null, root.fiber, null, () => {
     // Delete root
     roots.delete(target)
+
+    const state = root.store.getState()
 
     // Cancel animation
     if (state.animation) cancelAnimationFrame(state.animation)

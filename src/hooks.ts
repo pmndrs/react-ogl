@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
-import { RootState, Subscription } from './types'
+import type { StateSelector, EqualityChecker } from 'zustand'
+import { RootState, RootStore, Subscription } from './types'
 import { buildGraph } from './utils'
 
 /**
@@ -14,30 +15,38 @@ export const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayo
 /**
  * Internal OGL context.
  */
-export const OGLContext = React.createContext<RootState | null>(null)
+export const OGLContext = React.createContext<RootStore>(null!)
 
 /**
- * Accesses internal OGL state.
+ * Returns the internal OGL store.
  */
-export const useOGL = () => {
-  const state = React.useContext(OGLContext)
-  // We can only access context from within the scope of a context provider.
-  // If used outside, we throw an error instead of returning null for DX.
-  if (!state) throw 'Hooks must used inside a canvas or OGLContext provider!'
-  return state
+export function useStore() {
+  const store = React.useContext(OGLContext)
+  if (!store) throw `react-ogl hooks can only used inside a canvas or OGLContext provider!`
+  return store
+}
+
+/**
+ * Returns the internal OGL state.
+ */
+export function useOGL<T = RootState>(
+  selector: StateSelector<RootState, T> = (state) => state as unknown as T,
+  equalityFn?: EqualityChecker<T>,
+) {
+  return useStore()(selector, equalityFn)
 }
 
 /**
  * Creates an `ObjectMap` from an object.
  */
-export const useGraph = (object: OGL.Transform) => {
+export function useGraph(object: OGL.Transform) {
   return React.useMemo(() => buildGraph(object), [object])
 }
 
 /**
  * Subscribe an element into a shared render loop.
  */
-export const useFrame = (callback: Subscription, renderPriority = 0) => {
+export function useFrame(callback: Subscription, renderPriority = 0) {
   const state = useOGL()
   // Store frame callback in a ref so we can pass a mutable reference.
   // This allows the callback to dynamically update without blocking

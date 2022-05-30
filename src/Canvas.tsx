@@ -55,7 +55,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
       internalState.current = createInternals(canvas.current, {
         events,
         ...internalProps,
-      })
+      }).getState()
     }
 
     const state = internalState.current

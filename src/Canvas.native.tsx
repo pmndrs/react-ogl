@@ -62,7 +62,7 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas({ chil
       internalState.current = createInternals(canvas, {
         events,
         ...internalProps,
-      })
+      }).getState()
     }
 
     if (width > 0 && height > 0) {

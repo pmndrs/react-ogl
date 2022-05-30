@@ -1,5 +1,6 @@
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
+import type { SetState, UseBoundStore, StoreApi } from 'zustand'
 import { RENDER_MODES } from './constants'
 
 // Util funcs
@@ -107,7 +108,7 @@ export type EventHandlers = {
  * react-ogl root.
  */
 export interface Root {
-  render: (element: React.ReactNode) => RootState
+  render: (element: React.ReactNode) => UseBoundStore<RootState>
   unmount: () => void
 }
 
@@ -130,6 +131,8 @@ export type Subscription = (state: RootState, time: number) => any
  * react-ogl internal state.
  */
 export interface RootState {
+  set: SetState<RootState>
+  get: SetState<RootState>
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
   scene: Omit<OGL.Transform, 'children'> & { children: any[] }
@@ -145,6 +148,11 @@ export interface RootState {
   hovered?: Map<number, OGL.Transform>
   [key: string]: any
 }
+
+/**
+ * react-ogl internal Zustand store.
+ */
+export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
 
 /**
  * `fixed` | [`min`, `max`] — `min` and `max` are interpolated from native DPR.
