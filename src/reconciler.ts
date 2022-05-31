@@ -1,7 +1,7 @@
 import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { toPascalCase, applyProps, attach, detach, filterKeys } from './utils'
+import { toPascalCase, applyProps, attach, detach, filterKeys, classExtends } from './utils'
 import { RESERVED_PROPS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
@@ -57,9 +57,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Pass internal state to elements which depend on it.
   // This lets them be immutable upon creation and use props
-  const isGLInstance = Object.values(catalogueGL).some(
-    (elem) => Object.prototype.isPrototypeOf.call(elem, target) || elem === target,
-  )
+  const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
   if (!object && isGLInstance) {
     // Checks whether arg is an instance of a GL context
     const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext

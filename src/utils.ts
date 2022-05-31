@@ -20,6 +20,11 @@ export const toColor = (name: keyof typeof COLORS) => new OGL.Color(COLORS[name]
 export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...values)
 
 /**
+ * Checks for inheritance between two classes.
+ */
+export const classExtends = (a: any, b: any) => (Object.prototype.isPrototypeOf.call(a, b) as boolean) || a === b
+
+/**
  * Filters keys from an object.
  */
 export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {

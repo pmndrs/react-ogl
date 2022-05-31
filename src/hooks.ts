@@ -3,7 +3,7 @@ import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import type { StateSelector, EqualityChecker } from 'zustand'
 import { RootState, RootStore, Subscription } from './types'
-import { buildGraph } from './utils'
+import { buildGraph, classExtends } from './utils'
 
 /**
  * An SSR-friendly useLayoutEffect.
@@ -78,7 +78,7 @@ export const useLoader = (loader: any, input: string | string[], extensions?: (l
       const result = await Promise.all(
         urls.map(async (url) => {
           // OGL's loaders don't have a consistent signature
-          if (loader === OGL.TextureLoader) return loader.load(gl, { url })
+          if (classExtends(loader, OGL.TextureLoader)) return loader.load(gl, { url })
 
           const data = await loader.load(gl, url)
 
