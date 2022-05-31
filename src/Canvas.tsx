@@ -2,21 +2,18 @@ import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { Block, ErrorBoundary } from './utils'
+import { Block, calculateDpr, ErrorBoundary } from './utils'
 import { events as createPointerEvents } from './events'
 import { RenderProps, DPR, SetBlock } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
-export interface CanvasProps extends Omit<RenderProps, 'size'>, React.HTMLAttributes<HTMLDivElement> {
+export interface CanvasProps extends RenderProps, React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   resize?: ResizeOptions
+  dpr?: DPR
+  orthographic?: boolean
+  frameloop?: 'always' | 'never'
 }
-
-/**
- * Interpolates DPR from [min, max] based on device capabilities.
- */
-const calculateDpr = (dpr: DPR) =>
-  Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
 /**
  * A resizeable canvas whose children are declarative OGL elements.
@@ -26,6 +23,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
     resize,
     children,
     style,
+    mode,
     renderer,
     dpr,
     camera,
@@ -59,20 +57,17 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
       <ErrorBoundary set={setError}>
         <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
       </ErrorBoundary>,
-
       canvas,
       {
+        mode,
         renderer,
-        dpr,
         camera,
-        orthographic,
-        frameloop,
         events,
         onCreated(state) {
           // Animate
           const animate = (time?: number) => {
             // Cancel animation if frameloop is set, otherwise keep looping
-            if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
+            if (frameloop === 'never') return cancelAnimationFrame(state.animation)
             state.animation = requestAnimationFrame(animate)
 
             // Call subscribed elements
@@ -84,7 +79,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
             // Render to screen
             state.renderer.render({ scene: state.scene, camera: state.camera })
           }
-          if (state.frameloop !== 'never') animate()
+          if (frameloop !== 'never') animate()
 
           return onCreated?.(state)
         },
@@ -92,7 +87,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
     ).getState()
 
     // Set dpr, handle resize
-    state.renderer.dpr = calculateDpr(dpr || [1, 2])
+    state.renderer.dpr = calculateDpr(dpr ?? [1, 2])
     state.renderer.setSize(width, height)
 
     // Update projection

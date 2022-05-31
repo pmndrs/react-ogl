@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
+import { DPR, EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -23,6 +23,12 @@ export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...
  * Checks for inheritance between two classes.
  */
 export const classExtends = (a: any, b: any) => (Object.prototype.isPrototypeOf.call(a, b) as boolean) || a === b
+
+/**
+ * Interpolates DPR from [min, max] based on device capabilities.
+ */
+export const calculateDpr = (dpr: DPR) =>
+  Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
 /**
  * Resolves a stringified attach type against an `Instance`.

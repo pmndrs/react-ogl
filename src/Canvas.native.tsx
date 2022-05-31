@@ -9,16 +9,18 @@ import '@expo/browser-polyfill'
 
 export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
 
-export interface CanvasProps extends Omit<RenderProps, 'dpr' | 'size'>, ViewProps {
+export interface CanvasProps extends RenderProps, ViewProps {
   children: React.ReactNode
   style?: ViewStyle
+  orthographic?: boolean
+  frameloop?: 'always' | 'never'
 }
 
 /**
  * A resizeable canvas whose children are declarative OGL elements.
  */
 export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
-  { children, style, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
+  { children, style, mode, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
   forwardedRef,
 ) {
   const [{ width, height }, setSize] = React.useState({ width: 0, height: 0 })
@@ -59,16 +61,15 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       </ErrorBoundary>,
       canvas,
       {
+        mode,
         renderer,
         camera,
-        orthographic,
-        frameloop,
         events,
         onCreated(state) {
           // Animate
           const animate = (time?: number) => {
             // Cancel animation if frameloop is set, otherwise keep looping
-            if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
+            if (frameloop === 'never') return cancelAnimationFrame(state.animation)
             state.animation = requestAnimationFrame(animate)
 
             // Call subscribed elements
@@ -80,7 +81,7 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
             // Render to screen
             state.renderer.render({ scene: state.scene, camera: state.camera })
           }
-          if (state.frameloop !== 'never') animate()
+          if (frameloop !== 'never') animate()
 
           // Flush frame for native
           const gl = state.gl as unknown as ExpoWebGLRenderingContext | WebGL2RenderingContext

@@ -163,17 +163,13 @@ export type DPR = [number, number] | number
  * Canvas & imperative render method props.
  */
 export type RenderProps = {
-  size?: { width: number; height: number }
-  dpr?: DPR
   renderer?:
     | ((canvas: HTMLCanvasElement) => OGL.Renderer)
     | OGL.Renderer
     | Partial<NonFunctionKeys<OGL.Renderer>>
     | Partial<OGL.RendererOptions>
   gl?: OGL.OGLRenderingContext
-  frameloop?: 'always' | 'never'
   camera?: CameraProps | Partial<NonFunctionKeys<OGL.Camera>> | Partial<OGL.CameraOptions>
-  orthographic?: boolean
   events?: EventManager
   onCreated?: (state: RootState) => any
   mode?: keyof typeof RENDER_MODES
