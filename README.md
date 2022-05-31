@@ -24,7 +24,7 @@ react-ogl is a complete re-architecture of @react-three/fiber with:
 - **no defaults**; you have complete control. No default renderer, camera, etc. For library/engine authors, this allows components to be completely transformative of rendering behavior and API. But this freedom leads to boilerplate. For both users and authors, there are —
 - **extendable helpers**; react-ogl exports helper components and hooks for both web and native with an API familiar to @react-three/fiber, but these helpers are also modular. This enables you to change or extend rendering behavior and API while maintaining interop with the react-ogl ecosystem.
 
-The API is the same as @react-three/fiber, but react-ogl is completely extensible.
+The API is the same as @react-three/fiber, but react-ogl is completely modular.
 
 ### What does it look like?
 
