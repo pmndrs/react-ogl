@@ -1,5 +1,6 @@
 import * as OGL from 'ogl'
 import type { MutableRefObject } from 'react'
+import type { SetState, UseBoundStore, StoreApi } from 'zustand'
 import { RENDER_MODES } from './constants'
 
 // Util funcs
@@ -32,17 +33,18 @@ export type ObjectMap = {
  */
 export type Catalogue = { [key: string]: any }
 
+export type Attach = string | ((parent: Instance, self: Instance) => () => void)
+
 /**
  * Base OGL React instance.
  */
 export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach'> & {
   isPrimitive?: boolean
   __handlers?: EventHandlers
-  __attached?: Record<string, BaseInstance>
+  __attached?: BaseInstance[]
+  __previousAttach?: any
   children: Instance[]
-  attach?: string
-  remove?(): void
-  dispose?(): void
+  attach?: Attach
 }
 
 /**
@@ -60,7 +62,7 @@ export type InstanceProps = {
   object?: object
   visible?: boolean
   dispose?: null
-  attach?: string
+  attach?: Attach
 }
 
 /**
@@ -106,7 +108,7 @@ export type EventHandlers = {
  * react-ogl root.
  */
 export interface Root {
-  render: (element: React.ReactNode) => RootState
+  render: (element: React.ReactNode) => UseBoundStore<RootState>
   unmount: () => void
 }
 
@@ -129,12 +131,14 @@ export type Subscription = (state: RootState, time: number) => any
  * react-ogl internal state.
  */
 export interface RootState {
+  set: SetState<RootState>
+  get: SetState<RootState>
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
   scene: Omit<OGL.Transform, 'children'> & { children: any[] }
   camera: OGL.Camera
   priority: number
-  subscribed: Subscription[]
+  subscribed: React.MutableRefObject<Subscription>[]
   subscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   unsubscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   animation?: number
@@ -144,6 +148,11 @@ export interface RootState {
   hovered?: Map<number, OGL.Transform>
   [key: string]: any
 }
+
+/**
+ * react-ogl internal Zustand store.
+ */
+export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
 
 /**
  * `fixed` | [`min`, `max`] — `min` and `max` are interpolated from native DPR.
@@ -171,7 +180,7 @@ export type RenderProps = {
 // JSX types
 export interface NodeProps<T> {
   /** Attaches this class onto the parent under the given name and nulls it on unmount */
-  attach?: string
+  attach?: Attach
   /** Constructor arguments */
   args?: Filter<Args<T>, OGL.OGLRenderingContext>
   children?: React.ReactNode

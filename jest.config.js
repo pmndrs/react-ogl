@@ -1,6 +1,6 @@
 module.exports = {
   transform: {
-    '^.+\\.m?[tj]sx?$': '<rootDir>/tests/utils/transform.js',
+    '^.+\\.(mjs|cjs|jsx?|tsx?)$': '<rootDir>/tests/utils/transform.js',
   },
   transformIgnorePatterns: ['node_modules/(?!ogl)'],
   testMatch: ['<rootDir>/tests/**/*.test.{js,jsx,ts,tsx}'],

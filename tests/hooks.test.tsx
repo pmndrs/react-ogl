@@ -1,4 +1,5 @@
 import * as React from 'react'
+import create from 'zustand'
 import { render } from './utils'
 import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
 
@@ -13,13 +14,13 @@ describe('useOGL', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={'test' as any}>
+        <OGLContext.Provider value={create(() => ({ test: 'test' })) as any}>
           <Test />
         </OGLContext.Provider>,
       )
     })
 
-    expect(state).toBe('test')
+    expect(state.test).toBe('test')
   })
 
   it('should throw when used outside of context', async () => {
@@ -54,7 +55,7 @@ describe('useFrame', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={{ subscribe } as any}>
+        <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
         </OGLContext.Provider>,
       )
@@ -78,7 +79,7 @@ describe('useFrame', () => {
 
     await reconciler.act(async () => {
       render(
-        <OGLContext.Provider value={{ subscribe } as any}>
+        <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
         </OGLContext.Provider>,
       )

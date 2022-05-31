@@ -2,17 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { createRoot } from './renderer'
-import {
-  EventHandlers,
-  Instance,
-  InstanceProps,
-  ObjectMap,
-  RenderProps,
-  RootState,
-  SetBlock,
-  Subscription,
-} from './types'
+import { EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -39,24 +29,62 @@ export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
 }
 
 /**
+ * Resolves a stringified attach type against an `Instance`.
+ */
+export const resolveAttach = (instance: Instance, key: string) => {
+  let target = instance
+  if (key.includes('-')) {
+    const entries = key.split('-')
+    const last = entries.pop() as string
+    target = entries.reduce((acc, key) => acc[key], instance)
+    return { target, key: last }
+  } else return { target, key }
+}
+
+// Checks if a dash-cased string ends with an integer
+const INDEX_REGEX = /-\d+$/
+
+/**
  * Attaches an instance to a parent via its `attach` prop.
  */
 export const attach = (parent: Instance, child: Instance) => {
   if (!child.attach) return
 
-  parent[child.attach] = child
-  parent.__attached = parent.__attached || {}
-  parent.__attached[child.attach] = child
+  parent.__attached = parent.__attached ?? []
+  parent.__attached.push(child)
+
+  if (typeof child.attach === 'string') {
+    // If attaching into an array (foo-0), create one
+    if (INDEX_REGEX.test(child.attach)) {
+      const root = child.attach.replace(INDEX_REGEX, '')
+      const { target, key } = resolveAttach(parent, root)
+      if (!Array.isArray(target[key])) target[key] = []
+    }
+
+    const { target, key } = resolveAttach(parent, child.attach)
+    child.__previousAttach = target[key]
+    target[key] = child
+  } else {
+    child.__previousAttach = child.attach(parent, child)
+  }
 }
 
 /**
  * Removes an instance from a parent via its `attach` prop.
  */
 export const detach = (parent: Instance, child: Instance) => {
-  if (!parent?.__attached?.[child.attach]) return
+  const attachIndex = parent?.__attached?.indexOf(child)
+  if (typeof attachIndex !== 'number' || attachIndex === -1) return
 
-  delete parent.__attached[child.attach]
-  parent[child.attach] = null
+  child.__previousAttach = undefined
+  parent.__attached.splice(attachIndex, 1)
+
+  if (typeof child.attach === 'string') {
+    const { target, key } = resolveAttach(parent, child.attach)
+    target[key] = child.__r3f.previousAttach
+  } else {
+    child.__previousAttach?.(parent, child)
+  }
 }
 
 /**
@@ -228,118 +256,6 @@ export const createEvents = (state: RootState) => {
   }
 
   return { handleEvent }
-}
-
-/**
- * Configures rendering internals akin to R3F.
- */
-export const createInternals = (canvas: HTMLCanvasElement, props: RenderProps): RootState => {
-  // Create or accept renderer, apply props
-  const renderer = (
-    props.renderer instanceof OGL.Renderer
-      ? props.renderer
-      : typeof props.renderer === 'function'
-      ? props.renderer(canvas)
-      : new OGL.Renderer({
-          antialias: true,
-          powerPreference: 'high-performance',
-          ...(props.renderer as any),
-          canvas: canvas,
-        })
-  ) as OGL.Renderer
-
-  if (props.renderer && typeof props.renderer !== 'function') Object.assign(renderer, props.renderer)
-  const gl = renderer.gl
-  gl.clearColor(1, 1, 1, 0)
-
-  // Flush frame for native
-  if ('endFrameEXP' in renderer.gl) {
-    const renderFrame = renderer.render.bind(renderer)
-    renderer.render = ({ scene, camera }) => {
-      renderFrame({ scene, camera })
-      ;(renderer.gl as any).endFrameEXP()
-    }
-  }
-
-  // Create or accept camera, apply props
-  const camera =
-    props.camera instanceof OGL.Camera
-      ? props.camera
-      : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(props.camera as any) })
-  camera.position.z = 5
-  if (props.camera) applyProps(camera, props.camera as InstanceProps)
-
-  // Create scene
-  const scene = new OGL.Transform()
-
-  // Init rendering internals for useFrame, keep track of subscriptions
-  let priority = 0
-  const subscribed = []
-
-  // Subscribe/unsubscribe elements to the render loop
-  const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-    // Subscribe callback
-    subscribed.push(refCallback)
-
-    // Enable manual rendering if renderPriority is positive
-    if (renderPriority) priority += 1
-  }
-
-  const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-    // Unsubscribe callback
-    const index = subscribed.indexOf(refCallback)
-
-    if (index !== -1) subscribed.splice(index, 0)
-
-    // Disable manual rendering if renderPriority is positive
-    if (renderPriority) priority -= 1
-  }
-
-  // Init event state
-  const mouse = new OGL.Vec2()
-  const raycaster = new OGL.Raycast(gl)
-  const hovered = new Map()
-
-  // Set initial state
-  const state: RootState = {
-    ...props,
-    renderer,
-    gl,
-    camera,
-    scene,
-    priority,
-    subscribed,
-    subscribe,
-    unsubscribe,
-    mouse,
-    raycaster,
-    hovered,
-  }
-
-  // Init root
-  const root = createRoot(canvas, state)
-
-  // Handle callback
-  if (props.onCreated) props.onCreated(state)
-
-  // Animate
-  const animate = (time?: number) => {
-    // Cancel animation if frameloop is set, otherwise keep looping
-    if (props.frameloop === 'never') return cancelAnimationFrame(state.animation)
-    state.animation = requestAnimationFrame(animate)
-
-    // Call subscribed elements
-    subscribed.forEach((ref) => ref.current?.(state, time))
-
-    // If rendering manually, skip render
-    if (priority) return
-
-    // Render to screen
-    renderer.render({ scene, camera })
-  }
-  if (props.frameloop !== 'never') animate()
-
-  return { ...state, root }
 }
 
 /**

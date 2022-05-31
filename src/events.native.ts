@@ -13,6 +13,8 @@ export const EVENTS = {
   onPressMove: 'onPointerMove',
 } as const
 
+const managers = new Map<HTMLCanvasElement, any>()
+
 /**
  * DOM OGL events manager.
  */
@@ -50,17 +52,23 @@ export const events: EventManager = {
     )
     // Create event manager
     const manager = new Pressability(state.events.handlers)
-    state.events.connected = manager.getEventHandlers()
+    managers.set(canvas, manager)
+
+    // Mark events as connected
+    state.events.connected = true
 
     return state.events.connected
   },
   /**
    * Deletes and disconnects event listeners from canvas.
    */
-  disconnect(_, state) {
+  disconnect(canvas, state) {
     // Early return if controls already disconnected
-    if (!state.events?.connected) return // Disconnect handlers
-    ;(state.events.connected as any).reset?.()
+    if (!state.events?.connected) return
+
+    // Disconnect handlers
+    const manager = managers.get(canvas)!
+    manager.reset?.()
 
     // Mark events as disconnected
     state.events.connected = false
