@@ -76,7 +76,6 @@ export const detach = (parent: Instance, child: Instance) => {
   const attachIndex = parent?.__attached?.indexOf(child)
   if (typeof attachIndex !== 'number' || attachIndex === -1) return
 
-  child.__previousAttach = undefined
   parent.__attached.splice(attachIndex, 1)
 
   if (typeof child.attach === 'string') {
@@ -85,6 +84,8 @@ export const detach = (parent: Instance, child: Instance) => {
   } else {
     child.__previousAttach?.(parent, child)
   }
+
+  child.__previousAttach = undefined
 }
 
 /**
