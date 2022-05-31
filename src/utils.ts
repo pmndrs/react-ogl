@@ -25,15 +25,6 @@ export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...
 export const classExtends = (a: any, b: any) => (Object.prototype.isPrototypeOf.call(a, b) as boolean) || a === b
 
 /**
- * Filters keys from an object.
- */
-export const filterKeys = (obj: any, prune = false, ...keys: string[]) => {
-  const keysToSelect = new Set(keys.flat())
-
-  return Object.fromEntries(Object.entries(obj).filter(([key]) => keysToSelect.has(key) === !prune))
-}
-
-/**
  * Resolves a stringified attach type against an `Instance`.
  */
 export const resolveAttach = (instance: Instance, key: string) => {
@@ -95,85 +86,83 @@ export const detach = (parent: Instance, child: Instance) => {
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
-  // Filter identical props and reserved keys
-  const identical = Object.keys(newProps).filter((key) => newProps[key] === oldProps[key])
-  const handlers = Object.keys(newProps).filter(
-    (key) => typeof newProps[key] === 'function' && POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number]),
-  )
-  const props = filterKeys(newProps, true, ...identical, ...handlers, ...RESERVED_PROPS)
-
+export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
-  if (Object.keys(props).length) {
-    Object.entries(props).forEach(([key, value]) => {
-      let root = instance
-      let target = root[key]
+  for (let key in newProps) {
+    const isReserved = RESERVED_PROPS.includes(key as typeof RESERVED_PROPS[number])
+    const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
+    const isIdentical = newProps[key] === oldProps?.[key]
 
-      // Set deeply nested properties using piercing.
-      // <element prop1-prop2={...} /> => Element.prop1.prop2 = ...
-      if (key.includes('-')) {
-        // Build new target from chained props
-        const chain = key.split('-')
-        target = chain.reduce((acc, key) => acc[key], instance)
+    // Collect event handlers
+    if (isHandler) instance.__handlers = { ...instance.__handlers, [key]: newProps[key] }
 
-        // Switch root of target if atomic
-        if (!target?.set) {
-          // We're modifying the first of the chain instead of element.
-          // Remove the key from the chain and target it instead.
-          key = chain.pop()
-          root = chain.reduce((acc, key) => acc[key], instance)
-        }
+    // Skip key if reserved to react, a react-ogl event, or unchanged (no-op)
+    if (isReserved || isHandler || isIdentical) continue
+
+    const value = newProps[key]
+    let root = instance
+    let target = root[key]
+
+    // Set deeply nested properties using piercing.
+    // <element prop1-prop2={...} /> => Element.prop1.prop2 = ...
+    if (key.includes('-')) {
+      // Build new target from chained props
+      const chain = key.split('-')
+      target = chain.reduce((acc, key) => acc[key], instance)
+
+      // Switch root of target if atomic
+      if (!target?.set) {
+        // We're modifying the first of the chain instead of element.
+        // Remove the key from the chain and target it instead.
+        key = chain.pop()
+        root = chain.reduce((acc, key) => acc[key], instance)
       }
+    }
 
-      // Prefer to use properties' copy and set methods
-      // otherwise, mutate the property directly
-      if (target?.set) {
-        if (target.constructor.name === value.constructor.name) {
-          target.copy(value)
-        } else if (Array.isArray(value)) {
-          target.set(...value)
-        } else {
-          // Support shorthand scalar syntax like scale={1}
-          const scalar = new Array(target.length).fill(value)
-          target.set(...scalar)
-        }
+    // Prefer to use properties' copy and set methods
+    // otherwise, mutate the property directly
+    if (target?.set) {
+      if (target.constructor.name === value.constructor.name) {
+        target.copy(value)
+      } else if (Array.isArray(value)) {
+        target.set(...value)
       } else {
-        // Allow shorthand values for uniforms
-        if (key === 'uniforms') {
-          Object.entries(value).forEach(([uniform, entry]) => {
-            // Handle uniforms which don't have a value key set
-            if (entry?.value === undefined) {
-              let value: any
+        // Support shorthand scalar syntax like scale={1}
+        const scalar = new Array(target.length).fill(value)
+        target.set(...scalar)
+      }
+    } else {
+      // Allow shorthand values for uniforms
+      const uniformList = value as { [name: string]: any }
+      if (key === 'uniforms') {
+        for (const uniform in uniformList) {
+          let entry = uniformList[uniform]
 
-              if (typeof entry === 'string') {
-                // Uniform is a string, convert it into a color
-                value = toColor(entry as keyof typeof COLORS)
-              } else if (Array.isArray(entry)) {
-                // Uniform is an array, convert it into a vector
-                value = toVector(entry)
-              } else {
-                // Uniform is something else, don't convert it
-                value = entry
-              }
+          // Handle uniforms which don't have a value key set
+          if (entry?.value === undefined) {
+            let value: any
 
-              entry = { value }
+            if (typeof entry === 'string') {
+              // Uniform is a string, convert it into a color
+              value = toColor(entry as keyof typeof COLORS)
+            } else if (Array.isArray(entry)) {
+              // Uniform is an array, convert it into a vector
+              value = toVector(entry)
+            } else {
+              // Uniform is something else, don't convert it
+              value = entry
             }
 
-            root[key][uniform] = entry
-          })
-          // we apply uniforms directly to object as patch, not need apply value
-          return
-        }
+            entry = { value }
+          }
 
+          root[key][uniform] = entry
+        }
+      } else {
         // Mutate the property directly
         root[key] = value
       }
-    })
-  }
-
-  // Collect event handlers.
-  if (handlers.length) {
-    instance.__handlers = handlers.reduce((acc, key) => ({ ...acc, [key]: newProps[key] }), {})
+    }
   }
 }
 
@@ -223,11 +212,11 @@ export const createEvents = (state: RootState) => {
     const isHoverEvent = type === 'onPointerMove'
 
     // Trigger events for hovered elements
-    intersects.forEach((object) => {
+    for (const object of intersects) {
       const handlers = object.__handlers
 
       // Bail if object doesn't have handlers (managed externally)
-      if (!handlers) return
+      if (!handlers) continue
 
       if (isHoverEvent && !state.hovered.get(object.id)) {
         // Mark object as hovered and fire its hover events
@@ -240,7 +229,7 @@ export const createEvents = (state: RootState) => {
         // Otherwise, fire its generic event
         handlers[type]?.({ event, hit: object.hit })
       }
-    })
+    }
 
     // Cleanup stale hover events
     if (isHoverEvent || type === 'onPointerDown') {

@@ -1,7 +1,7 @@
 import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { toPascalCase, applyProps, attach, detach, filterKeys, classExtends } from './utils'
+import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
 import { RESERVED_PROPS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
@@ -203,22 +203,20 @@ export const checkShallow = (a: any, b: any) => {
  * Prepares a set of changes to be applied to the instance.
  */
 export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
-  // Prune reserved props
-  newProps = filterKeys(newProps, true, ...RESERVED_PROPS)
-  oldProps = filterKeys(oldProps, true, ...RESERVED_PROPS)
-
   const changedProps: InstanceProps = {}
 
   // Sort through props
-  Object.entries(newProps).forEach(([key, value]) => {
+  for (const key in newProps) {
+    // Skip reserved keys
+    if (RESERVED_PROPS.includes(key as typeof RESERVED_PROPS[number])) continue
     // Skip primitives
-    if (instance.isPrimitive && key === 'object') return
+    if (instance.isPrimitive && key === 'object') continue
     // Skip if props match
-    if (checkShallow(value, oldProps[key])) return
+    if (checkShallow(newProps[key], oldProps[key])) continue
 
     // Props changed, add them
-    changedProps[key] = value
-  })
+    changedProps[key] = newProps[key]
+  }
 
   return changedProps
 }
