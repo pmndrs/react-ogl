@@ -47,6 +47,7 @@
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-extra-semi": "off",
     "@typescript-eslint/no-inferrable-types": "warn",
-    "@typescript-eslint/adjacent-overload-signatures": "off"
+    "@typescript-eslint/adjacent-overload-signatures": "off",
+    "@typescript-eslint/triple-slash-reference": "off"
   }
 }
