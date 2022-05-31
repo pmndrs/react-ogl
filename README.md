@@ -41,9 +41,6 @@ const camera = new OGL.Camera(renderer.gl)
 camera.position.z = 5
 const scene = new OGL.Transform(renderer.gl)
 
-// Or you can use our own internals. This will also set up a render loop.
-// const { root, renderer, camera, scene } = createInternals(camera, config)
-
 // Set initial size
 renderer.setSize(window.innerWidth, window.innerHeight)
 camera.perspective({ aspect: window.innerWidth / window.innerHeight })
