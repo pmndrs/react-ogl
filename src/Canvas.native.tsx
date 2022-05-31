@@ -82,6 +82,16 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
           }
           if (state.frameloop !== 'never') animate()
 
+          // Flush frame for native
+          const gl = state.gl as unknown as ExpoWebGLRenderingContext | WebGL2RenderingContext
+          if ('endFrameEXP' in gl) {
+            const renderFrame = state.renderer.render.bind(renderer)
+            state.renderer.render = ({ scene, camera }) => {
+              renderFrame({ scene, camera })
+              gl.endFrameEXP()
+            }
+          }
+
           return onCreated?.(state)
         },
       },

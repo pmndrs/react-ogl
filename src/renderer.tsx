@@ -40,15 +40,6 @@ export const render = (
     const gl = renderer.gl
     gl.clearColor(1, 1, 1, 0)
 
-    // Flush frame for native
-    if ((gl as any).endFrameEXP) {
-      const renderFrame = renderer.render.bind(renderer)
-      renderer.render = ({ scene, camera }) => {
-        renderFrame({ scene, camera })
-        ;(gl as any).endFrameEXP()
-      }
-    }
-
     // Create or accept camera, apply props
     const camera =
       config.camera instanceof OGL.Camera
