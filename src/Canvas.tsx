@@ -37,7 +37,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
   },
   forwardedRef,
 ) {
-  const canvasRef = React.useRef<HTMLCanvasElement>(null!)
+  const canvasRef = React.useRef<HTMLCanvasElement>()
   const [div, { width, height }] = useMeasure({
     scroll: true,
     debounce: { scroll: 50, resize: 0 },
@@ -106,7 +106,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
 
   // Cleanup on unmount
   React.useEffect(() => {
-    if (canvas) return () => unmountComponentAtNode(canvas!)
+    if (canvas) return () => unmountComponentAtNode(canvas)
   }, [canvas])
 
   return (
