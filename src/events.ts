@@ -36,10 +36,13 @@ export const events: EventManager = {
     )
 
     // Register handlers
-    Object.entries(state.events.handlers ?? []).forEach(([name, handler]) => {
-      const [, passive] = EVENTS[name]
-      canvas.addEventListener(name, handler as any, { passive })
-    })
+    for (const key in EVENTS) {
+      const handler = state.events.handlers?.[key]
+      if (handler) {
+        const [, passive] = EVENTS[key]
+        canvas.addEventListener(key, handler, { passive })
+      }
+    }
 
     // Mark events as connected
     state.events.connected = true
@@ -49,9 +52,12 @@ export const events: EventManager = {
    */
   disconnect(canvas, state) {
     // Disconnect handlers
-    Object.entries(state.events.handlers ?? []).forEach(([name, handler]) => {
-      canvas.removeEventListener(name, handler as any)
-    })
+    for (const key in EVENTS) {
+      const handler = state.events.handlers?.[key]
+      if (handler) {
+        canvas.removeEventListener(key, handler as any)
+      }
+    }
 
     // Mark events as disconnected
     state.events.connected = false

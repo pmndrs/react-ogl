@@ -76,7 +76,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
             state.animation = requestAnimationFrame(animate)
 
             // Call subscribed elements
-            state.subscribed.forEach((ref) => ref.current?.(state, time))
+            for (const ref of state.subscribed) ref.current?.(state, time)
 
             // If rendering manually, skip render
             if (state.priority) return
