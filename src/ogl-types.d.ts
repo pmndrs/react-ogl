@@ -1,19 +1,5 @@
 declare module 'ogl' {
-  type BasisImage = (Uint8Array | Uint16Array) & {
-    width: number
-    height: number
-    isCompressedTexture: true
-    internalFormat: number
-    isBasis: true
-  }
-
-  export class BasisManager {
-    constructor(workerSrc: string | URL)
-    getSupportedFormat(): 'astc' | 'bptc' | 's3tc' | 'etc1' | 'pvrtc' | 'none'
-    initWorker(workerSrc: string | URL): void
-    onMessage(msg: { data: { id: number; error: string; image: BasisImage } }): void
-    parseTexture(buffer: ArrayBuffer): Promise<BasisImage>
-  }
+  // Core
 
   export type CameraOptions = {
     near: number
@@ -115,12 +101,7 @@ declare module 'ogl' {
     isInstanced: boolean
     bounds: Bounds
     raycast?: 'sphere' | 'box'
-    constructor(
-      gl: OGLRenderingContext,
-      attributes?: {
-        [key: string]: Partial<Attribute>
-      },
-    )
+    constructor(gl: OGLRenderingContext, attributes?: AttributeMap)
     addAttribute(key: string, attr: Partial<Attribute>): number
     updateAttribute(attr: Partial<Attribute>): void
     setIndex(value: Attribute): void
@@ -160,8 +141,8 @@ declare module 'ogl' {
     renderOrder: number
     modelViewMatrix: Mat4
     normalMatrix: Mat3
-    beforeRenderCallbacks: Array<MeshRenderCallback>
-    afterRenderCallbacks: Array<MeshRenderCallback>
+    beforeRenderCallbacks: MeshRenderCallback[]
+    afterRenderCallbacks: MeshRenderCallback[]
     hit: Partial<{
       localPoint: Vec3
       distance: number
@@ -299,19 +280,22 @@ declare module 'ogl' {
       width: number | null
       height: number | null
     }
-    textureUnits?: Array<number>
+    textureUnits?: number[]
     activeTextureUnit?: number
     framebuffer?: WebGLFramebuffer
     boundBuffer?: WebGLBuffer
     uniformLocations?: Map<number, WebGLUniformLocation>
     currentProgram: number | null
   }
+
   export type RenderExtensions = {
     [key: string]: any
   }
+
   export interface RendererSortable extends Mesh {
     zDepth: number
   }
+
   export class Renderer {
     dpr: number
     alpha: boolean
@@ -455,8 +439,21 @@ declare module 'ogl' {
     setSize(width: number, height: number): void
   }
 
+  export type CompressedImage = {
+    isCompressedTexture?: boolean
+  } & {
+    data: Uint8Array
+    width: number
+    height: number
+  }[]
+  export type ImageRepresentation =
+    | HTMLImageElement
+    | HTMLVideoElement
+    | HTMLImageElement[]
+    | ArrayBufferView
+    | CompressedImage
   export interface TextureOptions {
-    image: HTMLImageElement | HTMLVideoElement | HTMLImageElement[] | ArrayBufferView
+    image: ImageRepresentation
     target: number
     type: number
     format: number
@@ -474,19 +471,6 @@ declare module 'ogl' {
     height: number
     anisotropy: number
   }
-  export type CompressedImage = {
-    isCompressedTexture?: boolean
-  } & {
-    data: Uint8Array
-    width: number
-    height: number
-  }[]
-  export type ImageRepresentation =
-    | HTMLImageElement
-    | HTMLVideoElement
-    | HTMLImageElement[]
-    | ArrayBufferView
-    | CompressedImage
   export class Texture {
     ext: string
     gl: OGLRenderingContext
@@ -573,795 +557,7 @@ declare module 'ogl' {
     lookAt(target: Vec3, invert?: boolean): void
   }
 
-  export interface AnimationFrame {
-    position: Vec3
-    quaternion: Quat
-    scale: Vec3
-  }
-  export interface AnimationData {
-    frames: AnimationFrame[]
-  }
-  export interface AnimationOptions {
-    objects: BoneTransform[]
-    data: AnimationData
-  }
-  export class Animation {
-    objects: BoneTransform[]
-    data: AnimationData
-    elapsed: number
-    weight: number
-    duration: number
-    constructor({ objects, data }: AnimationOptions)
-    update(totalWeight: number, isSet: boolean): void
-  }
-
-  export type BoxOptions = {
-    width: number
-    height: number
-    depth: number
-    widthSegments: number
-    heightSegments: number
-    depthSegments: number
-    attributes: AttributeMap
-  }
-  export class Box extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      { width, height, depth, widthSegments, heightSegments, depthSegments, attributes }?: Partial<BoxOptions>,
-    )
-  }
-
-  export interface CurveOptions {
-    points: Vec3[]
-    divisions: number
-    type: 'catmullrom' | 'cubicbezier'
-  }
-  export class Curve {
-    static CATMULLROM: 'catmullrom'
-    static CUBICBEZIER: 'cubicbezier'
-    static QUADRATICBEZIER: 'quadraticbezier'
-    type: 'catmullrom' | 'cubicbezier' | 'quadraticbezier'
-    private points
-    private divisions
-    constructor({ points, divisions, type }?: Partial<CurveOptions>)
-    _getQuadraticBezierPoints(divisions?: number): Vec3[]
-    _getCubicBezierPoints(divisions?: number): Vec3[]
-    _getCatmullRomPoints(divisions?: number, a?: number, b?: number): Vec3[]
-    getPoints(divisions?: number, a?: number, b?: number): Vec3[]
-  }
-
-  export type CylinderOptions = {
-    radiusTop: number
-    radiusBottom: number
-    height: number
-    radialSegments: number
-    heightSegments: number
-    openEnded: boolean
-    thetaStart: number
-    thetaLength: number
-    attributes: AttributeMap
-  }
-  export class Cylinder extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        radiusTop,
-        radiusBottom,
-        height,
-        radialSegments,
-        heightSegments,
-        openEnded,
-        thetaStart,
-        thetaLength,
-        attributes,
-      }?: Partial<CylinderOptions>,
-    )
-  }
-
-  export interface FlowmapOptions {
-    size: number
-    falloff: number
-    alpha: number
-    dissipation: number
-    type: number
-  }
-  export class Flowmap {
-    gl: OGLRenderingContext
-    uniform: {
-      value: any
-    }
-    mask: {
-      read: RenderTarget
-      write: RenderTarget
-      swap: () => void
-    }
-    aspect: number
-    mouse: Vec2
-    velocity: Vec2
-    mesh: Mesh
-    constructor(gl: OGLRenderingContext, { size, falloff, alpha, dissipation, type }?: Partial<FlowmapOptions>)
-    update(): void
-  }
-
-  export interface GLTFAnimationData {
-    node: any
-    transform: any
-    interpolation: any
-    times: any
-    values: any
-  }
-  export class GLTFAnimation {
-    private data: GLTFAnimationData[]
-    private elapsed: number
-    private weight: number
-    private loop: boolean
-    private duration: number
-    private startTime: number
-    private endTime: number
-    constructor(data: GLTFAnimationData[], weight?: number)
-    update(totalWeight: number, isSet: boolean): void
-    cubicSplineInterpolate(t: number, prevVal: any, prevTan: any, nextTan: any, nextVal: any): any
-  }
-
-  export class GLTFLoader {
-    static load(
-      gl: OGLRenderingContext,
-      src: string,
-    ): Promise<{
-      json: any
-      buffers: any[]
-      bufferViews: any
-      images: any
-      textures: any
-      materials: any
-      meshes: any
-      nodes: any
-      animations: any
-      scenes: any
-      scene: any
-    }>
-    static setBasisManager(manager: BasisManager): void
-    static parse(
-      gl: any,
-      desc: any,
-      dir: any,
-    ): Promise<{
-      json: any
-      buffers: any[]
-      bufferViews: any
-      images: any
-      textures: any
-      materials: any
-      meshes: any
-      nodes: any
-      animations: any
-      scenes: any
-      scene: any
-    }>
-    static parseDesc(src: any): Promise<any>
-    static unpackGLB(glb: any): any
-    static resolveURI(uri: any, dir: any): string
-    static loadBuffers(desc: any, dir: any): Promise<any[]>
-    static parseBufferViews(gl: any, desc: any, buffers: any): any
-    static async parseImages(gl: any, desc: any, dir: any, bufferViews: any): Promise<any>
-    static parseTextures(gl: any, desc: any, images: any): any
-    static createTexture(
-      gl: any,
-      desc: any,
-      images: any,
-      opts: { sample: any; source: any; name: any; extensions: any; extras: any },
-    )
-    static parseMaterials(gl: any, desc: any, textures: any): any
-    static parseSkins(gl: any, desc: any, bufferViews: any): any
-    static parseMeshes(gl: any, desc: any, bufferViews: any, materials: any, skins: any): any
-    static parsePrimitives(
-      gl: any,
-      primitives: any,
-      desc: any,
-      bufferViews: any,
-      materials: any,
-      numInstances: any,
-      isLightmap: boolean,
-    ): any
-    static parseAccessor(
-      index: any,
-      desc: any,
-      bufferViews: any,
-    ): {
-      data: any
-      size: any
-      type: any
-      normalized: any
-      buffer: any
-      stride: any
-      offset: any
-      count: any
-      min: any
-      max: any
-    }
-    static parseNodes(gl: any, desc: any, meshes: any, skins: any, images: any): any
-    static parseLights(gl: any, desc: any, nodes: any, scenes: any)
-    static populateSkins(skins: any, nodes: any): void
-    static parseAnimations(gl: any, desc: any, nodes: any, bufferViews: any): any
-    static parseScenes(desc: any, nodes: any): any
-  }
-
-  export interface GLTFSkinOptions {
-    skeleton: {
-      joints: { worldMatrix: Mat4; bindInverse: Mat4 }[]
-    }
-    geometry: Geometry
-    program: Program
-    mode: Mesh['mode']
-  }
-  export class GLTFSkin extends Mesh {
-    skeleton: GLTFSkinOptions['skeleton']
-    animations: Animation[]
-    boneMatrices: Float32Array
-    boneTextureSize: number
-    boneTexture: Texture
-    constructor(gl: OGLRenderingContext, { skeleton, geometry, program, mode }?: Partial<GLTFSkinOptions>)
-    createBoneTexture(): void
-    updateUniforms(): void
-    draw({ camera }?: { camera?: Camera }): void
-  }
-
-  export interface GPGPUpass {
-    mesh: Mesh
-    program: Program
-    uniforms: {
-      [name: string]: any
-    }
-    enabled: boolean
-    textureUniform: string
-  }
-  export class GPGPU {
-    gl: OGLRenderingContext
-    passes: GPGPUpass[]
-    geometry: Triangle
-    dataLength: number
-    size: number
-    coords: Float32Array
-    uniform: {
-      value: any
-    }
-    fbo: {
-      read: RenderTarget
-      write: RenderTarget
-      swap: () => void
-    }
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        data,
-        geometry,
-        type,
-      }: {
-        data?: Float32Array
-        geometry?: Triangle
-        type?: Texture['type']
-      },
-    )
-    addPass({
-      vertex,
-      fragment,
-      uniforms,
-      textureUniform,
-      enabled,
-    }?: {
-      vertex?: string
-      fragment?: string
-      uniforms?: {}
-      textureUniform?: string
-      enabled?: boolean
-    }): {
-      mesh: Mesh
-      program: Program
-      uniforms: {}
-      enabled: boolean
-      textureUniform: string
-    }
-    render(): void
-  }
-
-  export interface KTXTextureOptions {
-    buffer: ArrayBuffer
-    src: string
-    wrapS: number
-    wrapT: number
-    anisotropy: number
-    minFilter: number
-    magFilter: number
-  }
-  export class KTXTexture extends Texture {
-    constructor(
-      gl: OGLRenderingContext,
-      { buffer, wrapS, wrapT, anisotropy, minFilter, magFilter }?: Partial<KTXTextureOptions>,
-    )
-    parseBuffer(buffer: ArrayBuffer): void
-  }
-
-  export function NormalProgram(gl: OGLRenderingContext): Program
-
-  export type OrbitOptions = {
-    element: HTMLElement
-    enabled: boolean
-    target: Vec3
-    ease: number
-    inertia: number
-    enableRotate: boolean
-    rotateSpeed: number
-    autoRotate: boolean
-    autoRotateSpeed: number
-    enableZoom: boolean
-    zoomSpeed: number
-    enablePan: boolean
-    panSpeed: number
-    minPolarAngle: number
-    maxPolarAngle: number
-    minAzimuthAngle: number
-    maxAzimuthAngle: number
-    minDistance: number
-    maxDistance: number
-  }
-  export class Orbit {
-    constructor(
-      object: Transform & {
-        fov: number
-      },
-      {
-        element,
-        enabled,
-        target,
-        ease,
-        inertia,
-        enableRotate,
-        rotateSpeed,
-        autoRotate,
-        autoRotateSpeed,
-        enableZoom,
-        zoomSpeed,
-        enablePan,
-        panSpeed,
-        minPolarAngle,
-        maxPolarAngle,
-        minAzimuthAngle,
-        maxAzimuthAngle,
-        minDistance,
-        maxDistance,
-      }?: Partial<OrbitOptions>,
-    )
-  }
-
-  export type PlaneOptions = {
-    width: number
-    height: number
-    widthSegments: number
-    heightSegments: number
-    attributes: AttributeMap
-  }
-  export class Plane extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      { width, height, widthSegments, heightSegments, attributes }?: Partial<PlaneOptions>,
-    )
-    static buildPlane(
-      position: Float32Array,
-      normal: Float32Array,
-      uv: Float32Array,
-      index: Uint32Array | Uint16Array,
-      width: number,
-      height: number,
-      depth: number,
-      wSegs: number,
-      hSegs: number,
-      u?: number,
-      v?: number,
-      w?: number,
-      uDir?: number,
-      vDir?: number,
-      i?: number,
-      ii?: number,
-    ): void
-  }
-
-  export interface PolylineOptions {
-    points: Vec3[]
-    vertex: string
-    fragment: string
-    uniforms: {
-      [key: string]: {
-        value: any
-      }
-    }
-    attributes: {
-      [key: string]: Partial<Attribute>
-    }
-  }
-  export class Polyline {
-    gl: OGLRenderingContext
-    points: Vec3[]
-    count: number
-    position: Float32Array
-    prev: Float32Array
-    next: Float32Array
-    geometry: Geometry
-    resolution: {
-      value: Vec2
-    }
-    dpr: {
-      value: number
-    }
-    thickness: {
-      value: number
-    }
-    color: {
-      value: Color
-    }
-    miter: {
-      value: number
-    }
-    program: Program
-    mesh: Mesh
-    constructor(gl: OGLRenderingContext, { points, vertex, fragment, uniforms, attributes }: Partial<PolylineOptions>)
-    updateGeometry(): void
-    resize(): void
-  }
-
-  export interface PostOptions {
-    width: number
-    height: number
-    dpr: number
-    wrapS: GLenum
-    wrapT: GLenum
-    minFilter: GLenum
-    magFilter: GLenum
-    geometry: Triangle
-    targetOnly: boolean
-  }
-  export interface Pass {
-    mesh: Mesh
-    program: Program
-    uniforms: {
-      [name: string]: any
-    }
-    enabled: boolean
-    textureUniform: string
-    vertex?: string
-    fragment?: string
-  }
-  export class Post {
-    gl: OGLRenderingContext
-    options: {
-      wrapS: GLenum
-      wrapT: GLenum
-      minFilter: GLenum
-      magFilter: GLenum
-      width?: number
-      height?: number
-    }
-    passes: Pass[]
-    geometry: Triangle
-    uniform: {
-      value: any
-    }
-    targetOnly: boolean
-    fbo: { read: RenderTarget; write: RenderTarget; swap: () => void }
-    dpr: number
-    width: number
-    height: number
-    constructor(
-      gl: OGLRenderingContext,
-      { width, height, dpr, wrapS, wrapT, minFilter, magFilter, geometry, targetOnly }?: Partial<PostOptions>,
-    )
-    addPass({ vertex, fragment, uniforms, textureUniform, enabled }?: Partial<Pass>): {
-      mesh: Mesh
-      program: Program
-      uniforms: {
-        [name: string]: any
-      }
-      enabled: boolean
-      textureUniform: string
-    }
-    resize({
-      width,
-      height,
-      dpr,
-    }?: Partial<{
-      width: number
-      height: number
-      dpr: number
-    }>): void
-    render({
-      scene,
-      camera,
-      texture,
-      target,
-      update,
-      sort,
-      frustumCull,
-    }: {
-      scene?: Transform
-      camera?: Camera
-      texture?: Texture
-      target?: RenderTarget
-      update?: boolean
-      sort?: boolean
-      frustumCull?: boolean
-    }): void
-  }
-
-  export class Raycast {
-    gl: OGLRenderingContext
-    origin: Vec3
-    direction: Vec3
-    constructor(gl: OGLRenderingContext)
-    castMouse(camera: Camera, mouse?: number[]): void
-    intersectBounds(
-      meshes: Mesh | Mesh[],
-      {
-        maxDistance,
-        output,
-      }?: {
-        maxDistance?: number
-        output?: Mesh[]
-      },
-    ): Mesh[]
-    intersectMeshes(
-      meshes: Mesh[],
-      {
-        cullFace,
-        maxDistance,
-        includeUV,
-        includeNormal,
-        output,
-      }?: {
-        cullFace?: boolean
-        maxDistance?: number
-        includeUV?: boolean
-        includeNormal?: boolean
-        output?: Mesh[]
-      },
-    ): Mesh[]
-    intersectSphere(sphere: Bounds, origin?: Vec3, direction?: Vec3): number
-    intersectBox(box: Bounds, origin?: Vec3, direction?: Vec3): number
-    intersectTriangle(
-      a: Vec3,
-      b: Vec3,
-      c: Vec3,
-      backfaceCulling?: boolean,
-      origin?: Vec3,
-      direction?: Vec3,
-      normal?: Vec3,
-    ): number
-    getBarycoord(point: Vec3, a: Vec3, b: Vec3, c: Vec3, target?: Vec3): Vec3
-  }
-
-  export class Shadow {
-    gl: OGLRenderingContext
-    light: Camera
-    target: RenderTarget
-    depthProgram: Program
-    castMeshes: Mesh[]
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        light,
-        width,
-        height,
-      }: {
-        light?: Camera
-        width?: number
-        height?: number
-      },
-    )
-    add({
-      mesh,
-      receive,
-      cast,
-      vertex,
-      fragment,
-      uniformProjection,
-      uniformView,
-      uniformTexture,
-    }: {
-      mesh: Mesh
-      receive?: boolean
-      cast?: boolean
-      vertex?: string
-      fragment?: string
-      uniformProjection?: string
-      uniformView?: string
-      uniformTexture?: string
-    }): void
-    render({ scene }: { scene: Transform }): void
-  }
-
-  export interface SkinRig {
-    bindPose: { position: Vec3; quaternion: Quat; scale: Vec3 }
-    bones: { name: string; parent: Transform }[]
-  }
-
-  export interface SkinOptions {
-    rig: SkinRig
-    geometry: Geometry
-    program: Program
-    mode: GLenum
-  }
-  export interface BoneTransform extends Transform {
-    name: string
-    bindInverse: Mat4
-  }
-  export class Skin extends Mesh {
-    animations: Animation[]
-    boneTexture: Texture
-    boneTextureSize: number
-    boneMatrices: Float32Array
-    root: Transform
-    bones: BoneTransform[]
-    constructor(gl: OGLRenderingContext, { rig, geometry, program, mode }?: Partial<SkinOptions>)
-    createBones(rig: SkinRig): void
-    createBoneTexture(): void
-    addAnimation(data: Animation['data']): Animation
-    update(): void
-    draw({ camera }?: { camera?: Camera }): void
-  }
-
-  export type SphereOptions = {
-    radius: number
-    widthSegments: number
-    heightSegments: number
-    phiStart: number
-    phiLength: number
-    thetaStart: number
-    thetaLength: number
-    attributes: AttributeMap
-  }
-  export class Sphere extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        radius,
-        widthSegments,
-        heightSegments,
-        phiStart,
-        phiLength,
-        thetaStart,
-        thetaLength,
-        attributes,
-      }?: Partial<SphereOptions>,
-    )
-  }
-
-  export interface TextFontChar {
-    char: string
-    xoffset: number
-    yoffset: number
-    width: number
-    height: number
-    x: number
-    y: number
-    xadvance: number
-  }
-  export interface TextFontKerning {
-    first: number
-    second: number
-    amount: number
-  }
-  export interface TextFont {
-    chars: TextFontChar[]
-    kernings: TextFontKerning[]
-    common: {
-      lineHeight: number
-      base: number
-      scaleW: number
-      scaleH: number
-    }
-  }
-  export class Text {
-    constructor({
-      font,
-      text,
-      width,
-      align,
-      size,
-      letterSpacing,
-      lineHeight,
-      wordSpacing,
-      wordBreak,
-    }: {
-      font: any
-      text: string
-      width?: number
-      align?: 'left' | 'right' | 'center'
-      size?: number
-      letterSpacing?: number
-      lineHeight?: number
-      wordSpacing?: number
-      wordBreak?: boolean
-    })
-  }
-
-  export interface TextureLoaderOptions {
-    src:
-      | Partial<{
-          pvrtc: string
-          s3tc: string
-          etc: string
-          etc1: string
-          astc: string
-          webp: string
-          jpg: string
-          png: string
-        }>
-      | string
-    wrapS: number
-    wrapT: number
-    anisotropy: number
-    format: number
-    internalFormat: number
-    generateMipmaps: boolean
-    minFilter: number
-    magFilter: number
-    premultiplyAlpha: boolean
-    unpackAlignment: number
-    flipY: boolean
-  }
-  export class TextureLoader {
-    static load<T extends Texture>(
-      gl: OGLRenderingContext,
-      {
-        src,
-        wrapS,
-        wrapT,
-        anisotropy,
-        format,
-        internalFormat,
-        generateMipmaps,
-        minFilter,
-        magFilter,
-        premultiplyAlpha,
-        unpackAlignment,
-        flipY,
-      }?: Partial<TextureLoaderOptions>,
-    ): T
-    static getSupportedExtensions(gl: OGLRenderingContext): string[]
-    static loadKTX(src: string, texture: KTXTexture): Promise<void>
-    static loadImage(gl: OGLRenderingContext, src: string, texture: Texture, flipY: boolean): Promise<HTMLImageElement>
-    static clearCache(): void
-  }
-
-  export class Torus extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        radius,
-        tube,
-        radialSegments,
-        tubularSegments,
-        arc,
-        attributes,
-      }?: {
-        radius?: number
-        tube?: number
-        radialSegments?: number
-        tubularSegments?: number
-        arc?: number
-        attributes?: {}
-      },
-    )
-  }
-
-  export class Triangle extends Geometry {
-    constructor(
-      gl: OGLRenderingContext,
-      {
-        attributes,
-      }?: {
-        attributes?: {}
-      },
-    )
-  }
+  // Math
 
   export class Color extends Array<number> {
     constructor(color: [number, number, number])
@@ -1384,7 +580,6 @@ declare module 'ogl' {
   }
 
   export type EulerOrder = 'XYZ' | 'XZY' | 'YXZ' | 'YZX' | 'ZXY' | 'ZYX'
-
   export class Euler extends Array<number> {
     onChange: () => void
     order: EulerOrder
@@ -1646,5 +841,808 @@ declare module 'ogl' {
     dot(v: Vec4): this
     fromArray(a: number[], o?: number): this
     toArray(a?: number[], o?: number): number[]
+  }
+
+  // Extras
+
+  export interface AnimationFrame {
+    position: Vec3
+    quaternion: Quat
+    scale: Vec3
+  }
+  export interface AnimationData {
+    frames: AnimationFrame[]
+  }
+  export interface AnimationOptions {
+    objects: BoneTransform[]
+    data: AnimationData
+  }
+  export class Animation {
+    objects: BoneTransform[]
+    data: AnimationData
+    elapsed: number
+    weight: number
+    duration: number
+    constructor({ objects, data }: AnimationOptions)
+    update(totalWeight: number, isSet: boolean): void
+  }
+
+  type BasisImage = (Uint8Array | Uint16Array) & {
+    width: number
+    height: number
+    isCompressedTexture: true
+    internalFormat: number
+    isBasis: true
+  }
+  export class BasisManager {
+    constructor(workerSrc: string | URL)
+    getSupportedFormat(): 'astc' | 'bptc' | 's3tc' | 'etc1' | 'pvrtc' | 'none'
+    initWorker(workerSrc: string | URL): void
+    onMessage(msg: { data: { id: number; error: string; image: BasisImage } }): void
+    parseTexture(buffer: ArrayBuffer): Promise<BasisImage>
+  }
+
+  export type BoxOptions = {
+    width: number
+    height: number
+    depth: number
+    widthSegments: number
+    heightSegments: number
+    depthSegments: number
+    attributes: AttributeMap
+  }
+  export class Box extends Geometry {
+    constructor(
+      gl: OGLRenderingContext,
+      { width, height, depth, widthSegments, heightSegments, depthSegments, attributes }?: Partial<BoxOptions>,
+    )
+  }
+
+  export interface CurveOptions {
+    points: Vec3[]
+    divisions: number
+    type: 'catmullrom' | 'cubicbezier'
+  }
+  export class Curve {
+    static CATMULLROM: 'catmullrom'
+    static CUBICBEZIER: 'cubicbezier'
+    static QUADRATICBEZIER: 'quadraticbezier'
+    type: 'catmullrom' | 'cubicbezier' | 'quadraticbezier'
+    private points
+    private divisions
+    constructor({ points, divisions, type }?: Partial<CurveOptions>)
+    _getQuadraticBezierPoints(divisions?: number): Vec3[]
+    _getCubicBezierPoints(divisions?: number): Vec3[]
+    _getCatmullRomPoints(divisions?: number, a?: number, b?: number): Vec3[]
+    getPoints(divisions?: number, a?: number, b?: number): Vec3[]
+  }
+
+  export type CylinderOptions = {
+    radiusTop: number
+    radiusBottom: number
+    height: number
+    radialSegments: number
+    heightSegments: number
+    openEnded: boolean
+    thetaStart: number
+    thetaLength: number
+    attributes: AttributeMap
+  }
+  export class Cylinder extends Geometry {
+    constructor(
+      gl: OGLRenderingContext,
+      {
+        radiusTop,
+        radiusBottom,
+        height,
+        radialSegments,
+        heightSegments,
+        openEnded,
+        thetaStart,
+        thetaLength,
+        attributes,
+      }?: Partial<CylinderOptions>,
+    )
+  }
+
+  export interface FlowmapOptions {
+    size: number
+    falloff: number
+    alpha: number
+    dissipation: number
+    type: number
+  }
+  export class Flowmap {
+    gl: OGLRenderingContext
+    uniform: {
+      value: any
+    }
+    mask: {
+      read: RenderTarget
+      write: RenderTarget
+      swap: () => void
+    }
+    aspect: number
+    mouse: Vec2
+    velocity: Vec2
+    mesh: Mesh
+    constructor(gl: OGLRenderingContext, { size, falloff, alpha, dissipation, type }?: Partial<FlowmapOptions>)
+    update(): void
+  }
+
+  export interface GLTFAnimationData {
+    node: any
+    transform: any
+    interpolation: any
+    times: any
+    values: any
+  }
+  export class GLTFAnimation {
+    private data: GLTFAnimationData[]
+    private elapsed: number
+    private weight: number
+    private loop: boolean
+    private duration: number
+    private startTime: number
+    private endTime: number
+    constructor(data: GLTFAnimationData[], weight?: number)
+    update(totalWeight: number, isSet: boolean): void
+    cubicSplineInterpolate(t: number, prevVal: any, prevTan: any, nextTan: any, nextVal: any): any
+  }
+
+  export class GLTFLoader {
+    static load(
+      gl: OGLRenderingContext,
+      src: string,
+    ): Promise<{
+      json: any
+      buffers: any[]
+      bufferViews: any
+      images: any
+      textures: any
+      materials: any
+      meshes: any
+      nodes: any
+      animations: any
+      scenes: any
+      scene: any
+    }>
+    static setBasisManager(manager: BasisManager): void
+    static parse(
+      gl: any,
+      desc: any,
+      dir: any,
+    ): Promise<{
+      json: any
+      buffers: any[]
+      bufferViews: any
+      images: any
+      textures: any
+      materials: any
+      meshes: any
+      nodes: any
+      animations: any
+      scenes: any
+      scene: any
+    }>
+    static parseDesc(src: any): Promise<any>
+    static unpackGLB(glb: any): any
+    static resolveURI(uri: any, dir: any): string
+    static loadBuffers(desc: any, dir: any): Promise<any[]>
+    static parseBufferViews(gl: any, desc: any, buffers: any): any
+    static async parseImages(gl: any, desc: any, dir: any, bufferViews: any): Promise<any>
+    static parseTextures(gl: any, desc: any, images: any): any
+    static createTexture(
+      gl: any,
+      desc: any,
+      images: any,
+      opts: { sample: any; source: any; name: any; extensions: any; extras: any },
+    )
+    static parseMaterials(gl: any, desc: any, textures: any): any
+    static parseSkins(gl: any, desc: any, bufferViews: any): any
+    static parseMeshes(gl: any, desc: any, bufferViews: any, materials: any, skins: any): any
+    static parsePrimitives(
+      gl: any,
+      primitives: any,
+      desc: any,
+      bufferViews: any,
+      materials: any,
+      numInstances: any,
+      isLightmap: boolean,
+    ): any
+    static parseAccessor(
+      index: any,
+      desc: any,
+      bufferViews: any,
+    ): {
+      data: any
+      size: any
+      type: any
+      normalized: any
+      buffer: any
+      stride: any
+      offset: any
+      count: any
+      min: any
+      max: any
+    }
+    static parseNodes(gl: any, desc: any, meshes: any, skins: any, images: any): any
+    static parseLights(gl: any, desc: any, nodes: any, scenes: any)
+    static populateSkins(skins: any, nodes: any): void
+    static parseAnimations(gl: any, desc: any, nodes: any, bufferViews: any): any
+    static parseScenes(desc: any, nodes: any): any
+  }
+
+  export interface GLTFSkinSkeleton {
+    joints: { worldMatrix: Mat4; bindInverse: Mat4 }[]
+  }
+  export interface GLTFSkinOptions {
+    skeleton: GLTFSkinSkeleton
+    geometry: Geometry
+    program: Program
+    mode: GLenum
+  }
+  export class GLTFSkin extends Mesh {
+    skeleton: GLTFSkinSkeleton
+    animations: Animation[]
+    boneMatrices: Float32Array
+    boneTextureSize: number
+    boneTexture: Texture
+    constructor(gl: OGLRenderingContext, { skeleton, geometry, program, mode }?: Partial<GLTFSkinOptions>)
+    createBoneTexture(): void
+    updateUniforms(): void
+    draw({ camera }?: { camera?: Camera }): void
+  }
+
+  export interface GPGPUpass {
+    mesh: Mesh
+    program: Program
+    uniforms: {
+      [name: string]: any
+    }
+    enabled: boolean
+    textureUniform: string
+  }
+  export class GPGPU {
+    gl: OGLRenderingContext
+    passes: GPGPUpass[]
+    geometry: Triangle
+    dataLength: number
+    size: number
+    coords: Float32Array
+    uniform: {
+      value: any
+    }
+    fbo: {
+      read: RenderTarget
+      write: RenderTarget
+      swap: () => void
+    }
+    constructor(
+      gl: OGLRenderingContext,
+      {
+        data,
+        geometry,
+        type,
+      }: {
+        data?: Float32Array
+        geometry?: Triangle
+        type?: Texture['type']
+      },
+    )
+    addPass({
+      vertex,
+      fragment,
+      uniforms,
+      textureUniform,
+      enabled,
+    }?: {
+      vertex?: string
+      fragment?: string
+      uniforms?: {
+        [name: string]: any
+      }
+      textureUniform?: string
+      enabled?: boolean
+    }): {
+      mesh: Mesh
+      program: Program
+      uniforms: {
+        [name: string]: any
+      }
+      enabled: boolean
+      textureUniform: string
+    }
+    render(): void
+  }
+
+  export interface KTXTextureOptions {
+    buffer: ArrayBuffer
+    src: string
+    wrapS: number
+    wrapT: number
+    anisotropy: number
+    minFilter: number
+    magFilter: number
+  }
+  export class KTXTexture extends Texture {
+    constructor(
+      gl: OGLRenderingContext,
+      { buffer, wrapS, wrapT, anisotropy, minFilter, magFilter }?: Partial<KTXTextureOptions>,
+    )
+    parseBuffer(buffer: ArrayBuffer): void
+  }
+
+  export function NormalProgram(gl: OGLRenderingContext): Program
+
+  export type OrbitOptions = {
+    element: HTMLElement
+    enabled: boolean
+    target: Vec3
+    ease: number
+    inertia: number
+    enableRotate: boolean
+    rotateSpeed: number
+    autoRotate: boolean
+    autoRotateSpeed: number
+    enableZoom: boolean
+    zoomSpeed: number
+    enablePan: boolean
+    panSpeed: number
+    minPolarAngle: number
+    maxPolarAngle: number
+    minAzimuthAngle: number
+    maxAzimuthAngle: number
+    minDistance: number
+    maxDistance: number
+  }
+  export class Orbit {
+    constructor(
+      object: Transform & {
+        fov: number
+      },
+      {
+        element,
+        enabled,
+        target,
+        ease,
+        inertia,
+        enableRotate,
+        rotateSpeed,
+        autoRotate,
+        autoRotateSpeed,
+        enableZoom,
+        zoomSpeed,
+        enablePan,
+        panSpeed,
+        minPolarAngle,
+        maxPolarAngle,
+        minAzimuthAngle,
+        maxAzimuthAngle,
+        minDistance,
+        maxDistance,
+      }?: Partial<OrbitOptions>,
+    )
+  }
+
+  export type PlaneOptions = {
+    width: number
+    height: number
+    widthSegments: number
+    heightSegments: number
+    attributes: AttributeMap
+  }
+  export class Plane extends Geometry {
+    constructor(
+      gl: OGLRenderingContext,
+      { width, height, widthSegments, heightSegments, attributes }?: Partial<PlaneOptions>,
+    )
+    static buildPlane(
+      position: Float32Array,
+      normal: Float32Array,
+      uv: Float32Array,
+      index: Uint32Array | Uint16Array,
+      width: number,
+      height: number,
+      depth: number,
+      wSegs: number,
+      hSegs: number,
+      u?: number,
+      v?: number,
+      w?: number,
+      uDir?: number,
+      vDir?: number,
+      i?: number,
+      ii?: number,
+    ): void
+  }
+
+  export interface PolylineOptions {
+    points: Vec3[]
+    vertex: string
+    fragment: string
+    uniforms: {
+      [key: string]: {
+        value: any
+      }
+    }
+    attributes: AttributeMap
+  }
+  export class Polyline {
+    gl: OGLRenderingContext
+    points: Vec3[]
+    count: number
+    position: Float32Array
+    prev: Float32Array
+    next: Float32Array
+    geometry: Geometry
+    resolution: {
+      value: Vec2
+    }
+    dpr: {
+      value: number
+    }
+    thickness: {
+      value: number
+    }
+    color: {
+      value: Color
+    }
+    miter: {
+      value: number
+    }
+    program: Program
+    mesh: Mesh
+    constructor(gl: OGLRenderingContext, { points, vertex, fragment, uniforms, attributes }: Partial<PolylineOptions>)
+    updateGeometry(): void
+    resize(): void
+  }
+
+  export interface PostOptions {
+    width: number
+    height: number
+    dpr: number
+    wrapS: GLenum
+    wrapT: GLenum
+    minFilter: GLenum
+    magFilter: GLenum
+    geometry: Triangle
+    targetOnly: boolean
+  }
+  export interface Pass {
+    mesh: Mesh
+    program: Program
+    uniforms: {
+      [name: string]: any
+    }
+    enabled: boolean
+    textureUniform: string
+    vertex?: string
+    fragment?: string
+  }
+  export class Post {
+    gl: OGLRenderingContext
+    options: {
+      wrapS: GLenum
+      wrapT: GLenum
+      minFilter: GLenum
+      magFilter: GLenum
+      width?: number
+      height?: number
+    }
+    passes: Pass[]
+    geometry: Triangle
+    uniform: {
+      value: any
+    }
+    targetOnly: boolean
+    fbo: { read: RenderTarget; write: RenderTarget; swap: () => void }
+    dpr: number
+    width: number
+    height: number
+    constructor(
+      gl: OGLRenderingContext,
+      { width, height, dpr, wrapS, wrapT, minFilter, magFilter, geometry, targetOnly }?: Partial<PostOptions>,
+    )
+    addPass({ vertex, fragment, uniforms, textureUniform, enabled }?: Partial<Pass>): {
+      mesh: Mesh
+      program: Program
+      uniforms: {
+        [name: string]: any
+      }
+      enabled: boolean
+      textureUniform: string
+    }
+    resize({
+      width,
+      height,
+      dpr,
+    }?: Partial<{
+      width: number
+      height: number
+      dpr: number
+    }>): void
+    render({
+      scene,
+      camera,
+      texture,
+      target,
+      update,
+      sort,
+      frustumCull,
+    }: {
+      scene?: Transform
+      camera?: Camera
+      texture?: Texture
+      target?: RenderTarget
+      update?: boolean
+      sort?: boolean
+      frustumCull?: boolean
+    }): void
+  }
+
+  export class Raycast {
+    gl: OGLRenderingContext
+    origin: Vec3
+    direction: Vec3
+    constructor(gl: OGLRenderingContext)
+    castMouse(camera: Camera, mouse?: number[]): void
+    intersectBounds(
+      meshes: Mesh | Mesh[],
+      {
+        maxDistance,
+        output,
+      }?: {
+        maxDistance?: number
+        output?: Mesh[]
+      },
+    ): Mesh[]
+    intersectMeshes(
+      meshes: Mesh[],
+      {
+        cullFace,
+        maxDistance,
+        includeUV,
+        includeNormal,
+        output,
+      }?: {
+        cullFace?: boolean
+        maxDistance?: number
+        includeUV?: boolean
+        includeNormal?: boolean
+        output?: Mesh[]
+      },
+    ): Mesh[]
+    intersectSphere(sphere: Bounds, origin?: Vec3, direction?: Vec3): number
+    intersectBox(box: Bounds, origin?: Vec3, direction?: Vec3): number
+    intersectTriangle(
+      a: Vec3,
+      b: Vec3,
+      c: Vec3,
+      backfaceCulling?: boolean,
+      origin?: Vec3,
+      direction?: Vec3,
+      normal?: Vec3,
+    ): number
+    getBarycoord(point: Vec3, a: Vec3, b: Vec3, c: Vec3, target?: Vec3): Vec3
+  }
+
+  export class Shadow {
+    gl: OGLRenderingContext
+    light: Camera
+    target: RenderTarget
+    depthProgram: Program
+    castMeshes: Mesh[]
+    constructor(
+      gl: OGLRenderingContext,
+      {
+        light,
+        width,
+        height,
+      }: {
+        light?: Camera
+        width?: number
+        height?: number
+      },
+    )
+    add({
+      mesh,
+      receive,
+      cast,
+      vertex,
+      fragment,
+      uniformProjection,
+      uniformView,
+      uniformTexture,
+    }: {
+      mesh: Mesh
+      receive?: boolean
+      cast?: boolean
+      vertex?: string
+      fragment?: string
+      uniformProjection?: string
+      uniformView?: string
+      uniformTexture?: string
+    }): void
+    render({ scene }: { scene: Transform }): void
+  }
+
+  export interface SkinRig {
+    bindPose: { position: Vec3; quaternion: Quat; scale: Vec3 }
+    bones: { name: string; parent: Transform }[]
+  }
+  export interface SkinOptions {
+    rig: SkinRig
+    geometry: Geometry
+    program: Program
+    mode: GLenum
+  }
+  export interface BoneTransform extends Transform {
+    name: string
+    bindInverse: Mat4
+  }
+  export class Skin extends Mesh {
+    animations: Animation[]
+    boneTexture: Texture
+    boneTextureSize: number
+    boneMatrices: Float32Array
+    root: Transform
+    bones: BoneTransform[]
+    constructor(gl: OGLRenderingContext, { rig, geometry, program, mode }?: Partial<SkinOptions>)
+    createBones(rig: SkinRig): void
+    createBoneTexture(): void
+    addAnimation(data: Animation['data']): Animation
+    update(): void
+    draw({ camera }?: { camera?: Camera }): void
+  }
+
+  export type SphereOptions = {
+    radius: number
+    widthSegments: number
+    heightSegments: number
+    phiStart: number
+    phiLength: number
+    thetaStart: number
+    thetaLength: number
+    attributes: AttributeMap
+  }
+  export class Sphere extends Geometry {
+    constructor(
+      gl: OGLRenderingContext,
+      {
+        radius,
+        widthSegments,
+        heightSegments,
+        phiStart,
+        phiLength,
+        thetaStart,
+        thetaLength,
+        attributes,
+      }?: Partial<SphereOptions>,
+    )
+  }
+
+  export interface TextFontChar {
+    char: string
+    xoffset: number
+    yoffset: number
+    width: number
+    height: number
+    x: number
+    y: number
+    xadvance: number
+  }
+  export interface TextFontKerning {
+    first: number
+    second: number
+    amount: number
+  }
+  export interface TextFont {
+    chars: TextFontChar[]
+    kernings: TextFontKerning[]
+    common: {
+      lineHeight: number
+      base: number
+      scaleW: number
+      scaleH: number
+    }
+  }
+  export type TextAlign = 'left' | 'right' | 'center'
+  export class Text {
+    constructor({
+      font,
+      text,
+      width,
+      align,
+      size,
+      letterSpacing,
+      lineHeight,
+      wordSpacing,
+      wordBreak,
+    }: {
+      font: any
+      text: string
+      width?: number
+      align?: TextAlign
+      size?: number
+      letterSpacing?: number
+      lineHeight?: number
+      wordSpacing?: number
+      wordBreak?: boolean
+    })
+  }
+
+  export interface TextureLoaderOptions {
+    src:
+      | Partial<{
+          pvrtc: string
+          s3tc: string
+          etc: string
+          etc1: string
+          astc: string
+          webp: string
+          jpg: string
+          png: string
+        }>
+      | string
+    wrapS: number
+    wrapT: number
+    anisotropy: number
+    format: number
+    internalFormat: number
+    generateMipmaps: boolean
+    minFilter: number
+    magFilter: number
+    premultiplyAlpha: boolean
+    unpackAlignment: number
+    flipY: boolean
+  }
+  export class TextureLoader {
+    static load<T extends Texture>(
+      gl: OGLRenderingContext,
+      {
+        src,
+        wrapS,
+        wrapT,
+        anisotropy,
+        format,
+        internalFormat,
+        generateMipmaps,
+        minFilter,
+        magFilter,
+        premultiplyAlpha,
+        unpackAlignment,
+        flipY,
+      }?: Partial<TextureLoaderOptions>,
+    ): T
+    static getSupportedExtensions(gl: OGLRenderingContext): string[]
+    static loadKTX(src: string, texture: KTXTexture): Promise<void>
+    static loadImage(gl: OGLRenderingContext, src: string, texture: Texture, flipY: boolean): Promise<HTMLImageElement>
+    static clearCache(): void
+  }
+
+  export class Torus extends Geometry {
+    constructor(
+      gl: OGLRenderingContext,
+      {
+        radius,
+        tube,
+        radialSegments,
+        tubularSegments,
+        arc,
+        attributes,
+      }?: {
+        radius?: number
+        tube?: number
+        radialSegments?: number
+        tubularSegments?: number
+        arc?: number
+        attributes?: AttributeMap
+      },
+    )
+  }
+
+  export class Triangle extends Geometry {
+    constructor(gl: OGLRenderingContext, { attributes }?: { attributes?: AttributeMap })
   }
 }
