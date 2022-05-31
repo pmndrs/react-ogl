@@ -81,7 +81,7 @@ export const detach = (parent: Instance, child: Instance) => {
 
   if (typeof child.attach === 'string') {
     const { target, key } = resolveAttach(parent, child.attach)
-    target[key] = child.__r3f.previousAttach
+    target[key] = child.__previousAttach
   } else {
     child.__previousAttach?.(parent, child)
   }
