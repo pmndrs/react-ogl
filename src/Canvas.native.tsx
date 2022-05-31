@@ -9,7 +9,7 @@ import '@expo/browser-polyfill'
 
 export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
 
-export interface CanvasProps extends RenderProps, ViewProps {
+export interface CanvasProps extends Omit<RenderProps, 'dpr'>, ViewProps {
   children: React.ReactNode
   style?: ViewStyle
   orthographic?: boolean
@@ -63,6 +63,9 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       {
         mode,
         renderer,
+        // expo-gl can only render at native dpr/resolution
+        // https://github.com/expo/expo-three/issues/39
+        dpr: PixelRatio.get(),
         camera,
         events,
         onCreated(state) {
@@ -98,13 +101,15 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       },
     ).getState()
 
-    // Set dpr, handle resize
-    state.renderer.dpr = PixelRatio.get()
-    state.renderer.setSize(width, height)
+    // Handle resize
+    if (state.renderer.width !== width || state.renderer.height !== height) {
+      // Set dpr, handle resize
+      state.renderer.setSize(width, height)
 
-    // Update projection
-    const projection = orthographic ? 'orthographic' : 'perspective'
-    state.camera[projection]({ aspect: width / height })
+      // Update projection
+      const projection = orthographic ? 'orthographic' : 'perspective'
+      state.camera[projection]({ aspect: width / height })
+    }
 
     // Bind events
     if (!bind) setBind(state.events.connected)

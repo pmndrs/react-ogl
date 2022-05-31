@@ -169,6 +169,7 @@ export type RenderProps = {
     | Partial<NonFunctionKeys<OGL.Renderer>>
     | Partial<OGL.RendererOptions>
   gl?: OGL.OGLRenderingContext
+  dpr?: DPR
   camera?: CameraProps | Partial<NonFunctionKeys<OGL.Camera>> | Partial<OGL.CameraOptions>
   events?: EventManager
   onCreated?: (state: RootState) => any

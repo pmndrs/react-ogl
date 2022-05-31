@@ -6,7 +6,7 @@ import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext } from './hooks'
 import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
-import { applyProps } from './utils'
+import { applyProps, calculateDpr } from './utils'
 
 // Store roots here since we can render to multiple targets
 const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
@@ -36,6 +36,8 @@ export const render = (
           })
     if (config.renderer && typeof config.renderer !== 'function')
       applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
+
+    renderer.dpr = calculateDpr(config.dpr ?? [1, 2])
 
     const gl = renderer.gl
     gl.clearColor(1, 1, 1, 0)

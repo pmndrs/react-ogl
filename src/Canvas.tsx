@@ -2,15 +2,14 @@ import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { Block, calculateDpr, ErrorBoundary } from './utils'
+import { Block, ErrorBoundary } from './utils'
 import { events as createPointerEvents } from './events'
-import { RenderProps, DPR, SetBlock } from './types'
+import { RenderProps, SetBlock } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
 export interface CanvasProps extends RenderProps, React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   resize?: ResizeOptions
-  dpr?: DPR
   orthographic?: boolean
   frameloop?: 'always' | 'never'
 }
@@ -61,6 +60,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
       {
         mode,
         renderer,
+        dpr,
         camera,
         events,
         onCreated(state) {
@@ -86,13 +86,15 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
       },
     ).getState()
 
-    // Set dpr, handle resize
-    state.renderer.dpr = calculateDpr(dpr ?? [1, 2])
-    state.renderer.setSize(width, height)
+    // Handle resize
+    if (state.renderer.width !== width || state.renderer.height !== height) {
+      // Set dpr, handle resize
+      state.renderer.setSize(width, height)
 
-    // Update projection
-    const projection = orthographic ? 'orthographic' : 'perspective'
-    state.camera[projection]({ aspect: width / height })
+      // Update projection
+      const projection = orthographic ? 'orthographic' : 'perspective'
+      state.camera[projection]({ aspect: width / height })
+    }
   }
 
   useIsomorphicLayoutEffect(() => {
