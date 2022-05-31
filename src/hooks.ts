@@ -15,7 +15,7 @@ export const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayo
 /**
  * Internal OGL context.
  */
-export const OGLContext = React.createContext<RootStore>(null!)
+export const OGLContext = React.createContext<RootStore>(null)
 
 /**
  * Returns the internal OGL store.

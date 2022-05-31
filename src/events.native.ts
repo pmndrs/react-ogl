@@ -67,8 +67,8 @@ export const events: EventManager = {
     if (!state.events?.connected) return
 
     // Disconnect handlers
-    const manager = managers.get(canvas)!
-    manager.reset?.()
+    const manager = managers.get(canvas)
+    manager?.reset?.()
 
     // Mark events as disconnected
     state.events.connected = false
