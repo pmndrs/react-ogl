@@ -5,7 +5,7 @@ import create, { SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext } from './hooks'
-import { InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
+import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps } from './utils'
 
 // Store roots here since we can render to multiple targets
@@ -34,7 +34,8 @@ export const render = (
             ...(config.renderer as any),
             canvas: target,
           })
-    if (config.renderer && typeof config.renderer !== 'function') applyProps(renderer, config.renderer as InstanceProps)
+    if (config.renderer && typeof config.renderer !== 'function')
+      applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
 
     const gl = renderer.gl
     gl.clearColor(1, 1, 1, 0)
