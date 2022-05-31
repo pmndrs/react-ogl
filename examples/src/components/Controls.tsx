@@ -14,7 +14,6 @@ function Controls() {
 
   useFrame(() => controls.current.update())
 
-  // @ts-ignore
   return <orbit ref={controls} args={[camera, { element: gl.canvas, enableZoom: false }]} />
 }
 

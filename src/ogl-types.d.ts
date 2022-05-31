@@ -1223,6 +1223,16 @@ declare module 'ogl' {
         maxDistance,
       }?: Partial<OrbitOptions>,
     )
+    update(): void
+    forcePosition(): void
+    remove(): void
+    enabled: boolean
+    minDistance: number
+    maxDistance: number
+    offset: number
+    zoomStyle: 'dolly' | any
+    mouseButtons = { ORBIT: number, ZOOM: number, PAN: number }
+    target: Vec3
   }
 
   export type PlaneOptions = {

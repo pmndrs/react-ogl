@@ -1,3 +1,5 @@
+/// <reference path="./ogl-types.d.ts" />
+
 import * as OGL from 'ogl'
 import type { MutableRefObject } from 'react'
 import type { SetState, UseBoundStore, StoreApi } from 'zustand'
