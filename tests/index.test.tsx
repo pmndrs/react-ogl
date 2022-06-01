@@ -143,20 +143,26 @@ describe('renderer', () => {
   it('should accept shorthand props as uniforms', async () => {
     let state: RootState
 
+    const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
+    const texture = new OGL.Texture(renderer.gl)
+
     await reconciler.act(async () => {
       state = render(
         <mesh>
           <box />
-          <normalProgram uniforms={{ color: 'white', vector: [0, 0, 0] }} />
+          <normalProgram uniforms={{ color: 'white', vector: [0, 0, 0], textures: [texture, texture] }} />
         </mesh>,
       )
     })
 
     const [mesh] = state.scene.children
-    const { color, vector } = mesh.program.uniforms
+    const { color, vector, textures } = mesh.program.uniforms
 
-    expect(color.value instanceof OGL.Color).toBe(true)
-    expect(vector.value instanceof OGL.Vec3).toBe(true)
+    expect(color.value).toBeInstanceOf(OGL.Color)
+    expect(vector.value).toBeInstanceOf(OGL.Vec3)
+    expect(textures.value).toBeInstanceOf(Array)
+    expect(textures.value[0]).toBe(texture)
+    expect(textures.value[1]).toBe(texture)
   })
 
   it('should accept props as geometry attributes', async () => {
