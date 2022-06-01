@@ -215,6 +215,9 @@ export type PrimitiveProps = { object: any } & { [properties: string]: any }
 
 export type UniformValue = keyof typeof COLORS | number | number[] | OGL.Texture | OGL.Texture[]
 export type UniformRepresentation = UniformValue | { [structName: string]: UniformValue }
+export type UniformList = {
+  [uniform: string]: UniformRepresentation | { value: UniformRepresentation }
+}
 
 // Core
 export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
@@ -223,9 +226,7 @@ export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
 export type ProgramProps = Omit<Node<OGL.Program, typeof OGL.Program>, 'uniforms'> & {
   vertex?: string
   fragment?: string
-  uniforms?: {
-    [uniform: string]: UniformRepresentation | { value: UniformRepresentation }
-  }
+  uniforms?: UniformList
 }
 export type RendererProps = Node<OGL.Renderer, typeof OGL.Renderer>
 export type CameraProps = TransformNode<OGL.Camera, typeof OGL.Camera>

@@ -2,7 +2,17 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { COLORS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { DPR, EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
+import {
+  DPR,
+  EventHandlers,
+  Instance,
+  InstanceProps,
+  ObjectMap,
+  RootState,
+  SetBlock,
+  UniformList,
+  UniformRepresentation,
+} from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -142,18 +152,22 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
       }
     } else {
       // Allow shorthand values for uniforms
-      const uniformList = value as { [name: string]: any }
+      const uniformList = value as UniformList
       if (key === 'uniforms') {
         for (const uniform in uniformList) {
-          let uniformValue = uniformList[uniform]?.value ?? uniformList[uniform]
+          // @ts-ignore
+          let uniformValue: UniformRepresentation = uniformList[uniform]?.value ?? uniformList[uniform]
 
           // Handle uniforms shorthand
           if (typeof uniformValue === 'string') {
             // Uniform is a string, convert it into a color
             uniformValue = toColor(uniformValue as keyof typeof COLORS)
-          } else if (Array.isArray(uniformValue) && uniformValue.constructor === Array) {
+          } else if (
+            uniformValue?.constructor === Array &&
+            (uniformValue as any[]).every((v: any) => typeof v === 'number')
+          ) {
             // Uniform is an array, convert it into a vector
-            uniformValue = toVector(uniformValue)
+            uniformValue = toVector(uniformValue as number[])
           }
 
           root.uniforms[uniform] = { value: uniformValue }
