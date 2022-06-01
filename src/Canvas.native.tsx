@@ -49,6 +49,7 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       clientHeight: context.drawingBufferHeight,
       getContext: (() => context) as any,
     } as HTMLCanvasElement
+    ;(context as any).canvas = canvasShim
 
     setCanvas(canvasShim)
   }, [])
@@ -69,6 +70,16 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
         camera,
         events,
         onCreated(state) {
+          // Flush frame for native
+          const gl = state.gl as unknown as ExpoWebGLRenderingContext | WebGL2RenderingContext
+          if ('endFrameEXP' in gl) {
+            const renderFrame = state.renderer.render.bind(state.renderer)
+            state.renderer.render = (...args) => {
+              renderFrame(...args)
+              gl.endFrameEXP()
+            }
+          }
+
           // Animate
           const animate = (time?: number) => {
             // Cancel animation if frameloop is set, otherwise keep looping
@@ -85,16 +96,6 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
             state.renderer.render({ scene: state.scene, camera: state.camera })
           }
           if (frameloop !== 'never') animate()
-
-          // Flush frame for native
-          const gl = state.gl as unknown as ExpoWebGLRenderingContext | WebGL2RenderingContext
-          if ('endFrameEXP' in gl) {
-            const renderFrame = state.renderer.render.bind(renderer)
-            state.renderer.render = ({ scene, camera }) => {
-              renderFrame({ scene, camera })
-              gl.endFrameEXP()
-            }
-          }
 
           return onCreated?.(state)
         },
