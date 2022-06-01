@@ -97,6 +97,9 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
           }
           if (frameloop !== 'never') animate()
 
+          // Bind events
+          setBind(state.events?.connected)
+
           return onCreated?.(state)
         },
       },
@@ -111,9 +114,6 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       const projection = orthographic ? 'orthographic' : 'perspective'
       state.camera[projection]({ aspect: width / height })
     }
-
-    // Bind events
-    if (!bind) setBind(state.events.connected)
   }
 
   // Cleanup on unmount
