@@ -2,7 +2,6 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
-import { RESERVED_PROPS } from './constants'
 import { Catalogue, Instance, InstanceProps, RootState } from './types'
 
 // Custom objects that extend the OGL namespace
@@ -79,7 +78,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   }
 
   // Create instance
-  const instance = object || (Array.isArray(args) ? new target(...args) : new target(args))
+  const instance: Instance = object || (Array.isArray(args) ? new target(...args) : new target(args))
 
   // If primitive, make a note of it
   if (type === 'primitive') instance.isPrimitive = true
@@ -202,13 +201,13 @@ export const checkShallow = (a: any, b: any) => {
 /**
  * Prepares a set of changes to be applied to the instance.
  */
-export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps = {}) => {
+export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) => {
   const changedProps: InstanceProps = {}
 
   // Sort through props
   for (const key in newProps) {
     // Skip reserved keys
-    if (RESERVED_PROPS.includes(key as typeof RESERVED_PROPS[number])) continue
+    if (key === 'children') continue
     // Skip primitives
     if (instance.isPrimitive && key === 'object') continue
     // Skip if props match

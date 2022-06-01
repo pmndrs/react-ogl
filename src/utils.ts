@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { COLORS, POINTER_EVENTS, RESERVED_PROPS } from './constants'
+import { COLORS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
 import { DPR, EventHandlers, Instance, InstanceProps, ObjectMap, RootState, SetBlock } from './types'
 
@@ -95,15 +95,18 @@ export const detach = (parent: Instance, child: Instance) => {
 export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
   for (let key in newProps) {
-    const isReserved = RESERVED_PROPS.includes(key as typeof RESERVED_PROPS[number])
-    const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
-    const isIdentical = newProps[key] === oldProps?.[key]
+    // Don't mutate reserved keys
+    if (key === 'children') continue
+
+    // Don't mutate unchanged keys
+    if (newProps[key] === oldProps?.[key]) continue
 
     // Collect event handlers
-    if (isHandler) instance.__handlers = { ...instance.__handlers, [key]: newProps[key] }
-
-    // Skip key if reserved to react, a react-ogl event, or unchanged (no-op)
-    if (isReserved || isHandler || isIdentical) continue
+    const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
+    if (isHandler) {
+      instance.__handlers = { ...instance.__handlers, [key]: newProps[key] }
+      continue
+    }
 
     const value = newProps[key]
     let root = instance
