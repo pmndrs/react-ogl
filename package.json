@@ -88,6 +88,7 @@
     "build": "vite build && tsc",
     "test": "jest",
     "lint": "eslint src/**/*.{ts,tsx}",
-    "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}"
+    "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}",
+    "prepublish": "yarn build && yarn test && yarn lint"
   }
 }
