@@ -145,27 +145,18 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
       const uniformList = value as { [name: string]: any }
       if (key === 'uniforms') {
         for (const uniform in uniformList) {
-          let entry = uniformList[uniform]
+          let uniformValue = uniformList[uniform]?.value ?? uniformList[uniform]
 
-          // Handle uniforms which don't have a value key set
-          if (entry?.value === undefined) {
-            let value: any
-
-            if (typeof entry === 'string') {
-              // Uniform is a string, convert it into a color
-              value = toColor(entry as keyof typeof COLORS)
-            } else if (Array.isArray(entry)) {
-              // Uniform is an array, convert it into a vector
-              value = toVector(entry)
-            } else {
-              // Uniform is something else, don't convert it
-              value = entry
-            }
-
-            entry = { value }
+          // Handle uniforms shorthand
+          if (typeof uniformValue === 'string') {
+            // Uniform is a string, convert it into a color
+            uniformValue = toColor(uniformValue as keyof typeof COLORS)
+          } else if (Array.isArray(uniformValue) && uniformValue.constructor === Array) {
+            // Uniform is an array, convert it into a vector
+            uniformValue = toVector(uniformValue)
           }
 
-          root[key][uniform] = entry
+          root.uniforms[uniform] = { value: uniformValue }
         }
       } else {
         // Mutate the property directly
