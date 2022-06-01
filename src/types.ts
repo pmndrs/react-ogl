@@ -1,7 +1,7 @@
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 import type { SetState, UseBoundStore, StoreApi } from 'zustand'
-import { RENDER_MODES } from './constants'
+import { COLORS, RENDER_MODES } from './constants'
 
 // Util funcs
 export type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : T
@@ -213,6 +213,9 @@ export type TransformNode<T, P> = Overwrite<
 
 export type PrimitiveProps = { object: any } & { [properties: string]: any }
 
+export type UniformValue = keyof typeof COLORS | number | number[] | OGL.Texture | OGL.Texture[]
+export type UniformRepresentation = UniformValue | { [structName: string]: UniformValue }
+
 // Core
 export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
   [attributes: string]: { data: ArrayBufferView; size?: number }
@@ -220,7 +223,9 @@ export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
 export type ProgramProps = Omit<Node<OGL.Program, typeof OGL.Program>, 'uniforms'> & {
   vertex?: string
   fragment?: string
-  uniforms?: { [uniform: string]: number[] | string | any }
+  uniforms?: {
+    [uniform: string]: UniformRepresentation | { value: UniformRepresentation }
+  }
 }
 export type RendererProps = Node<OGL.Renderer, typeof OGL.Renderer>
 export type CameraProps = TransformNode<OGL.Camera, typeof OGL.Camera>
@@ -230,11 +235,11 @@ export type TextureProps = Node<OGL.Texture, typeof OGL.Texture>
 export type RenderTargetProps = Node<OGL.RenderTarget, typeof OGL.RenderTarget>
 
 // Math
-export type ColorProps = ConstructorParameters<typeof OGL.Color> | OGL.Color | number | string
-export type EulerProps = OGL.Euler | Parameters<OGL.Euler['set']>
-export type Mat3Props = OGL.Mat3 | Parameters<OGL.Mat3['set']>
-export type Mat4Props = OGL.Mat4 | Parameters<OGL.Mat4['set']>
-export type QuatProps = OGL.Quat | Parameters<OGL.Quat['set']>
+export type ColorProps = ConstructorParameters<typeof OGL.Color> | OGL.Color | number | keyof typeof COLORS
+export type EulerProps = OGL.Euler | Parameters<OGL.Euler['set']> | number
+export type Mat3Props = OGL.Mat3 | Parameters<OGL.Mat3['set']> | number
+export type Mat4Props = OGL.Mat4 | Parameters<OGL.Mat4['set']> | number
+export type QuatProps = OGL.Quat | Parameters<OGL.Quat['set']> | number
 export type Vec2Props = OGL.Vec2 | Parameters<OGL.Vec2['set']> | number
 export type Vec3Props = OGL.Vec3 | Parameters<OGL.Vec3['set']> | number
 export type Vec4Props = OGL.Vec4 | Parameters<OGL.Vec4['set']> | number
