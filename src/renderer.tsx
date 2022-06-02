@@ -18,6 +18,7 @@ export const render = (
   element: React.ReactNode,
   target: HTMLCanvasElement,
   { mode = 'blocking', ...config }: RenderProps = {},
+  onMount?: (state: RootStore) => any,
 ) => {
   // Check for existing root, create on first run
   let root = roots.get(target)
@@ -119,7 +120,7 @@ export const render = (
     <OGLContext.Provider value={root.store}>{element}</OGLContext.Provider>,
     root.fiber,
     null,
-    () => undefined,
+    () => onMount?.(root.store),
   )
 
   return root.store

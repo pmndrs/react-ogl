@@ -108,7 +108,7 @@ export type EventHandlers = {
  * react-ogl root.
  */
 export interface Root {
-  render: (element: React.ReactNode) => UseBoundStore<RootState>
+  render: (element: React.ReactNode) => RootStore
   unmount: () => void
 }
 

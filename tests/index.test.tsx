@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 // @ts-ignore
 import * as OGL from 'ogl'
-import { render } from './utils'
-import { Node, extend, reconciler, RootState } from '../src'
+import { renderAsync } from './utils'
+import { Node, extend, reconciler, RootState, unmountComponentAtNode } from 'react-ogl'
 
 class CustomElement extends OGL.Transform {}
 
@@ -15,22 +16,22 @@ declare global {
 }
 
 describe('renderer', () => {
-  it('should render JSX', async () => {
+  it('should renderAsync JSX', async () => {
     let state: RootState
 
     await reconciler.act(async () => {
-      state = render(<transform />)
+      state = await renderAsync(<transform />)
     })
 
     expect(state.scene.children.length).not.toBe(0)
   })
 
-  it('should render extended elements', async () => {
+  it('should renderAsync extended elements', async () => {
     let state: RootState
 
     await reconciler.act(async () => {
       extend({ CustomElement })
-      state = render(<customElement />)
+      state = await renderAsync(<customElement />)
     })
 
     const [element] = state.scene.children
@@ -42,7 +43,7 @@ describe('renderer', () => {
     let state: RootState
 
     await reconciler.act(async () => {
-      state = render(
+      state = await renderAsync(
         <mesh>
           <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
           <normalProgram />
@@ -59,7 +60,7 @@ describe('renderer', () => {
     let state: RootState
 
     await reconciler.act(async () => {
-      state = render(
+      state = await renderAsync(
         <>
           <mesh>
             <geometry />
@@ -88,7 +89,7 @@ describe('renderer', () => {
     let crashed = false
 
     try {
-      await reconciler.act(async () => render(<box />))
+      await reconciler.act(async () => await renderAsync(<box />))
     } catch (_) {
       crashed = true
     }
@@ -103,7 +104,7 @@ describe('renderer', () => {
     const fragment = 'fragment'
 
     await reconciler.act(async () => {
-      state = render(
+      state = await renderAsync(
         <mesh>
           <box />
           <program vertex={vertex} fragment={fragment} />
@@ -128,13 +129,13 @@ describe('renderer', () => {
     )
 
     await reconciler.act(async () => {
-      state = render(<Mesh value={false} />)
+      state = await renderAsync(<Mesh value={false} />)
     })
 
     expect(state.scene.children[0].program.uniforms.uniform.value).toBe(false)
 
     await reconciler.act(async () => {
-      state = render(<Mesh value={true} />)
+      state = await renderAsync(<Mesh value={true} />)
     })
 
     expect(state.scene.children[0].program.uniforms.uniform.value).toBe(true)
@@ -147,7 +148,7 @@ describe('renderer', () => {
     const texture = new OGL.Texture(renderer.gl)
 
     await reconciler.act(async () => {
-      state = render(
+      state = await renderAsync(
         <mesh>
           <box />
           <normalProgram uniforms={{ color: 'white', vector: [0, 0, 0], textures: [texture, texture] }} />
@@ -172,7 +173,7 @@ describe('renderer', () => {
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
 
     await reconciler.act(async () => {
-      state = render(
+      state = await renderAsync(
         <mesh>
           <geometry position={position} uv={uv} />
           <normalProgram />
@@ -191,14 +192,14 @@ describe('renderer', () => {
     let unbind = false
 
     await reconciler.act(async () => {
-      const state = render(<transform />, {
+      const state = await renderAsync(<transform />, {
         events: {
           connected: false,
           connect: () => (bind = true),
           disconnect: () => (unbind = true),
         },
       })
-      state.root.unmount()
+      unmountComponentAtNode(state.gl.canvas)
     })
 
     expect(bind).toBe(true)
@@ -217,14 +218,14 @@ describe('renderer', () => {
     )
 
     await reconciler.act(async () => {
-      state = render(<Test n={1} />)
+      state = await renderAsync(<Test n={1} />)
     })
 
     const [oldInstance] = state.scene.children
     oldInstance.original = true
 
     await reconciler.act(async () => {
-      state = render(<Test n={2} />)
+      state = await renderAsync(<Test n={2} />)
     })
 
     const [newInstance] = state.scene.children

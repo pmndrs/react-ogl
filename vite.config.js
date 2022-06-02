@@ -13,6 +13,11 @@ export default defineConfig({
       'react-ogl': path.resolve(process.cwd(), 'src'),
     },
   },
+  test: {
+    dir: path.resolve(process.cwd(), 'tests'),
+    environment: 'jsdom',
+    setupFiles: path.resolve(process.cwd(), 'tests/utils/setupTests.ts'),
+  },
   build: {
     minify: false,
     outDir: path.resolve(process.cwd(), 'dist'),

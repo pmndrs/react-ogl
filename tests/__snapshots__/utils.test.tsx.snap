@@ -1,27 +1,27 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`applyProps should accept scalar shorthand 1`] = `
-Array [
+exports[`applyProps > should accept scalar shorthand 1`] = `
+[
   3,
   3,
   3,
 ]
 `;
 
-exports[`applyProps should accept shorthand uniforms 1`] = `
-Object {
-  "bar": Object {
+exports[`applyProps > should accept shorthand uniforms 1`] = `
+{
+  "bar": {
     "value": 1,
   },
-  "foo": Object {
+  "foo": {
     "value": 0,
   },
 }
 `;
 
-exports[`applyProps should convert CSS color names to color uniforms 1`] = `
-Object {
-  "color": Object {
+exports[`applyProps > should convert CSS color names to color uniforms 1`] = `
+{
+  "color": {
     "value": Color [
       1,
       0,
@@ -31,9 +31,9 @@ Object {
 }
 `;
 
-exports[`applyProps should convert arrays into vector uniforms 1`] = `
-Object {
-  "uv": Object {
+exports[`applyProps > should convert arrays into vector uniforms 1`] = `
+{
+  "uv": {
     "value": Vec2 [
       0,
       1,
@@ -42,28 +42,28 @@ Object {
 }
 `;
 
-exports[`applyProps should diff & merge uniforms 1`] = `
-Object {
-  "a": Object {
+exports[`applyProps > should diff & merge uniforms 1`] = `
+{
+  "a": {
     "value": 0,
   },
-  "b": Object {
+  "b": {
     "value": 1,
   },
-  "c": Object {
+  "c": {
     "value": 2,
   },
 }
 `;
 
-exports[`applyProps should pierce into nested properties 1`] = `
-Object {
+exports[`applyProps > should pierce into nested properties 1`] = `
+{
   "color": "red",
 }
 `;
 
-exports[`applyProps should spread array prop values 1`] = `
-Array [
+exports[`applyProps > should spread array prop values 1`] = `
+[
   1,
   2,
   3,

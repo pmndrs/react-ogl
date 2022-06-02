@@ -1,11 +1,6 @@
 .DS_Store
-.npm
-.eslintcache
 node_modules
-coverage
 dist
-*.log
-*-lock.json
 
 # Editor directories and files
 .idea

@@ -1,18 +1,8 @@
 import * as React from 'react'
-import { createRoot, RenderProps, RootState } from '../../src'
+import { RenderProps, RootState, render } from 'react-ogl'
 
 /**
  * Renders JSX into OGL state.
  */
-export const render = (element: React.ReactNode, config?: RenderProps): RootState => {
-  // Create canvas
-  const canvas = document.createElement('canvas')
-
-  // Init internals
-  const root = createRoot(canvas, config)
-
-  // Render and get output state
-  const state = root.render(element).getState()
-
-  return { ...state, root }
-}
+export const renderAsync = async (element: React.ReactNode, config?: RenderProps): Promise<RootState> =>
+  new Promise((res) => render(element, document.createElement('canvas'), config, (store) => res(store.getState())))

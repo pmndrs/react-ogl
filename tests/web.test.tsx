@@ -1,6 +1,7 @@
 import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { render, RenderResult } from '@testing-library/react'
-import { reconciler, Canvas } from '../src'
+import { reconciler, Canvas } from 'react-ogl'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {

@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { View } from 'react-native'
 import { render, RenderAPI } from '@testing-library/react-native'
-import { reconciler } from '../src'
-import { Canvas } from '../src/Canvas.native' // explicitly require native module
+import { reconciler } from 'react-ogl'
+import { Canvas } from 'react-ogl/Canvas.native' // explicitly require native module
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {

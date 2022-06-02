@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { vi } from 'vitest'
 import { ViewProps, LayoutChangeEvent } from 'react-native'
 import WebGLRenderingContext from './WebGLRenderingContext'
 
 // Mock scheduler to test React features
-jest.mock('scheduler', () => require('scheduler/unstable_mock'))
+vi.mock('scheduler', () => require('scheduler/unstable_mock'))
 
 // Polyfill PointerEvent
 if (!global.PointerEvent) {
@@ -61,13 +62,13 @@ const Measure = () => {
   }
   return [ref, bounds]
 }
-jest.mock('react-use-measure', () => ({
+vi.mock('react-use-measure', () => ({
   __esModule: true,
   default: Measure,
 }))
 
 // Mock native dependencies for react-ogl/native
-jest.mock('react-native', () => ({
+vi.mock('react-native', () => ({
   StyleSheet: {},
   View: React.memo(
     React.forwardRef(({ onLayout, ...props }: ViewProps, ref) => {
@@ -93,9 +94,9 @@ jest.mock('react-native', () => ({
     }),
   ),
 }))
-jest.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
-jest.mock('@expo/browser-polyfill', () => ({}))
-jest.mock('expo-gl', () => ({
+vi.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
+vi.mock('@expo/browser-polyfill', () => ({}))
+vi.mock('expo-gl', () => ({
   GLView: ({ onContextCreate }) => {
     React.useLayoutEffect(() => {
       const gl = new WebGLRenderingContext({ width: 1280, height: 800 } as HTMLCanvasElement)

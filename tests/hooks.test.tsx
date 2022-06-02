@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import create from 'zustand'
-import { render } from './utils'
-import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
+import { renderAsync } from './utils'
+import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } from 'react-ogl'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
@@ -13,7 +14,7 @@ describe('useOGL', () => {
     }
 
     await reconciler.act(async () => {
-      render(
+      await renderAsync(
         <OGLContext.Provider value={create(() => ({ test: 'test' })) as any}>
           <Test />
         </OGLContext.Provider>,
@@ -54,7 +55,7 @@ describe('useFrame', () => {
     }
 
     await reconciler.act(async () => {
-      render(
+      await renderAsync(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
         </OGLContext.Provider>,
@@ -65,7 +66,7 @@ describe('useFrame', () => {
     expect(time).toBeDefined()
   })
 
-  it('should accept render priority', async () => {
+  it('should accept renderAsync priority', async () => {
     let priority = 0
 
     const subscribe = (_: React.MutableRefObject<Subscription>, renderPriority: number) => {
@@ -78,7 +79,7 @@ describe('useFrame', () => {
     }
 
     await reconciler.act(async () => {
-      render(
+      await renderAsync(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
         </OGLContext.Provider>,

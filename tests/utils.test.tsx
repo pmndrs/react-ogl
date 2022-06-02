@@ -1,6 +1,7 @@
+import { describe, it, expect, vi } from 'vitest'
 // @ts-ignore
 import * as OGL from 'ogl'
-import { applyProps, Instance } from '../src'
+import { applyProps, Instance } from 'react-ogl'
 
 describe('applyProps', () => {
   it('should accept shorthand uniforms', async () => {
@@ -97,7 +98,7 @@ describe('applyProps', () => {
 
   it('should prefer to copy from external props', async () => {
     const target = { color: new OGL.Color() } as unknown as Instance
-    target.color.copy = jest.fn()
+    target.color.copy = vi.fn()
 
     applyProps(target, {
       color: new OGL.Color(),
