@@ -348,11 +348,12 @@ export const reconciler = Reconciler({
 })
 
 // Injects renderer meta into devtools.
+const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
 reconciler.injectIntoDevTools({
   findFiberByHostInstance(instance: Instance) {
     return getContainer(instance.parent, instance.child).root
   },
-  bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
+  bundleType: isProd ? 0 : 1,
   version: React.version,
   rendererPackageName: 'react-ogl',
 })
