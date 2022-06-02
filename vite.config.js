@@ -2,11 +2,8 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import includeAll from 'rollup-include-all'
 
-const LIBRARY_MODE = process.env.NODE_ENV === 'production'
-
 export default defineConfig({
-  plugins: [LIBRARY_MODE && includeAll()].filter(Boolean),
-  logLevel: LIBRARY_MODE ? 'warn' : 'info',
+  plugins: [includeAll()],
   root: 'examples',
   resolve: {
     alias: {
