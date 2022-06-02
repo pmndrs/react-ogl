@@ -6445,10 +6445,10 @@ rimraf@~2.6.2:
   dependencies:
     glob "^7.1.3"
 
-rollup-include-all@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/rollup-include-all/-/rollup-include-all-1.0.1.tgz#e21119cf9541df12b4aeede68f5c19e07bf09e71"
-  integrity sha512-R7E+kwROeqHVT0niZueFJUu0u/NcmN+f3zPxfbcQ3lDXGiqBKrn78rNiy7l4mFwtIa0ZoA0xCkwHRtvoWeNWWQ==
+rollup-include-all@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/rollup-include-all/-/rollup-include-all-1.0.2.tgz#07ea17927cef5478f6b6cd157e92ae3ef5ea433b"
+  integrity sha512-I9D3MGYvyFdVyIOML6jF/mNw9tsDjgZm7VrMTph//hV51It28ENDNS1YtiCH72vjNduKTR+dt2bHi+KSS9UVLA==
 
 rollup@^2.59.0:
   version "2.75.3"
