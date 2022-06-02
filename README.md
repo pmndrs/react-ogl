@@ -289,3 +289,21 @@ export default App
 ```
 
 </details>
+
+## OGL issues with SSR/Node
+
+OGL doesn't properly label its ESM target, so Node environments won't be able to resolve it correctly. You can fix that with the following, creating a CJS bundle and mending targets:
+
+```bash
+npx rollup node_modules/ogl/src/index.mjs --file node_modules/ogl/ogl.cjs --format cjs && npx json -I -f node_modules/ogl/package.json -e "this.module=\"./src/index.mjs\";this.main=\"./ogl.cjs\""
+```
+
+This is best to add to a postinstall script or on a fork of https://github.com/oframe/ogl, so changes will persist:
+
+```json
+{
+  "scripts": {
+    "postinstall": "npx rollup node_modules/ogl/src/index.mjs --file node_modules/ogl/ogl.cjs --format cjs && npx json -I -f node_modules/ogl/package.json -e \"this.module=\\\"./src/index.mjs\\\";this.main=\\\"./ogl.cjs\\\"\""
+  }
+}
+```
