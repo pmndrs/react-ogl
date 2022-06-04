@@ -1,11 +1,11 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { Fiber } from 'react-reconciler'
-import create, { SetState } from 'zustand'
+import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext } from './hooks'
-import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
+import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription, XRManager } from './types'
 import { applyProps, calculateDpr } from './utils'
 
 // Store roots here since we can render to multiple targets
@@ -19,90 +19,103 @@ export const render = (
   target: HTMLCanvasElement,
   {
     mode = 'blocking',
+    dpr = [1, 2],
     size = { width: target.parentElement?.clientWidth ?? 0, height: target.parentElement?.clientHeight ?? 0 },
+    frameloop = 'always',
+    orthographic = false,
+    events,
     ...config
   }: RenderProps = {},
 ) => {
   // Check for existing root, create on first run
   let root = roots.get(target)
   if (!root) {
-    // Create renderer
-    const renderer =
-      config.renderer instanceof OGL.Renderer
-        ? config.renderer
-        : typeof config.renderer === 'function'
-        ? config.renderer(target)
-        : new OGL.Renderer({
-            antialias: true,
-            powerPreference: 'high-performance',
-            ...(config.renderer as any),
-            canvas: target,
-          })
-    if (config.renderer && typeof config.renderer !== 'function')
-      applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
-
-    renderer.dpr = calculateDpr(config.dpr ?? [1, 2])
-
-    const gl = renderer.gl
-    gl.clearColor(1, 1, 1, 0)
-
-    // Create or accept camera, apply props
-    const camera =
-      config.camera instanceof OGL.Camera
-        ? config.camera
-        : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(config.camera as any) })
-    camera.position.z = 5
-    if (config.camera) applyProps(camera, config.camera as InstanceProps)
-
-    // Create scene
-    const scene = new OGL.Transform()
-
-    // Init rendering internals for useFrame, keep track of subscriptions
-    let priority = 0
-    const subscribed = []
-
-    // Subscribe/unsubscribe elements to the render loop
-    const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-      // Subscribe callback
-      subscribed.push(refCallback)
-
-      // Enable manual rendering if renderPriority is positive
-      if (renderPriority) priority += 1
-    }
-
-    const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => {
-      // Unsubscribe callback
-      const index = subscribed.indexOf(refCallback)
-
-      if (index !== -1) subscribed.splice(index, 0)
-
-      // Disable manual rendering if renderPriority is positive
-      if (renderPriority) priority -= 1
-    }
-
-    // Init event state
-    const mouse = new OGL.Vec2()
-    const raycaster = new OGL.Raycast(gl)
-    const hovered = new Map()
-
     // Create root store
-    const store = create((set: SetState<RootState>, get: SetState<RootState>) => ({
-      size,
-      renderer,
-      gl,
-      camera,
-      scene,
-      priority,
-      subscribed,
-      subscribe,
-      unsubscribe,
-      mouse,
-      raycaster,
-      hovered,
-      events: config.events,
-      set,
-      get,
-    })) as RootStore
+    const store = create((set: SetState<RootState>, get: GetState<RootState>) => {
+      // Create renderer
+      const renderer =
+        config.renderer instanceof OGL.Renderer
+          ? config.renderer
+          : typeof config.renderer === 'function'
+          ? config.renderer(target)
+          : new OGL.Renderer({
+              antialias: true,
+              powerPreference: 'high-performance',
+              ...(config.renderer as any),
+              canvas: target,
+            })
+      if (config.renderer && typeof config.renderer !== 'function')
+        applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
+
+      renderer.dpr = calculateDpr(dpr)
+
+      const gl = renderer.gl
+      gl.clearColor(1, 1, 1, 0)
+
+      // Create or accept camera, apply props
+      const camera =
+        config.camera instanceof OGL.Camera
+          ? config.camera
+          : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(config.camera as any) })
+      camera.position.z = 5
+      if (config.camera) applyProps(camera, config.camera as InstanceProps)
+
+      // Create scene
+      const scene = new OGL.Transform()
+
+      // Init rendering internals for useFrame, keep track of subscriptions
+      let priority = 0
+      const subscribed = []
+
+      // Subscribe/unsubscribe elements to the render loop
+      const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) => {
+        // Subscribe callback
+        subscribed.push(refCallback)
+
+        // Enable manual rendering if renderPriority is positive
+        priority += renderPriority
+      }
+
+      const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) => {
+        // Unsubscribe callback
+        const index = subscribed.indexOf(refCallback)
+        if (index !== -1) subscribed.splice(index, 0)
+
+        // Disable manual rendering if renderPriority is positive
+        priority -= renderPriority
+      }
+
+      const xr: XRManager = {
+        session: null,
+        setSession(session) {
+          set((state) => ({ xr: { ...state.xr, session } }))
+        },
+        connect(session) {
+          xr.setSession(session)
+        },
+        disconnect() {
+          xr.setSession(null)
+        },
+      }
+
+      return {
+        size,
+        xr,
+        renderer,
+        frameloop,
+        orthographic,
+        gl,
+        camera,
+        scene,
+        priority,
+        subscribed,
+        subscribe,
+        unsubscribe,
+        events,
+        set,
+        get,
+      }
+    }) as RootStore
 
     // Bind events
     const state = store.getState()
@@ -111,14 +124,19 @@ export const render = (
     // Handle callback
     config.onCreated?.(state)
 
-    // Animate
-    const animate = (time?: number) => {
+    // Toggle rendering modes
+    let nextFrame: number
+    const animate = (time = 0, frame?: XRFrame) => {
+      // Toggle XR rendering
+      const state = store.getState()
+      const mode = state.xr.session ?? window
+
       // Cancel animation if frameloop is set, otherwise keep looping
-      if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
-      state.animation = requestAnimationFrame(animate)
+      if (state.frameloop === 'never') return mode.cancelAnimationFrame(nextFrame)
+      nextFrame = mode.requestAnimationFrame(animate)
 
       // Call subscribed elements
-      for (const ref of state.subscribed) ref.current?.(state, time)
+      for (const ref of state.subscribed) ref.current?.(state, time, frame)
 
       // If rendering manually, skip render
       if (state.priority) return
@@ -131,12 +149,10 @@ export const render = (
     // Handle resize
     const onResize = (state: RootState) => {
       const { width, height } = state.size
-      if (state.renderer.width !== width || state.renderer.height !== height) {
-        // Set dpr, handle resize
-        state.renderer.setSize(width, height)
+      const projection = state.orthographic ? 'orthographic' : 'perspective'
 
-        // Update projection
-        const projection = state.orthographic ? 'orthographic' : 'perspective'
+      if (state.renderer.width !== width || state.renderer.height !== height || state.camera.type !== projection) {
+        state.renderer.setSize(width, height)
         state.camera[projection]({ aspect: width / height })
       }
     }
@@ -150,6 +166,12 @@ export const render = (
     root = { fiber, store }
     roots.set(target, root)
   }
+
+  // Update reactive props
+  const state = root.store.getState()
+  if (state.size.width !== size.width || state.size.height !== size.height) state.set(() => ({ size }))
+  if (state.frameloop !== frameloop) state.set(() => ({ frameloop }))
+  if (state.orthographic !== orthographic) state.set(() => ({ orthographic }))
 
   // Update fiber
   reconciler.updateContainer(
@@ -177,7 +199,7 @@ export const unmountComponentAtNode = (target: HTMLCanvasElement) => {
     const state = root.store.getState()
 
     // Cancel animation
-    if (state.animation) cancelAnimationFrame(state.animation)
+    state.set(() => ({ frameloop: 'never' }))
 
     // Unbind events
     if (state.events?.disconnect) state.events.disconnect(target, state)

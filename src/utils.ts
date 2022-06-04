@@ -205,6 +205,11 @@ export const buildGraph = (object: OGL.Transform) => {
  * Creates event handlers, returning an event handler method.
  */
 export const createEvents = (state: RootState) => {
+  // Init event state
+  state.mouse = new OGL.Vec2()
+  state.raycaster = new OGL.Raycast(state.gl)
+  state.hovered = new Map()
+
   const handleEvent = (event: PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
     state.mouse.x = (event.offsetX / state.renderer.width) * 2 - 1
