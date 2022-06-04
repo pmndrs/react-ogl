@@ -9,11 +9,9 @@ import '@expo/browser-polyfill'
 
 export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
 
-export interface CanvasProps extends Omit<RenderProps, 'dpr'>, ViewProps {
+export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProps {
   children: React.ReactNode
   style?: ViewStyle
-  orthographic?: boolean
-  frameloop?: 'always' | 'never'
 }
 
 /**
@@ -54,15 +52,18 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
     setCanvas(canvasShim)
   }, [])
 
+  // Render to screen
   if (canvas && width > 0 && height > 0) {
-    // Render to screen
-    const state = render(
+    render(
       <ErrorBoundary set={setError}>
         <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
       </ErrorBoundary>,
       canvas,
       {
+        size: { width, height },
         mode,
+        orthographic,
+        frameloop,
         renderer,
         // expo-gl can only render at native dpr/resolution
         // https://github.com/expo/expo-three/issues/39
@@ -80,40 +81,13 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
             }
           }
 
-          // Animate
-          const animate = (time?: number) => {
-            // Cancel animation if frameloop is set, otherwise keep looping
-            if (frameloop === 'never') return cancelAnimationFrame(state.animation)
-            state.animation = requestAnimationFrame(animate)
-
-            // Call subscribed elements
-            for (const ref of state.subscribed) ref.current?.(state, time)
-
-            // If rendering manually, skip render
-            if (state.priority) return
-
-            // Render to screen
-            state.renderer.render({ scene: state.scene, camera: state.camera })
-          }
-          if (frameloop !== 'never') animate()
-
           // Bind events
           setBind(state.events?.connected)
 
           return onCreated?.(state)
         },
       },
-    ).getState()
-
-    // Handle resize
-    if (state.renderer.width !== width || state.renderer.height !== height) {
-      // Set dpr, handle resize
-      state.renderer.setSize(width, height)
-
-      // Update projection
-      const projection = orthographic ? 'orthographic' : 'perspective'
-      state.camera[projection]({ aspect: width / height })
-    }
+    )
   }
 
   // Cleanup on unmount
