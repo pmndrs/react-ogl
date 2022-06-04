@@ -1,6 +1,7 @@
+/// <reference types="webxr" />
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
-import type { SetState, UseBoundStore, StoreApi } from 'zustand'
+import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
 import { COLORS, RENDER_MODES } from './constants'
 
 // Util funcs
@@ -112,6 +113,13 @@ export interface Root {
   unmount: () => void
 }
 
+export interface XRManager {
+  session: XRSession | null
+  setSession(session: XRSession | null): void
+  connect(session: XRSession): void
+  disconnect(): void
+}
+
 /**
  * react-ogl event manager.
  */
@@ -122,17 +130,28 @@ export interface EventManager {
   disconnect?: (target: HTMLCanvasElement, state: RootState) => void
 }
 
+export interface Size {
+  width: number
+  height: number
+}
+
+export type Frameloop = 'always' | 'never'
+
 /**
  * useFrame subscription.
  */
-export type Subscription = (state: RootState, time: number) => any
+export type Subscription = (state: RootState, time: number, frame?: XRFrame) => any
 
 /**
  * react-ogl internal state.
  */
 export interface RootState {
   set: SetState<RootState>
-  get: SetState<RootState>
+  get: GetState<RootState>
+  size: Size
+  xr: XRManager
+  orthographic: boolean
+  frameloop: Frameloop
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
   scene: Omit<OGL.Transform, 'children'> & { children: any[] }
@@ -141,7 +160,6 @@ export interface RootState {
   subscribed: React.MutableRefObject<Subscription>[]
   subscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
   unsubscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
-  animation?: number
   events?: EventManager
   mouse?: OGL.Vec2
   raycaster?: OGL.Raycast
@@ -163,6 +181,9 @@ export type DPR = [number, number] | number
  * Canvas & imperative render method props.
  */
 export type RenderProps = {
+  size?: Size
+  orthographic?: boolean
+  frameloop?: Frameloop
   renderer?:
     | ((canvas: HTMLCanvasElement) => OGL.Renderer)
     | OGL.Renderer
