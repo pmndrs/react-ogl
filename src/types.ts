@@ -140,7 +140,7 @@ export type Frameloop = 'always' | 'never'
 /**
  * useFrame subscription.
  */
-export type Subscription = (state: RootState, time: number) => any
+export type Subscription = (state: RootState, time: number, frame?: XRFrame) => any
 
 /**
  * react-ogl internal state.

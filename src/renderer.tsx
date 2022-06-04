@@ -125,18 +125,18 @@ export const render = (
     config.onCreated?.(state)
 
     // Toggle rendering modes
-    let frame: number
-    const animate = (time?: number) => {
+    let nextFrame: number
+    const animate = (time = 0, frame?: XRFrame) => {
       // Toggle XR rendering
       const state = store.getState()
       const mode = state.xr.session ?? window
 
       // Cancel animation if frameloop is set, otherwise keep looping
-      if (state.frameloop === 'never') return mode.cancelAnimationFrame(frame)
-      frame = mode.requestAnimationFrame(animate)
+      if (state.frameloop === 'never') return mode.cancelAnimationFrame(nextFrame)
+      nextFrame = mode.requestAnimationFrame(animate)
 
       // Call subscribed elements
-      for (const ref of state.subscribed) ref.current?.(state, time)
+      for (const ref of state.subscribed) ref.current?.(state, time, frame)
 
       // If rendering manually, skip render
       if (state.priority) return
