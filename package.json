@@ -55,6 +55,7 @@
   "dependencies": {
     "@expo/browser-polyfill": "^1.0.0",
     "@types/react-reconciler": "^0.26.4",
+    "@types/webxr": "^0.4.0",
     "ogl-typescript": "^0.1.40",
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
