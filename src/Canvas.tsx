@@ -7,11 +7,9 @@ import { events as createPointerEvents } from './events'
 import { RenderProps, SetBlock } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
-export interface CanvasProps extends RenderProps, React.HTMLAttributes<HTMLDivElement> {
+export interface CanvasProps extends Omit<RenderProps, 'size'>, React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   resize?: ResizeOptions
-  orthographic?: boolean
-  frameloop?: 'always' | 'never'
 }
 
 /**
@@ -50,51 +48,25 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
   // Throw exception outwards if anything within Canvas throws
   if (error) throw error
 
+  // Render to screen
   if (canvas && width > 0 && height > 0) {
-    // Render to screen
-    const state = render(
+    render(
       <ErrorBoundary set={setError}>
         <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
       </ErrorBoundary>,
       canvas,
       {
+        size: { width, height },
         mode,
+        orthographic,
+        frameloop,
         renderer,
         dpr,
         camera,
         events,
-        onCreated(state) {
-          // Animate
-          const animate = (time?: number) => {
-            // Cancel animation if frameloop is set, otherwise keep looping
-            if (frameloop === 'never') return cancelAnimationFrame(state.animation)
-            state.animation = requestAnimationFrame(animate)
-
-            // Call subscribed elements
-            for (const ref of state.subscribed) ref.current?.(state, time)
-
-            // If rendering manually, skip render
-            if (state.priority) return
-
-            // Render to screen
-            state.renderer.render({ scene: state.scene, camera: state.camera })
-          }
-          if (frameloop !== 'never') animate()
-
-          return onCreated?.(state)
-        },
+        onCreated,
       },
-    ).getState()
-
-    // Handle resize
-    if (state.renderer.width !== width || state.renderer.height !== height) {
-      // Set dpr, handle resize
-      state.renderer.setSize(width, height)
-
-      // Update projection
-      const projection = orthographic ? 'orthographic' : 'perspective'
-      state.camera[projection]({ aspect: width / height })
-    }
+    )
   }
 
   useIsomorphicLayoutEffect(() => {

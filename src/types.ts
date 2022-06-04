@@ -122,6 +122,13 @@ export interface EventManager {
   disconnect?: (target: HTMLCanvasElement, state: RootState) => void
 }
 
+export interface Size {
+  width: number
+  height: number
+}
+
+export type Frameloop = 'always' | 'never'
+
 /**
  * useFrame subscription.
  */
@@ -133,6 +140,9 @@ export type Subscription = (state: RootState, time: number) => any
 export interface RootState {
   set: SetState<RootState>
   get: SetState<RootState>
+  size: Size
+  orthographic: boolean
+  frameloop: Frameloop
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
   scene: Omit<OGL.Transform, 'children'> & { children: any[] }
@@ -163,6 +173,9 @@ export type DPR = [number, number] | number
  * Canvas & imperative render method props.
  */
 export type RenderProps = {
+  size?: Size
+  orthographic?: boolean
+  frameloop?: Frameloop
   renderer?:
     | ((canvas: HTMLCanvasElement) => OGL.Renderer)
     | OGL.Renderer

@@ -17,7 +17,11 @@ const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
 export const render = (
   element: React.ReactNode,
   target: HTMLCanvasElement,
-  { mode = 'blocking', ...config }: RenderProps = {},
+  {
+    mode = 'blocking',
+    size = { width: target.parentElement?.clientWidth ?? 0, height: target.parentElement?.clientHeight ?? 0 },
+    ...config
+  }: RenderProps = {},
 ) => {
   // Check for existing root, create on first run
   let root = roots.get(target)
@@ -83,6 +87,7 @@ export const render = (
 
     // Create root store
     const store = create((set: SetState<RootState>, get: SetState<RootState>) => ({
+      size,
       renderer,
       gl,
       camera,
@@ -105,6 +110,38 @@ export const render = (
 
     // Handle callback
     config.onCreated?.(state)
+
+    // Animate
+    const animate = (time?: number) => {
+      // Cancel animation if frameloop is set, otherwise keep looping
+      if (state.frameloop === 'never') return cancelAnimationFrame(state.animation)
+      state.animation = requestAnimationFrame(animate)
+
+      // Call subscribed elements
+      for (const ref of state.subscribed) ref.current?.(state, time)
+
+      // If rendering manually, skip render
+      if (state.priority) return
+
+      // Render to screen
+      state.renderer.render({ scene: state.scene, camera: state.camera })
+    }
+    if (state.frameloop !== 'never') animate()
+
+    // Handle resize
+    const onResize = (state: RootState) => {
+      const { width, height } = state.size
+      if (state.renderer.width !== width || state.renderer.height !== height) {
+        // Set dpr, handle resize
+        state.renderer.setSize(width, height)
+
+        // Update projection
+        const projection = state.orthographic ? 'orthographic' : 'perspective'
+        state.camera[projection]({ aspect: width / height })
+      }
+    }
+    store.subscribe(onResize)
+    onResize(state)
 
     // Create root fiber
     const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
