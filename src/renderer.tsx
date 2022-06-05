@@ -1,10 +1,10 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { Fiber } from 'react-reconciler'
+import { Fiber, ReactPortal } from 'react-reconciler'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
-import { OGLContext } from './hooks'
+import { OGLContext, useOGL } from './hooks'
 import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription, XRManager } from './types'
 import { applyProps, calculateDpr } from './utils'
 
@@ -214,8 +214,16 @@ export const createRoot = (target: HTMLCanvasElement, config?: RenderProps): Roo
   unmount: () => unmountComponentAtNode(target),
 })
 
+// Prepares portal target
+function PortalRoot({ children, target }: { children: React.ReactElement; target: OGL.Transform }) {
+  const gl = useOGL((state) => state.gl)
+  if (!target.gl) target.gl = gl
+  return children
+}
+
 /**
  * Portals into a remote OGL element.
  */
-export const createPortal = (children: React.ReactNode, target: OGL.Transform): React.ReactNode =>
-  reconciler.createPortal(children, target, null, null)
+export const createPortal = (children: React.ReactElement, target: OGL.Transform): ReactPortal => {
+  return reconciler.createPortal(<PortalRoot target={target}>{children}</PortalRoot>, target, null, null)
+}

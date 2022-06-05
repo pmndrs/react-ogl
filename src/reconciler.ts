@@ -41,7 +41,7 @@ export const extend = (objects: Catalogue, passGL = false) => {
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type: string, { object, args, ...props }: InstanceProps, fiber: Reconciler.Fiber) => {
+export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
@@ -58,14 +58,8 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
   // This lets them be immutable upon creation and use props
   const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
   if (!object && isGLInstance) {
-    // Checks whether arg is an instance of a GL context
-    const isGL = (arg: any) => arg instanceof WebGL2RenderingContext || arg instanceof WebGLRenderingContext
-
-    // Get gl arg, use root gl as fallback
-    const gl = args?.find((arg) => isGL(arg)) ?? (fiber as unknown as RootState).gl
-
     // Get attribute arg
-    const attrs = args?.find((arg) => !isGL(arg)) ?? {}
+    const attrs = args?.find((arg) => arg !== root.gl) ?? {}
 
     // Accept props as args
     const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
@@ -74,7 +68,7 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
     }, attrs)
 
     // Rebuild args
-    args = [gl, propAttrs]
+    args = [root.gl, propAttrs]
   }
 
   // Create instance
@@ -92,6 +86,9 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 
   // Set initial props
   applyProps(instance, props)
+
+  // Store root gl on instance
+  instance.gl = root.gl
 
   return instance
 }
@@ -125,9 +122,9 @@ export const removeChild = (parent: Instance, child: Instance) => {
 /**
  * Switches instance to a new one, moving over children.
  */
-export const switchInstance = (instance: Instance, type: string, props: InstanceProps, fiber: Reconciler.Fiber) => {
+export const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: RootState) => {
   // Create a new instance
-  const newInstance = createInstance(type, props, fiber)
+  const newInstance = createInstance(type, props, root)
 
   // Move children to new instance
   if (!instance.isPrimitive && instance.children) {
@@ -152,7 +149,7 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
 
   // Switches the react-internal fiber node
   // https://github.com/facebook/react/issues/14983
-  ;[fiber, fiber.alternate].forEach((fiber) => {
+  ;[root, root.alternate].forEach((fiber) => {
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
@@ -321,10 +318,10 @@ export const reconciler = Reconciler({
     type: string,
     oldProps: InstanceProps,
     newProps: InstanceProps,
-    fiber: Reconciler.Fiber,
+    root: RootState,
   ) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps, fiber)
+    if (reconstruct) return switchInstance(instance, type, newProps, root)
 
     // Otherwise, just apply changed props
     applyProps(instance, changedProps)
