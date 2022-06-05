@@ -5,7 +5,7 @@ import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext, useOGL } from './hooks'
-import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription, XRManager } from './types'
+import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps, calculateDpr } from './utils'
 
 // Store roots here since we can render to multiple targets
@@ -60,61 +60,50 @@ export const render = (
       camera.position.z = 5
       if (config.camera) applyProps(camera, config.camera as InstanceProps)
 
-      // Create scene
-      const scene = new OGL.Transform()
-
-      // Init rendering internals for useFrame, keep track of subscriptions
-      let priority = 0
-      const subscribed = []
-
-      // Subscribe/unsubscribe elements to the render loop
-      const subscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) => {
-        // Subscribe callback
-        subscribed.push(refCallback)
-
-        // Enable manual rendering if renderPriority is positive
-        priority += renderPriority
-      }
-
-      const unsubscribe = (refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) => {
-        // Unsubscribe callback
-        const index = subscribed.indexOf(refCallback)
-        if (index !== -1) subscribed.splice(index, 0)
-
-        // Disable manual rendering if renderPriority is positive
-        priority -= renderPriority
-      }
-
-      const xr: XRManager = {
-        session: null,
-        setSession(session) {
-          set((state) => ({ xr: { ...state.xr, session } }))
-        },
-        connect(session) {
-          xr.setSession(session)
-        },
-        disconnect() {
-          xr.setSession(null)
-        },
-      }
-
       return {
         size,
-        xr,
+        xr: {
+          session: null,
+          setSession(session) {
+            set((state) => ({ xr: { ...state.xr, session } }))
+          },
+          connect(session) {
+            get().xr.setSession(session)
+          },
+          disconnect() {
+            get().xr.setSession(null)
+          },
+        },
         renderer,
         frameloop,
         orthographic,
         gl,
         camera,
-        scene,
-        priority,
-        subscribed,
-        subscribe,
-        unsubscribe,
+        scene: new OGL.Transform(),
+        priority: 0,
+        subscribed: [],
+        // Subscribe/unsubscribe elements to the render loop
+        subscribe(refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) {
+          // Subscribe callback
+          const { subscribed } = get()
+          subscribed.push(refCallback)
+
+          // Enable manual rendering if renderPriority is positive
+          set((state) => ({ priority: state.priority + renderPriority }))
+        },
+        unsubscribe(refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) {
+          // Unsubscribe callback
+          const { subscribed } = get()
+          const index = subscribed.indexOf(refCallback)
+          if (index !== -1) subscribed.splice(index, 0)
+
+          // Disable manual rendering if renderPriority is positive
+          set((state) => ({ priority: state.priority - renderPriority }))
+        },
         events,
         set,
         get,
-      }
+      } as RootState
     }) as RootStore
 
     // Bind events
