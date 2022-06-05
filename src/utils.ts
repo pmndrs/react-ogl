@@ -224,7 +224,7 @@ export const createEvents = (state: RootState) => {
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Instance[] = state.raycaster.intersectMeshes(interactive)
+    const intersects: OGL.Mesh[] = state.raycaster.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state

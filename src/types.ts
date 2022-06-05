@@ -39,7 +39,9 @@ export type Attach = string | ((parent: Instance, self: Instance) => () => void)
 /**
  * Base OGL React instance.
  */
-export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach'> & {
+export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach' | 'parent'> & {
+  gl: OGL.OGLRenderingContext
+  parent: BaseInstance | null
   isPrimitive?: boolean
   __handlers?: EventHandlers
   __attached?: BaseInstance[]

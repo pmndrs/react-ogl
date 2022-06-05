@@ -2,7 +2,7 @@ import * as React from 'react'
 // @ts-ignore
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { Node, extend, reconciler, RootState } from '../src'
+import { Node, extend, reconciler, RootState, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
@@ -231,5 +231,27 @@ describe('renderer', () => {
     expect(newInstance.original).not.toBe(true) // Created a new instance
     expect(newInstance.children[0].visible).toBe(false) // Preserves scene hierarchy
     expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
+  })
+
+  it('will prepare foreign objects when portaling', async () => {
+    let state: RootState = null!
+    const object = new OGL.Transform()
+    const mesh = React.createRef<OGL.Mesh>()
+
+    await reconciler.act(async () => {
+      state = render(
+        createPortal(
+          <mesh ref={mesh}>
+            <box />
+            <normalProgram />
+          </mesh>,
+          object,
+        ),
+      )
+    })
+
+    expect(state.scene.children.length).toBe(0)
+    expect(object.children.length).not.toBe(0)
+    expect(mesh.current.parent).toBe(object)
   })
 })
