@@ -140,8 +140,8 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
 
     // Prefer to use properties' copy and set methods
     // otherwise, mutate the property directly
-    if (target?.set) {
-      if (target.constructor.name === value.constructor.name) {
+    if (!ArrayBuffer.isView(value) && typeof target?.set === 'function') {
+      if (target.constructor === value.constructor) {
         target.copy(value)
       } else if (Array.isArray(value)) {
         target.set(...value)

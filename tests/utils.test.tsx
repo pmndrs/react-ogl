@@ -128,4 +128,13 @@ describe('applyProps', () => {
     expect(target.position).toBeInstanceOf(OGL.Vec3)
     expect(Array.from(target.position)).toMatchSnapshot()
   })
+
+  it('should properly set array-like buffer views', async () => {
+    const target = {} as unknown as Instance
+    const pixel = new Uint8Array([255, 0, 0, 255])
+
+    applyProps(target, { pixel })
+
+    expect(target.pixel).toBe(pixel)
+  })
 })
