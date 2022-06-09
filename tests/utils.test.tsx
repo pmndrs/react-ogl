@@ -137,4 +137,14 @@ describe('applyProps', () => {
 
     expect(target.pixel).toBe(pixel)
   })
+
+  it('should properly set non-math classes who implement set', async () => {
+    const target = { test: new Map() } as unknown as Instance
+    const test = new Map()
+    test.set(1, 2)
+
+    applyProps(target, { test })
+
+    expect(target.test).toBe(test)
+  })
 })
