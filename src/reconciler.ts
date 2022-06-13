@@ -2,7 +2,7 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
-import { Catalogue, Instance, InstanceProps, RootState } from './types'
+import { Catalogue, Fiber, Instance, InstanceProps } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue: Catalogue = {}
@@ -41,54 +41,28 @@ export const extend = (objects: Catalogue, passGL = false) => {
 /**
  * Creates an OGL element from a React node.
  */
-export const createInstance = (type: string, { object, args, ...props }: InstanceProps, root: RootState) => {
+const createInstance = (type: string, { object = null, args = [], ...props }: InstanceProps, root: Fiber) => {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
   // Get class from extended OGL namespace
-  const target = catalogue[name] || OGL[name]
+  const target = catalogue[name] ?? OGL[name]
 
   // Validate OGL elements
-  if (type !== 'primitive' && !target) throw `${type} is not a part of the OGL namespace! Did you forget to extend?`
+  if (type !== 'primitive' && !target) throw `${type} is not a part of the OGL catalogue! Did you forget to extend?`
 
   // Validate primitives
   if (type === 'primitive' && !object) throw `"object" must be set when using primitives.`
 
-  // Pass internal state to elements which depend on it.
-  // This lets them be immutable upon creation and use props
-  const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
-  if (!object && isGLInstance) {
-    // Get attribute arg
-    const attrs = args?.find((arg) => arg !== root.gl) ?? {}
-
-    // Accept props as args
-    const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
-      if (!key.includes('-')) acc[key] = value
-      return acc
-    }, attrs)
-
-    // Rebuild args
-    args = [root.gl, propAttrs]
-  }
-
   // Create instance
-  const instance: Instance = object || (Array.isArray(args) ? new target(...args) : new target(args))
-
-  // If primitive, make a note of it
-  if (type === 'primitive') instance.isPrimitive = true
-
-  // Auto-attach geometry and programs to meshes
-  if (instance instanceof OGL.Geometry) {
-    props = { attach: 'geometry', ...props }
-  } else if (instance instanceof OGL.Program) {
-    props = { attach: 'program', ...props }
+  const instance: Instance = {
+    root,
+    parent: null,
+    children: [],
+    type,
+    props: { ...props, args },
+    object,
   }
-
-  // Set initial props
-  applyProps(instance, props)
-
-  // Store root gl on instance
-  instance.gl = root.gl
 
   return instance
 }
@@ -96,56 +70,100 @@ export const createInstance = (type: string, { object, args, ...props }: Instanc
 /**
  * Adds elements to our scene and attaches children to their parents.
  */
-export const appendChild = (parent: Instance, child: Instance) => {
-  if (!child) return
-
-  if (!child.attach) child.setParent?.(parent)
+const appendChild = (parent: Instance, child: Instance) => {
   child.parent = parent
+  parent.children.push(child)
 }
 
 /**
  * Removes elements from scene and disposes of them.
  */
-export const removeChild = (parent: Instance, child: Instance) => {
-  if (!child) return
+const removeChild = (parent: Instance, child: Instance) => {
+  child.parent = null
+  const childIndex = parent.children.indexOf(child)
+  if (childIndex !== -1) parent.children.splice(childIndex, 1)
 
-  if (child.attach) {
-    detach(parent, child)
-  } else {
-    parent?.removeChild?.(child)
+  if (child.props.attach) detach(parent, child)
+  else if (child.object instanceof OGL.Transform) parent.object.removeChild(child.object)
+
+  child.object.dispose?.()
+  child.object = null
+}
+
+const commitInstance = (instance: Instance) => {
+  if (instance.type !== 'primitive' && !instance.object) {
+    const name = toPascalCase(instance.type)
+    const target = catalogue[name] ?? OGL[name]
+
+    // Pass internal state to elements which depend on it.
+    // This lets them be immutable upon creation and use props
+    const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
+    if (isGLInstance) {
+      const { gl } = instance.root.getState()
+      const { args, ...props } = instance.props
+      const attrs = args.find((arg) => arg !== gl) ?? {}
+
+      // Accept props as args
+      const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
+        if (!key.includes('-')) acc[key] = value
+        return acc
+      }, attrs)
+
+      instance.object = new target(gl, propAttrs)
+    } else {
+      instance.object = new target(...instance.props.args)
+    }
   }
 
-  child.parent = null
-  child.dispose?.()
+  for (const child of instance.children) {
+    if (child.props.attach) {
+      attach(instance, child)
+    } else if (child.object instanceof OGL.Transform) {
+      child.object.setParent(instance.object)
+    } else if (child.object instanceof OGL.Geometry) {
+      instance.object.geometry = child.object
+    } else if (child.object instanceof OGL.Program) {
+      instance.object.program = child.object
+    }
+  }
+
+  applyProps(instance.object, instance.props)
 }
 
 /**
  * Switches instance to a new one, moving over children.
  */
-export const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: RootState) => {
+const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: Fiber) => {
   // Create a new instance
   const newInstance = createInstance(type, props, root)
-
-  // Move children to new instance
-  if (!instance.isPrimitive && instance.children) {
-    for (const child of instance.children) {
-      appendChild(newInstance, child)
-    }
-    instance.children = []
-  }
-
-  // Move over attached instances
-  if (instance.__attached) {
-    for (const attachedInstance of Object.values(instance.__attached)) {
-      attachedInstance.parent = newInstance
-      detach(instance, attachedInstance)
-      attach(newInstance, attachedInstance)
-    }
-  }
 
   // Replace instance in scene-graph
   removeChild(instance.parent, instance)
   appendChild(instance.parent, newInstance)
+
+  commitInstance(newInstance)
+
+  if (newInstance.props.attach) {
+    attach(newInstance.parent, newInstance)
+  } else if (newInstance.object instanceof OGL.Transform) {
+    newInstance.object.setParent(newInstance.parent.object)
+  } else if (newInstance.object instanceof OGL.Geometry) {
+    newInstance.parent.object.geometry = newInstance.object
+  } else if (newInstance.object instanceof OGL.Program) {
+    newInstance.parent.object.program = newInstance.object
+  }
+
+  // Move children to new instance
+  if (instance.type !== 'primitive') {
+    for (const child of instance.children) {
+      appendChild(newInstance, child)
+      if (child.props.attach) {
+        detach(instance, child)
+        attach(newInstance, child)
+      }
+    }
+    instance.children = []
+  }
 
   // Switches the react-internal fiber node
   // https://github.com/facebook/react/issues/14983
@@ -153,8 +171,8 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
-        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance)
-        else (fiber.ref as Reconciler.RefObject).current = newInstance
+        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance.object)
+        else (fiber.ref as Reconciler.RefObject).current = newInstance.object
       }
     }
   })
@@ -163,20 +181,9 @@ export const switchInstance = (instance: Instance, type: string, props: Instance
 }
 
 /**
- * Gets the root store and container from a target container and child instance.
- */
-export const getContainer = (
-  container: RootState | Instance | null,
-  child: Instance,
-): { root: Reconciler.Fiber; container: Instance } => ({
-  root: container?.scene ? container : container?.rootNode ?? child.rootNode,
-  container: container?.scene || container,
-})
-
-/**
  * Shallow checks objects.
  */
-export const checkShallow = (a: any, b: any) => {
+const checkShallow = (a: any, b: any) => {
   // If comparing arrays, shallow compare
   if (Array.isArray(a)) {
     // Check if types match
@@ -198,7 +205,7 @@ export const checkShallow = (a: any, b: any) => {
 /**
  * Prepares a set of changes to be applied to the instance.
  */
-export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) => {
+const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) => {
   const changedProps: InstanceProps = {}
 
   // Sort through props
@@ -206,7 +213,7 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
     // Skip reserved keys
     if (key === 'children') continue
     // Skip primitives
-    if (instance.isPrimitive && key === 'object') continue
+    if (instance.type === 'primitive' && key === 'object') continue
     // Skip if props match
     if (checkShallow(newProps[key], oldProps[key])) continue
 
@@ -220,7 +227,7 @@ export const diffProps = (instance: Instance, newProps: InstanceProps, oldProps:
 /**
  * Inserts an instance between instances of a ReactNode.
  */
-export const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) => {
+const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) => {
   if (!child) return
 
   child.parent = parent
@@ -242,7 +249,7 @@ export const reconciler = Reconciler({
   // We set this to false because this can work on top of react-dom
   isPrimaryRenderer: false,
   // We can modify the ref here, but we return it instead (no-op)
-  getPublicInstance: (instance: Instance) => instance,
+  getPublicInstance: (instance: Instance) => instance.object,
   // This object that's passed into the reconciler is the host context.
   // Don't expose the root though, only children for portalling
   getRootHostContext: () => null,
@@ -264,29 +271,20 @@ export const reconciler = Reconciler({
   // These methods add elements to the scene
   appendChild,
   appendInitialChild: appendChild,
-  appendChildToContainer(parent: RootState | Instance, child: Instance) {
-    const { container } = getContainer(parent, child)
-    appendChild(container, child)
-  },
+  appendChildToContainer: () => {},
   // These methods remove elements from the scene
   removeChild,
-  removeChildFromContainer(parent: RootState | Instance, child: Instance) {
-    const { container } = getContainer(parent, child)
-    removeChild(container, child)
-  },
+  removeChildFromContainer: () => {},
   // We can specify an order for children to be specified here.
   // This is useful if you want to override stuff like materials
   insertBefore,
-  insertInContainerBefore(parent: RootState | Instance, child: Instance, beforeChild: Instance) {
-    const { container } = getContainer(parent, child)
-    insertBefore(container, child, beforeChild)
-  },
+  insertInContainerBefore: () => {},
   // Used to calculate updates in the render phase or commitUpdate.
   // Greatly improves performance by reducing paint to rapid mutations.
   // Returns [shouldReconstruct: boolean, changedProps]
   prepareUpdate(instance: Instance, type: string, oldProps: InstanceProps, newProps: InstanceProps) {
     // Element is a primitive. We must recreate it when its object prop is changed
-    if (instance.isPrimitive && newProps.object && newProps.object !== instance) return [true]
+    if (instance.type === 'primitive' && oldProps.object !== newProps.object) return [true]
 
     // Element is a program. Check whether its vertex or fragment props changed to recreate
     if (type === 'program') {
@@ -318,38 +316,31 @@ export const reconciler = Reconciler({
     type: string,
     oldProps: InstanceProps,
     newProps: InstanceProps,
-    root: RootState,
+    root: Fiber,
   ) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps, root)
-
+    if (reconstruct) switchInstance(instance, type, newProps, root)
     // Otherwise, just apply changed props
-    applyProps(instance, changedProps)
+    else applyProps(instance.object, changedProps)
   },
   hideInstance(instance: Instance) {
-    if (instance instanceof OGL.Transform) instance.visible = false
+    if (instance.object instanceof OGL.Transform) {
+      instance.object.visible = false
+    }
   },
-  unhideInstance(instance: Instance, props: InstanceProps) {
-    if ((instance instanceof OGL.Transform && props.visible == null) || props.visible) instance.visible = true
+  unhideInstance(instance: Instance) {
+    if (instance.object instanceof OGL.Transform) {
+      instance.object.visible = instance.props.visible ?? true
+    }
   },
-  finalizeInitialChildren(instance: Instance) {
-    // https://github.com/facebook/react/issues/20271
-    // Returning true will trigger commitMount
-    return !!instance.attach
-  },
-  commitMount(instance: Instance) {
-    // https://github.com/facebook/react/issues/20271
-    // This will make sure attachments are only added once to the central container through suspense
-    if (instance.attach) attach(instance.parent, instance)
-  },
+  finalizeInitialChildren: () => true,
+  commitMount: commitInstance,
 })
 
 // Injects renderer meta into devtools.
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
 reconciler.injectIntoDevTools({
-  findFiberByHostInstance(instance: Instance) {
-    return getContainer(instance.parent, instance.child).root
-  },
+  findFiberByHostInstance: (instance: Instance) => instance.root,
   bundleType: isProd ? 0 : 1,
   version: React.version,
   rendererPackageName: 'react-ogl',

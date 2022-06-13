@@ -1,4 +1,5 @@
 /// <reference types="webxr" />
+import type { Fiber as ReconcilerFiber } from 'react-reconciler'
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
@@ -34,26 +35,9 @@ export type ObjectMap = {
  */
 export type Catalogue = { [key: string]: any }
 
-export type Attach = string | ((parent: Instance, self: Instance) => () => void)
+export type Attach = string | ((parent: any, self: any) => () => void)
 
-/**
- * Base OGL React instance.
- */
-export type BaseInstance = Omit<OGL.Transform, 'children' | 'attach' | 'parent'> & {
-  gl: OGL.OGLRenderingContext
-  parent: BaseInstance | null
-  isPrimitive?: boolean
-  __handlers?: EventHandlers
-  __attached?: BaseInstance[]
-  __previousAttach?: any
-  children: Instance[]
-  attach?: Attach
-}
-
-/**
- * Extended OGL React instance.
- */
-export type Instance = BaseInstance & { [key: string]: any }
+export type Fiber = ReconcilerFiber & RootStore
 
 /**
  * OGL.Transform React instance.
@@ -63,9 +47,20 @@ export type InstanceProps = {
 } & {
   args?: any[]
   object?: object
-  visible?: boolean
   dispose?: null
   attach?: Attach
+}
+
+/**
+ * Internal react-ogl instance.
+ */
+export interface Instance {
+  root: Fiber
+  parent: Instance | null
+  children: Instance[]
+  type: string
+  props: InstanceProps
+  object: any | null
 }
 
 /**

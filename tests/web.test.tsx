@@ -4,7 +4,7 @@ import { reconciler, Canvas } from '../src'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer: RenderResult
+    let renderer: RenderResult = null!
 
     await reconciler.act(async () => {
       renderer = render(

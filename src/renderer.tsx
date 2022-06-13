@@ -149,7 +149,7 @@ export const render = (
     onResize(state)
 
     // Create root fiber
-    const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
+    const fiber = reconciler.createContainer(store, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
 
     // Set root
     root = { fiber, store }
@@ -164,7 +164,9 @@ export const render = (
 
   // Update fiber
   reconciler.updateContainer(
-    <OGLContext.Provider value={root.store}>{element}</OGLContext.Provider>,
+    <OGLContext.Provider value={root.store}>
+      <primitive object={state.scene}>{element}</primitive>
+    </OGLContext.Provider>,
     root.fiber,
     null,
     () => undefined,

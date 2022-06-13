@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as OGL from 'ogl'
-import { applyProps, Instance } from '../src'
+import { applyProps } from '../src'
 
 describe('applyProps', () => {
   it('should accept shorthand uniforms', async () => {
@@ -96,7 +96,7 @@ describe('applyProps', () => {
   })
 
   it('should prefer to copy from external props', async () => {
-    const target = { color: new OGL.Color() } as unknown as Instance
+    const target = { color: new OGL.Color() }
     target.color.copy = jest.fn()
 
     applyProps(target, {
@@ -108,7 +108,7 @@ describe('applyProps', () => {
   })
 
   it('should spread array prop values', async () => {
-    const target = { position: new OGL.Vec3() } as unknown as Instance
+    const target = { position: new OGL.Vec3() }
 
     applyProps(target, {
       position: [1, 2, 3],
@@ -119,7 +119,7 @@ describe('applyProps', () => {
   })
 
   it('should accept scalar shorthand', async () => {
-    const target = { position: new OGL.Vec3() } as unknown as Instance
+    const target = { position: new OGL.Vec3() }
 
     applyProps(target, {
       position: 3,
@@ -130,7 +130,7 @@ describe('applyProps', () => {
   })
 
   it('should properly set array-like buffer views', async () => {
-    const target = {} as unknown as Instance
+    const target = { pixel: null }
     const pixel = new Uint8Array([255, 0, 0, 255])
 
     applyProps(target, { pixel })
@@ -139,7 +139,7 @@ describe('applyProps', () => {
   })
 
   it('should properly set non-math classes who implement set', async () => {
-    const target = { test: new Map() } as unknown as Instance
+    const target = { test: new Map() }
     const test = new Map()
     test.set(1, 2)
 

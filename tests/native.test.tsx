@@ -6,7 +6,7 @@ import { Canvas } from '../src/Canvas.native' // explicitly require native modul
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer: RenderAPI
+    let renderer: RenderAPI = null!
 
     await reconciler.act(async () => {
       renderer = render(
