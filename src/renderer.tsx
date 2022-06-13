@@ -4,7 +4,7 @@ import { Fiber, ReactPortal } from 'react-reconciler'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
-import { OGLContext, useOGL } from './hooks'
+import { OGLContext, useStore } from './hooks'
 import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps, calculateDpr } from './utils'
 
@@ -149,7 +149,7 @@ export const render = (
     onResize(state)
 
     // Create root fiber
-    const fiber = reconciler.createContainer(state, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
+    const fiber = reconciler.createContainer(store, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
 
     // Set root
     root = { fiber, store }
@@ -164,7 +164,9 @@ export const render = (
 
   // Update fiber
   reconciler.updateContainer(
-    <OGLContext.Provider value={root.store}>{element}</OGLContext.Provider>,
+    <OGLContext.Provider value={root.store}>
+      <primitive object={state.scene}>{element}</primitive>
+    </OGLContext.Provider>,
     root.fiber,
     null,
     () => undefined,
@@ -204,15 +206,28 @@ export const createRoot = (target: HTMLCanvasElement, config?: RenderProps): Roo
 })
 
 // Prepares portal target
-function PortalRoot({ children, target }: { children: React.ReactElement; target: OGL.Transform }) {
-  const gl = useOGL((state) => state.gl)
-  if (!target.gl) target.gl = gl
-  return children
+interface PortalRootProps {
+  children: React.ReactElement
+  target: OGL.Transform
+  container: any
+}
+function PortalRoot({ children, target, container }: PortalRootProps) {
+  const store = useStore()
+  React.useMemo(() => Object.assign(container, store), [container, store])
+  return <primitive object={target}>{children}</primitive>
 }
 
 /**
  * Portals into a remote OGL element.
  */
 export const createPortal = (children: React.ReactElement, target: OGL.Transform): ReactPortal => {
-  return reconciler.createPortal(<PortalRoot target={target}>{children}</PortalRoot>, target, null, null)
+  const container = {}
+  return reconciler.createPortal(
+    <PortalRoot target={target} container={container}>
+      {children}
+    </PortalRoot>,
+    container,
+    null,
+    null,
+  )
 }

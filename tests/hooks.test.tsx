@@ -5,7 +5,7 @@ import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } fro
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const Test = () => {
       state = useOGL()
@@ -38,8 +38,8 @@ describe('useOGL', () => {
 
 describe('useFrame', () => {
   it('should subscribe an element to the frameloop', async () => {
-    let state: RootState
-    let time: number
+    let state: RootState = null!
+    let time: number = null!
 
     const subscribe = (callback: React.MutableRefObject<Subscription>) => {
       callback.current('test' as any, 1)
@@ -73,7 +73,7 @@ describe('useFrame', () => {
     }
 
     const Test = () => {
-      useFrame(null, 1)
+      useFrame(null!, 1)
       return null
     }
 

@@ -16,7 +16,7 @@ declare global {
 
 describe('renderer', () => {
   it('should render JSX', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = render(<transform />)
@@ -26,7 +26,7 @@ describe('renderer', () => {
   })
 
   it('should render extended elements', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       extend({ CustomElement })
@@ -39,7 +39,7 @@ describe('renderer', () => {
   })
 
   it('should set pierced props', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = render(
@@ -56,7 +56,7 @@ describe('renderer', () => {
   })
 
   it('should handle attach', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = render(
@@ -97,7 +97,7 @@ describe('renderer', () => {
   })
 
   it('should accept vertex and fragment as program args', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const vertex = 'vertex'
     const fragment = 'fragment'
@@ -118,7 +118,7 @@ describe('renderer', () => {
   })
 
   it('should update program uniforms reactively', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const Mesh = ({ value }) => (
       <mesh>
@@ -141,7 +141,7 @@ describe('renderer', () => {
   })
 
   it('should accept shorthand props as uniforms', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
     const texture = new OGL.Texture(renderer.gl)
@@ -166,7 +166,7 @@ describe('renderer', () => {
   })
 
   it('should accept props as geometry attributes', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }

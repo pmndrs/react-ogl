@@ -43,12 +43,11 @@ export const calculateDpr = (dpr: DPR) =>
 /**
  * Resolves a stringified attach type against an `Instance`.
  */
-export const resolveAttach = (instance: Instance, key: string) => {
-  let target = instance
+export const resolveAttach = (target: any, key: string) => {
   if (key.includes('-')) {
     const entries = key.split('-')
     const last = entries.pop() as string
-    target = entries.reduce((acc, key) => acc[key], instance)
+    target = entries.reduce((acc, key) => acc[key], target)
     return { target, key: last }
   } else return { target, key }
 }
@@ -60,24 +59,19 @@ const INDEX_REGEX = /-\d+$/
  * Attaches an instance to a parent via its `attach` prop.
  */
 export const attach = (parent: Instance, child: Instance) => {
-  if (!child.attach) return
-
-  parent.__attached = parent.__attached ?? []
-  parent.__attached.push(child)
-
-  if (typeof child.attach === 'string') {
+  if (typeof child.props.attach === 'string') {
     // If attaching into an array (foo-0), create one
-    if (INDEX_REGEX.test(child.attach)) {
-      const root = child.attach.replace(INDEX_REGEX, '')
-      const { target, key } = resolveAttach(parent, root)
+    if (INDEX_REGEX.test(child.props.attach)) {
+      const root = child.props.attach.replace(INDEX_REGEX, '')
+      const { target, key } = resolveAttach(parent.object, root)
       if (!Array.isArray(target[key])) target[key] = []
     }
 
-    const { target, key } = resolveAttach(parent, child.attach)
-    child.__previousAttach = target[key]
-    target[key] = child
+    const { target, key } = resolveAttach(parent.object, child.props.attach)
+    child.object.__previousAttach = target[key]
+    target[key] = child.object
   } else {
-    child.__previousAttach = child.attach(parent, child)
+    child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
 }
 
@@ -85,24 +79,20 @@ export const attach = (parent: Instance, child: Instance) => {
  * Removes an instance from a parent via its `attach` prop.
  */
 export const detach = (parent: Instance, child: Instance) => {
-  const attachIndex = parent?.__attached?.indexOf(child)
-  if (typeof attachIndex !== 'number' || attachIndex === -1) return
-
-  child.__previousAttach = undefined
-  parent.__attached.splice(attachIndex, 1)
-
-  if (typeof child.attach === 'string') {
-    const { target, key } = resolveAttach(parent, child.attach)
-    target[key] = child.__previousAttach
+  if (typeof child.props.attach === 'string') {
+    const { target, key } = resolveAttach(parent.object, child.props.attach)
+    target[key] = child.object.__previousAttach
   } else {
-    child.__previousAttach?.(parent, child)
+    child.object.__previousAttach?.(parent.object, child.object)
   }
+
+  delete child.object.__previousAttach
 }
 
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps?: InstanceProps) => {
+export const applyProps = (object: any, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
   for (let key in newProps) {
     // Don't mutate reserved keys
@@ -114,12 +104,12 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
     // Collect event handlers
     const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
     if (isHandler) {
-      instance.__handlers = { ...instance.__handlers, [key]: newProps[key] }
+      object.__handlers = { ...object.__handlers, [key]: newProps[key] }
       continue
     }
 
     const value = newProps[key]
-    let root = instance
+    let root = object
     let target = root[key]
 
     // Set deeply nested properties using piercing.
@@ -127,14 +117,14 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
     if (key.includes('-')) {
       // Build new target from chained props
       const chain = key.split('-')
-      target = chain.reduce((acc, key) => acc[key], instance)
+      target = chain.reduce((acc, key) => acc[key], object)
 
       // Switch root of target if atomic
       if (!target?.set) {
         // We're modifying the first of the chain instead of element.
         // Remove the key from the chain and target it instead.
         key = chain.pop()
-        root = chain.reduce((acc, key) => acc[key], instance)
+        root = chain.reduce((acc, key) => acc[key], object)
       }
     }
 
@@ -220,7 +210,7 @@ export const createEvents = (state: RootState) => {
     const interactive: OGL.Mesh[] = []
     state.scene.traverse((node: OGL.Mesh) => {
       // Mesh has registered events and a defined volume
-      if ((node as Instance).__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if (node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
@@ -233,7 +223,7 @@ export const createEvents = (state: RootState) => {
 
     // Trigger events for hovered elements
     for (const object of intersects) {
-      const handlers = object.__handlers
+      const handlers = object.__handlers as EventHandlers
 
       // Bail if object doesn't have handlers (managed externally)
       if (!handlers) continue
@@ -253,8 +243,8 @@ export const createEvents = (state: RootState) => {
 
     // Cleanup stale hover events
     if (isHoverEvent || type === 'onPointerDown') {
-      state.hovered.forEach((object: Instance) => {
-        const handlers = object.__handlers
+      state.hovered.forEach((object: OGL.Mesh) => {
+        const handlers = object.__handlers as EventHandlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
           // Reset hover state
