@@ -3,50 +3,38 @@ import type { Fiber as ReconcilerFiber } from 'react-reconciler'
 import type * as OGL from 'ogl-typescript'
 import type { MutableRefObject } from 'react'
 import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
-import { COLORS, RENDER_MODES } from './constants'
+import { RENDER_MODES } from './constants'
 
-// Util funcs
-export type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : T
-export type NonFunctionKeys<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]
-export type Overwrite<T, O> = Omit<T, NonFunctionKeys<O>> & O
-export type Filter<T, O> = T extends []
-  ? []
-  : T extends [infer H, ...infer R]
-  ? H extends O
-    ? Filter<R, O>
-    : [H, ...Filter<R, O>]
-  : T
-
-/**
- * Internal suspense promise type.
- */
-export type SetBlock = false | Promise<null> | null
-
-/**
- * A map representation of a loader result.
- */
-export type ObjectMap = {
-  nodes: { [name: string]: OGL.Transform }
-  programs: { [name: string]: OGL.Program }
+export interface OGLEvent<TEvent extends Event> {
+  nativeEvent: TEvent
+  localPoint: OGL.Vec3
+  point: OGL.Vec3
+  distance: number
+  faceNormal?: OGL.Vec3
+  localFaceNormal?: OGL.Vec3
+  localNormal?: OGL.Vec3
+  normal?: OGL.Vec3
+  uv?: OGL.Vec2
 }
 
-/**
- * Extended OGL namespace.
- */
-export type Catalogue = { [key: string]: any }
+export interface EventHandlers {
+  onClick?: (event: OGLEvent<MouseEvent>) => void
+  onPointerUp?: (event: OGLEvent<PointerEvent>) => void
+  onPointerDown?: (event: OGLEvent<PointerEvent>) => void
+  onPointerMove?: (event: OGLEvent<PointerEvent>) => void
+  onPointerOver?: (event: OGLEvent<PointerEvent>) => void
+  onPointerOut?: (event: OGLEvent<PointerEvent>) => void
+}
 
 export type Attach = string | ((parent: any, self: any) => () => void)
 
 export type Fiber = ReconcilerFiber & RootStore
 
-/**
- * OGL.Transform React instance.
- */
 export type InstanceProps = {
   [key: string]: unknown
 } & {
   args?: any[]
-  object?: object
+  object?: any
   dispose?: null
   attach?: Attach
 }
@@ -73,43 +61,6 @@ export type Events = {
   onPointerMove: EventListener
 }
 
-export interface IHitResult {
-  localPoint: OGL.Vec3
-  point: OGL.Vec3
-  distance: number
-
-  faceNormal?: OGL.Vec3
-  localFaceNormal?: OGL.Vec3
-  localNormal?: OGL.Vec3
-  normal?: OGL.Vec3
-
-  uv?: OGL.Vec2
-}
-
-export interface IEventPair<T> {
-  event: T
-  hit?: IHitResult
-}
-/**
- * react-ogl event handlers.
- */
-export type EventHandlers = {
-  onClick?: (event: IEventPair<MouseEvent>) => void
-  onPointerUp?: (event: IEventPair<PointerEvent>) => void
-  onPointerDown?: (event: IEventPair<PointerEvent>) => void
-  onPointerMove?: (event: IEventPair<PointerEvent>) => void
-  onPointerOver?: (event: IEventPair<PointerEvent>) => void
-  onPointerOut?: (event: IEventPair<PointerEvent>) => void
-}
-
-/**
- * react-ogl root.
- */
-export interface Root {
-  render: (element: React.ReactNode) => UseBoundStore<RootState>
-  unmount: () => void
-}
-
 export interface XRManager {
   session: XRSession | null
   setSession(session: XRSession | null): void
@@ -117,9 +68,6 @@ export interface XRManager {
   disconnect(): void
 }
 
-/**
- * react-ogl event manager.
- */
 export interface EventManager {
   connected: boolean
   handlers?: any
@@ -134,14 +82,8 @@ export interface Size {
 
 export type Frameloop = 'always' | 'never'
 
-/**
- * useFrame subscription.
- */
 export type Subscription = (state: RootState, time: number, frame?: XRFrame) => any
 
-/**
- * react-ogl internal state.
- */
 export interface RootState {
   set: SetState<RootState>
   get: GetState<RootState>
@@ -151,7 +93,7 @@ export interface RootState {
   frameloop: Frameloop
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
-  scene: Omit<OGL.Transform, 'children'> & { children: any[] }
+  scene: OGL.Transform
   camera: OGL.Camera
   priority: number
   subscribed: React.MutableRefObject<Subscription>[]
@@ -160,23 +102,19 @@ export interface RootState {
   events?: EventManager
   mouse?: OGL.Vec2
   raycaster?: OGL.Raycast
-  hovered?: Map<number, OGL.Transform>
+  hovered?: Map<number, OGL.Mesh>
   [key: string]: any
 }
 
-/**
- * react-ogl internal Zustand store.
- */
 export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
 
-/**
- * `fixed` | [`min`, `max`] — `min` and `max` are interpolated from native DPR.
- */
+export interface Root {
+  render: (element: React.ReactNode) => RootStore
+  unmount: () => void
+}
+
 export type DPR = [number, number] | number
 
-/**
- * Canvas & imperative render method props.
- */
 export type RenderProps = {
   size?: Size
   orthographic?: boolean
@@ -184,160 +122,117 @@ export type RenderProps = {
   renderer?:
     | ((canvas: HTMLCanvasElement) => OGL.Renderer)
     | OGL.Renderer
-    | Partial<NonFunctionKeys<OGL.Renderer>>
+    | WithOGLProps<OGL.Renderer>
     | Partial<OGL.RendererOptions>
   gl?: OGL.OGLRenderingContext
   dpr?: DPR
-  camera?: CameraProps | Partial<NonFunctionKeys<OGL.Camera>> | Partial<OGL.CameraOptions>
+  camera?: OGL.Camera | WithOGLProps<OGL.Camera> | Partial<OGL.CameraOptions>
   events?: EventManager
   onCreated?: (state: RootState) => any
   mode?: keyof typeof RENDER_MODES
 }
 
-/**
- *
- * OGL / JSX types
- *
- */
+type NonFunctionKeys<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]
+type Filter<T, O> = T extends []
+  ? []
+  : T extends [infer H, ...infer R]
+  ? H extends O
+    ? Filter<R, O>
+    : [H, ...Filter<R, O>]
+  : T
+type Args<T> = T extends new (...args: any) => any ? ConstructorParameters<T> : never
 
-export interface NodeProps<T> {
-  /** Attaches this class onto the parent under the given name and nulls it on unmount */
-  attach?: Attach
-  /** Constructor arguments */
-  args?: Filter<Args<T>, OGL.OGLRenderingContext>
-  children?: React.ReactNode
-  ref?: React.Ref<React.ReactNode | {}>
-  key?: React.Key
-}
-
-export type Node<T, P> = Overwrite<Partial<T>, NodeProps<P>>
-
-export type TransformNode<T, P> = Overwrite<
-  Node<T, P>,
-  {
-    visible?: boolean
-    matrix?: Mat4Props
-    worldMatrix?: Mat4Props
-    matrixAutoUpdate?: boolean
-    worldMatrixNeedsUpdate?: boolean
-    position?: Vec3Props
-    scale?: Vec3Props
-    up?: Vec3Props
-    quaternion?: QuatProps
-    rotation?: EulerProps
-  }
-> &
-  EventHandlers
-
-export type PrimitiveProps = { object: any } & { [properties: string]: any }
-
-export type UniformValue = keyof typeof COLORS | number | number[] | OGL.Texture | OGL.Texture[]
-export type UniformRepresentation = UniformValue | { [structName: string]: UniformValue }
-export type UniformList = {
+type ColorNames = 'black' | 'white' | 'red' | 'green' | 'blue' | 'fuchsia' | 'cyan' | 'yellow' | 'orange'
+type UniformValue = ColorNames | number | number[] | OGL.Texture | OGL.Texture[]
+type UniformRepresentation = UniformValue | { [structName: string]: UniformValue }
+type UniformList = {
   [uniform: string]: UniformRepresentation | { value: UniformRepresentation }
 }
 
-// Core
-export type GeometryProps = Node<OGL.Geometry, typeof OGL.Geometry> & {
-  [attributes: string]: { data: ArrayBufferView; size?: number }
+interface MathRepresentation extends Array<number> {
+  set(...args: any): any
 }
-export type ProgramProps = Omit<Node<OGL.Program, typeof OGL.Program>, 'uniforms'> & {
-  vertex?: string
-  fragment?: string
-  uniforms?: UniformList
-}
-export type RendererProps = Node<OGL.Renderer, typeof OGL.Renderer>
-export type CameraProps = TransformNode<OGL.Camera, typeof OGL.Camera>
-export type TransformProps = Node<OGL.Transform, typeof OGL.Transform>
-export type MeshProps = TransformNode<OGL.Mesh, typeof OGL.Mesh>
-export type TextureProps = Node<OGL.Texture, typeof OGL.Texture>
-export type RenderTargetProps = Node<OGL.RenderTarget, typeof OGL.RenderTarget>
+type MathProps<T extends MathRepresentation> = T | Parameters<T['set']> | number
+type WithMathProps<T> = { [K in keyof T]: T[K] extends MathRepresentation | undefined ? MathProps<T[K]> : T[K] }
+type WithProgramProps<T> = T extends OGL.Program
+  ? Omit<T, 'vertex' | 'fragment' | 'uniforms'> & {
+      vertex?: string
+      fragment?: string
+      uniforms?: UniformList
+    }
+  : T
+type WithGeometryProps<T> = T extends OGL.Geometry
+  ? T & {
+      [name: string]: Partial<Omit<OGL.Attribute, 'data'>> & Required<Pick<OGL.Attribute, 'data'>>
+    }
+  : T
+export type WithOGLProps<T, O = {}> = Partial<
+  WithGeometryProps<WithProgramProps<WithMathProps<Omit<T, NonFunctionKeys<O>>>>>
+> &
+  O
 
-// Math
-export type ColorProps = ConstructorParameters<typeof OGL.Color> | OGL.Color | number | keyof typeof COLORS
-export type EulerProps = OGL.Euler | Parameters<OGL.Euler['set']> | number
-export type Mat3Props = OGL.Mat3 | Parameters<OGL.Mat3['set']> | number
-export type Mat4Props = OGL.Mat4 | Parameters<OGL.Mat4['set']> | number
-export type QuatProps = OGL.Quat | Parameters<OGL.Quat['set']> | number
-export type Vec2Props = OGL.Vec2 | Parameters<OGL.Vec2['set']> | number
-export type Vec3Props = OGL.Vec3 | Parameters<OGL.Vec3['set']> | number
-export type Vec4Props = OGL.Vec4 | Parameters<OGL.Vec4['set']> | number
-
-// Extras
-export type PlaneProps = Node<OGL.Plane, typeof OGL.Plane>
-export type BoxProps = Node<OGL.Box, typeof OGL.Box>
-export type SphereProps = Node<OGL.Sphere, typeof OGL.Sphere>
-export type CylinderProps = Node<OGL.Cylinder, typeof OGL.Cylinder>
-export type TriangleProps = Node<OGL.Triangle, typeof OGL.Triangle>
-export type TorusProps = Node<OGL.Torus, typeof OGL.Torus>
-// export type OrbitProps = Node<OGL.Orbit, typeof OGL.Orbit>
-export type RaycastProps = Node<OGL.Raycast, typeof OGL.Raycast>
-export type CurveProps = Node<OGL.Curve, typeof OGL.Curve>
-export type PostProps = Node<OGL.Post, typeof OGL.Post>
-export type SkinProps = TransformNode<OGL.Skin, typeof OGL.Skin>
-export type AnimationProps = Node<OGL.Animation, typeof OGL.Animation>
-// export type TextProps = Node<OGL.Text, typeof OGL.Text>
-export type NormalProgramProps = Omit<ProgramProps, 'vertex' | 'fragment'>
-export type FlowmapProps = Node<OGL.Flowmap, typeof OGL.Flowmap>
-export type GPGPUProps = Node<OGL.GPGPU, typeof OGL.GPGPU>
-// export type PolylineProps = Node<OGL.Polyline, typeof OGL.Polyline>
-export type ShadowProps = Node<OGL.Shadow, typeof OGL.Shadow>
-// export type KTXTextureProps = Node<OGL.KTXTexture, typeof OGL.KTXTexture>
-export type TextureLoaderProps = Node<OGL.TextureLoader, typeof OGL.TextureLoader>
-export type GLTFLoaderProps = Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
-export type GLTFSkinProps = TransformNode<OGL.GLTFSkin, typeof OGL.GLTFSkin>
-// export type BasisManagerProps = Node<OGL.BasisManager, typeof OGL.BasisManager>
+export type Node<T, P> = WithOGLProps<
+  T,
+  {
+    args?: Filter<Args<P>, OGL.OGLRenderingContext>
+    dispose?: null
+    attach?: Attach
+    children?: React.ReactNode
+    ref?: React.Ref<P>
+    key?: React.Key
+  } & (T extends OGL.Mesh ? EventHandlers : {})
+>
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
       // primitive
-      primitive: PrimitiveProps
+      primitive: Omit<Node<{}, {}>, 'args'> & { object: any }
 
       // Core
-      geometry: GeometryProps
-      program: ProgramProps
-      renderer: RendererProps
-      camera: CameraProps
-      transform: TransformProps
-      mesh: MeshProps
-      texture: TextureProps
-      renderTarget: RenderTargetProps
+      geometry: Node<OGL.Geometry, typeof OGL.Geometry>
+      program: Node<OGL.Program, typeof OGL.Program>
+      renderer: Node<OGL.Renderer, typeof OGL.Renderer>
+      camera: Node<OGL.Camera, typeof OGL.Camera>
+      transform: Node<OGL.Transform, typeof OGL.Transform>
+      mesh: Node<OGL.Mesh, typeof OGL.Mesh>
+      texture: Node<OGL.Texture, typeof OGL.Texture>
+      renderTarget: Node<OGL.RenderTarget, typeof OGL.RenderTarget>
 
       // Math
-      color: ColorProps
-      euler: EulerProps
-      mat3: Mat3Props
-      mat4: Mat4Props
-      quat: QuatProps
-      vec2: Vec2Props
-      vec3: Vec3Props
-      vec4: Vec4Props
+      color: Node<OGL.Color, typeof OGL.Color>
+      euler: Node<OGL.Euler, typeof OGL.Euler>
+      mat3: Node<OGL.Mat3, typeof OGL.Mat3>
+      mat4: Node<OGL.Mat4, typeof OGL.Mat4>
+      quat: Node<OGL.Quat, typeof OGL.Quat>
+      vec2: Node<OGL.Vec2, typeof OGL.Vec2>
+      vec3: Node<OGL.Vec3, typeof OGL.Vec3>
+      vec4: Node<OGL.Vec4, typeof OGL.Vec4>
 
       // Extra
-      plane: PlaneProps
-      box: BoxProps
-      sphere: SphereProps
-      cylinder: CylinderProps
-      triangle: TriangleProps
-      torus: TorusProps
-      // orbit: OrbitProps
-      raycast: RaycastProps
-      curve: CurveProps
-      post: PostProps
-      skin: SkinProps
-      animation: AnimationProps
-      // text: TextProps
-      normalProgram: NormalProgramProps
-      flowmap: FlowmapProps
-      gPGPU: GPGPUProps
-      // polyline: PolylineProps
-      shadow: ShadowProps
-      // kTXTexture: KTXTextureProps
-      textureLoader: TextureLoaderProps
-      gLTFLoader: GLTFLoaderProps
-      gLTFSkin: GLTFSkinProps
-      // basisManager: BasisManagerProps
+      plane: Node<OGL.Plane, typeof OGL.Plane>
+      box: Node<OGL.Box, typeof OGL.Box>
+      sphere: Node<OGL.Sphere, typeof OGL.Sphere>
+      cylinder: Node<OGL.Cylinder, typeof OGL.Cylinder>
+      triangle: Node<OGL.Triangle, typeof OGL.Triangle>
+      torus: Node<OGL.Torus, typeof OGL.Torus>
+      // orbit: Node<OGL.Orbit, typeof OGL.Orbit>
+      raycast: Node<OGL.Raycast, typeof OGL.Raycast>
+      curve: Node<OGL.Curve, typeof OGL.Curve>
+      post: Node<OGL.Post, typeof OGL.Post>
+      skin: Node<OGL.Skin, typeof OGL.Skin>
+      animation: Node<OGL.Animation, typeof OGL.Animation>
+      // text: Node<OGL.Text, typeof OGL.Text>
+      normalProgram: Node<OGL.Program, typeof OGL.Program>
+      flowmap: Node<OGL.Flowmap, typeof OGL.Flowmap>
+      gPGPU: Node<OGL.GPGPU, typeof OGL.GPGPU>
+      // polyline: Node<OGL.Polyline, typeof OGL.Polyline>
+      shadow: Node<OGL.Shadow, typeof OGL.Shadow>
+      kTXTexture: Node<OGL.KTXTexture, typeof OGL.KTXTexture>
+      textureLoader: Node<OGL.TextureLoader, typeof OGL.TextureLoader>
+      gLTFLoader: Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
+      gLTFSkin: Node<OGL.GLTFSkin, typeof OGL.GLTFSkin>
+      // basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
     }
   }
 }

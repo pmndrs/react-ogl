@@ -1,33 +1,13 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { COLORS, POINTER_EVENTS } from './constants'
+import { POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import {
-  DPR,
-  EventHandlers,
-  Instance,
-  InstanceProps,
-  ObjectMap,
-  RootState,
-  SetBlock,
-  UniformList,
-  UniformRepresentation,
-} from './types'
+import { DPR, EventHandlers, Instance, InstanceProps, RootState } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
  */
 export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.substring(1)
-
-/**
- * Converts a stringified color name into a Color.
- */
-export const toColor = (name: keyof typeof COLORS) => new OGL.Color(COLORS[name] ?? name)
-
-/**
- * Converts an array of integers into a Vector.
- */
-export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...values)
 
 /**
  * Checks for inheritance between two classes.
@@ -132,22 +112,22 @@ export const applyProps = (object: any, newProps: InstanceProps, oldProps?: Inst
       }
     } else {
       // Allow shorthand values for uniforms
-      const uniformList = value as UniformList
+      const uniformList = value as any
       if (key === 'uniforms') {
         for (const uniform in uniformList) {
           // @ts-ignore
-          let uniformValue: UniformRepresentation = uniformList[uniform]?.value ?? uniformList[uniform]
+          let uniformValue = uniformList[uniform]?.value ?? uniformList[uniform]
 
           // Handle uniforms shorthand
           if (typeof uniformValue === 'string') {
             // Uniform is a string, convert it into a color
-            uniformValue = toColor(uniformValue as keyof typeof COLORS)
+            uniformValue = new OGL.Color(uniformValue)
           } else if (
             uniformValue?.constructor === Array &&
             (uniformValue as any[]).every((v: any) => typeof v === 'number')
           ) {
             // Uniform is an array, convert it into a vector
-            uniformValue = toVector(uniformValue as number[])
+            uniformValue = new OGL[`Vec${uniformValue.length}`](...uniformValue)
           }
 
           root.uniforms[uniform] = { value: uniformValue }
@@ -158,6 +138,11 @@ export const applyProps = (object: any, newProps: InstanceProps, oldProps?: Inst
       }
     }
   }
+}
+
+export interface ObjectMap {
+  nodes: { [name: string]: OGL.Transform }
+  programs: { [name: string]: OGL.Program }
 }
 
 /**
@@ -222,11 +207,11 @@ export const createEvents = (state: RootState) => {
         state.hovered.set(object.id, object)
 
         // Fire hover events
-        handlers.onPointerMove?.({ event, hit: object.hit })
-        handlers.onPointerOver?.({ event, hit: object.hit })
+        handlers.onPointerMove?.({ ...object.hit, nativeEvent: event })
+        handlers.onPointerOver?.({ ...object.hit, nativeEvent: event })
       } else {
         // Otherwise, fire its generic event
-        handlers[type]?.({ event, hit: object.hit })
+        handlers[type]?.({ ...object.hit, nativeEvent: event })
       }
     }
 
@@ -240,7 +225,7 @@ export const createEvents = (state: RootState) => {
           state.hovered.delete(object.id)
 
           // Fire unhover event
-          if (handlers?.onPointerOut) handlers.onPointerOut({ event, hit: object.hit })
+          if (handlers?.onPointerOut) handlers.onPointerOut({ ...object.hit, nativeEvent: event })
         }
       })
     }
@@ -250,6 +235,8 @@ export const createEvents = (state: RootState) => {
 
   return { handleEvent }
 }
+
+export type SetBlock = false | Promise<null> | null
 
 /**
  * Used to block rendering via its `set` prop. Useful for suspenseful effects.
