@@ -69,7 +69,7 @@ export const attach = (parent: Instance, child: Instance) => {
 
     const { target, key } = resolveAttach(parent.object, child.props.attach)
     child.object.__previousAttach = target[key]
-    target[key] = child
+    target[key] = child.object
   } else {
     child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
