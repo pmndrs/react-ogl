@@ -41,15 +41,21 @@ export const calculateDpr = (dpr: DPR) =>
   Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
 /**
- * Resolves a stringified attach type against an `Instance`.
+ * Resolves a potentially pierced key type against an object.
  */
-export const resolveAttach = (target: any, key: string) => {
-  if (key.includes('-')) {
-    const entries = key.split('-')
-    const last = entries.pop() as string
-    target = entries.reduce((acc, key) => acc[key], target)
-    return { target, key: last }
-  } else return { target, key }
+export const resolve = (root: any, key: string) => {
+  let target = root[key]
+  if (!key.includes('-')) return { root, key, target }
+
+  // Resolve pierced target
+  const chain = key.split('-')
+  target = chain.reduce((acc, key) => acc[key], root)
+  key = chain.pop()
+
+  // Switch root if atomic
+  if (!target?.set) root = chain.reduce((acc, key) => acc[key], root)
+
+  return { root, key, target }
 }
 
 // Checks if a dash-cased string ends with an integer
@@ -62,14 +68,14 @@ export const attach = (parent: Instance, child: Instance) => {
   if (typeof child.props.attach === 'string') {
     // If attaching into an array (foo-0), create one
     if (INDEX_REGEX.test(child.props.attach)) {
-      const root = child.props.attach.replace(INDEX_REGEX, '')
-      const { target, key } = resolveAttach(parent.object, root)
-      if (!Array.isArray(target[key])) target[key] = []
+      const target = child.props.attach.replace(INDEX_REGEX, '')
+      const { root, key } = resolve(parent.object, target)
+      if (!Array.isArray(root[key])) root[key] = []
     }
 
-    const { target, key } = resolveAttach(parent.object, child.props.attach)
-    child.object.__previousAttach = target[key]
-    target[key] = child.object
+    const { root, key } = resolve(parent.object, child.props.attach)
+    child.object.__previousAttach = root[key]
+    root[key] = child.object
   } else {
     child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
@@ -80,8 +86,8 @@ export const attach = (parent: Instance, child: Instance) => {
  */
 export const detach = (parent: Instance, child: Instance) => {
   if (typeof child.props.attach === 'string') {
-    const { target, key } = resolveAttach(parent.object, child.props.attach)
-    target[key] = child.object.__previousAttach
+    const { root, key } = resolve(parent.object, child.props.attach)
+    root[key] = child.object.__previousAttach
   } else {
     child.object.__previousAttach?.(parent.object, child.object)
   }
@@ -94,39 +100,22 @@ export const detach = (parent: Instance, child: Instance) => {
  */
 export const applyProps = (object: any, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
-  for (let key in newProps) {
+  for (const prop in newProps) {
     // Don't mutate reserved keys
-    if (key === 'children') continue
+    if (prop === 'children') continue
 
     // Don't mutate unchanged keys
-    if (newProps[key] === oldProps?.[key]) continue
+    if (newProps[prop] === oldProps?.[prop]) continue
 
     // Collect event handlers
-    const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
+    const isHandler = POINTER_EVENTS.includes(prop as typeof POINTER_EVENTS[number])
     if (isHandler) {
-      object.__handlers = { ...object.__handlers, [key]: newProps[key] }
+      object.__handlers = { ...object.__handlers, [prop]: newProps[prop] }
       continue
     }
 
-    const value = newProps[key]
-    let root = object
-    let target = root[key]
-
-    // Set deeply nested properties using piercing.
-    // <element prop1-prop2={...} /> => Element.prop1.prop2 = ...
-    if (key.includes('-')) {
-      // Build new target from chained props
-      const chain = key.split('-')
-      target = chain.reduce((acc, key) => acc[key], object)
-
-      // Switch root of target if atomic
-      if (!target?.set) {
-        // We're modifying the first of the chain instead of element.
-        // Remove the key from the chain and target it instead.
-        key = chain.pop()
-        root = chain.reduce((acc, key) => acc[key], object)
-      }
-    }
+    const value = newProps[prop]
+    const { root, key, target } = resolve(object, prop)
 
     // Prefer to use properties' copy and set methods
     // otherwise, mutate the property directly

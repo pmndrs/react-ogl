@@ -1,6 +1,25 @@
 // @ts-ignore
 import * as OGL from 'ogl'
-import { applyProps } from '../src'
+import { resolve, applyProps } from '../src'
+
+describe('resolve', () => {
+  it('should resolve pierced props', () => {
+    const object = { foo: { bar: 1 } }
+    const { root, key, target } = resolve(object, 'foo-bar')
+
+    expect(root).toBe(object['foo'])
+    expect(key).toBe('bar')
+    expect(target).toBe(root[key])
+  })
+
+  it('should switch roots for atomic targets', () => {
+    const object = { foo: { bar: new OGL.Vec2() } }
+    const { root, key, target } = resolve(object, 'foo-bar')
+
+    expect(root).toBe(object)
+    expect(key).toBe('bar')
+  })
+})
 
 describe('applyProps', () => {
   it('should accept shorthand uniforms', async () => {
