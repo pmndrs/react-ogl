@@ -213,7 +213,7 @@ interface PortalRootProps {
 }
 function PortalRoot({ children, target, container }: PortalRootProps) {
   const store = useStore()
-  React.useMemo(() => Object.assign(container, store), [store])
+  React.useMemo(() => Object.assign(container, store), [container, store])
   return <primitive object={target}>{children}</primitive>
 }
 
