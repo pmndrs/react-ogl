@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 // @ts-ignore
 import * as OGL from 'ogl'
 import { renderAsync } from './utils'
-import { Node, extend, reconciler, RootState, unmountComponentAtNode } from 'react-ogl'
+import { Node, extend, reconciler, RootState, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
@@ -16,8 +16,8 @@ declare global {
 }
 
 describe('renderer', () => {
-  it('should renderAsync JSX', async () => {
-    let state: RootState
+  it('should render JSX', async () => {
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = await renderAsync(<transform />)
@@ -26,8 +26,8 @@ describe('renderer', () => {
     expect(state.scene.children.length).not.toBe(0)
   })
 
-  it('should renderAsync extended elements', async () => {
-    let state: RootState
+  it('should render extended elements', async () => {
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       extend({ CustomElement })
@@ -40,7 +40,7 @@ describe('renderer', () => {
   })
 
   it('should set pierced props', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = await renderAsync(
@@ -57,7 +57,7 @@ describe('renderer', () => {
   })
 
   it('should handle attach', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     await reconciler.act(async () => {
       state = await renderAsync(
@@ -98,7 +98,7 @@ describe('renderer', () => {
   })
 
   it('should accept vertex and fragment as program args', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const vertex = 'vertex'
     const fragment = 'fragment'
@@ -119,7 +119,7 @@ describe('renderer', () => {
   })
 
   it('should update program uniforms reactively', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const Mesh = ({ value }) => (
       <mesh>
@@ -142,7 +142,7 @@ describe('renderer', () => {
   })
 
   it('should accept shorthand props as uniforms', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
     const texture = new OGL.Texture(renderer.gl)
@@ -167,7 +167,7 @@ describe('renderer', () => {
   })
 
   it('should accept props as geometry attributes', async () => {
-    let state: RootState
+    let state: RootState = null!
 
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
@@ -232,5 +232,27 @@ describe('renderer', () => {
     expect(newInstance.original).not.toBe(true) // Created a new instance
     expect(newInstance.children[0].visible).toBe(false) // Preserves scene hierarchy
     expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
+  })
+
+  it('will prepare foreign objects when portaling', async () => {
+    let state: RootState = null!
+    const object = new OGL.Transform()
+    const mesh = React.createRef<OGL.Mesh>()
+
+    await reconciler.act(async () => {
+      state = await renderAsync(
+        createPortal(
+          <mesh ref={mesh}>
+            <box />
+            <normalProgram />
+          </mesh>,
+          object,
+        ),
+      )
+    })
+
+    expect(state.scene.children.length).toBe(0)
+    expect(object.children.length).not.toBe(0)
+    expect(mesh.current.parent).toBe(object)
   })
 })

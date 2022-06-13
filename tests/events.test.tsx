@@ -30,7 +30,7 @@ it('handles all interactive meshes', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handleOnClick).toHaveBeenCalled()
 })
@@ -54,7 +54,7 @@ it('handles onClick', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handleOnClick).toHaveBeenCalled()
 })
@@ -78,7 +78,7 @@ it('handles onPointerUp', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handlePointerUp).toHaveBeenCalled()
 })
@@ -102,7 +102,7 @@ it('handles onPointerDown', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handlePointerDown).toHaveBeenCalled()
 })
@@ -126,7 +126,7 @@ it('handles onPointerMove', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handlePointerMove).toHaveBeenCalled()
 })
@@ -150,7 +150,7 @@ it('handles onPointerOver', async () => {
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
 
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   expect(handleOnPointerOver).toHaveBeenCalled()
 })
@@ -174,14 +174,14 @@ it('handles onPointerOut', async () => {
   const event = new PointerEvent('pointermove')
   ;(event as any).offsetX = 640
   ;(event as any).offsetY = 400
-  fireEvent(canvas.current, event)
+  fireEvent(canvas.current!, event)
 
   // Move pointer away from mesh
   const event2 = new PointerEvent('pointermove')
   ;(event2 as any).offsetX = 0
   ;(event2 as any).offsetY = 0
 
-  fireEvent(canvas.current, event2)
+  fireEvent(canvas.current!, event2)
 
   expect(handlePointerOut).toHaveBeenCalled()
 })

@@ -1,7 +1,26 @@
 import { describe, it, expect, vi } from 'vitest'
 // @ts-ignore
 import * as OGL from 'ogl'
-import { applyProps, Instance } from 'react-ogl'
+import { resolve, applyProps } from 'react-ogl'
+
+describe('resolve', () => {
+  it('should resolve pierced props', () => {
+    const object = { foo: { bar: 1 } }
+    const { root, key, target } = resolve(object, 'foo-bar')
+
+    expect(root).toBe(object['foo'])
+    expect(key).toBe('bar')
+    expect(target).toBe(root[key])
+  })
+
+  it('should switch roots for atomic targets', () => {
+    const object = { foo: { bar: new OGL.Vec2() } }
+    const { root, key, target } = resolve(object, 'foo-bar')
+
+    expect(root).toBe(object)
+    expect(key).toBe('bar')
+  })
+})
 
 describe('applyProps', () => {
   it('should accept shorthand uniforms', async () => {
@@ -97,7 +116,7 @@ describe('applyProps', () => {
   })
 
   it('should prefer to copy from external props', async () => {
-    const target = { color: new OGL.Color() } as unknown as Instance
+    const target = { color: new OGL.Color() }
     target.color.copy = vi.fn()
 
     applyProps(target, {
@@ -109,7 +128,7 @@ describe('applyProps', () => {
   })
 
   it('should spread array prop values', async () => {
-    const target = { position: new OGL.Vec3() } as unknown as Instance
+    const target = { position: new OGL.Vec3() }
 
     applyProps(target, {
       position: [1, 2, 3],
@@ -120,7 +139,7 @@ describe('applyProps', () => {
   })
 
   it('should accept scalar shorthand', async () => {
-    const target = { position: new OGL.Vec3() } as unknown as Instance
+    const target = { position: new OGL.Vec3() }
 
     applyProps(target, {
       position: 3,
@@ -128,5 +147,24 @@ describe('applyProps', () => {
 
     expect(target.position).toBeInstanceOf(OGL.Vec3)
     expect(Array.from(target.position)).toMatchSnapshot()
+  })
+
+  it('should properly set array-like buffer views', async () => {
+    const target = { pixel: null }
+    const pixel = new Uint8Array([255, 0, 0, 255])
+
+    applyProps(target, { pixel })
+
+    expect(target.pixel).toBe(pixel)
+  })
+
+  it('should properly set non-math classes who implement set', async () => {
+    const target = { test: new Map() }
+    const test = new Map()
+    test.set(1, 2)
+
+    applyProps(target, { test })
+
+    expect(target.test).toBe(test)
   })
 })

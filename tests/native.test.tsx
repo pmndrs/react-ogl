@@ -7,7 +7,7 @@ import { Canvas } from 'react-ogl/Canvas.native' // explicitly require native mo
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer: RenderAPI
+    let renderer: RenderAPI = null!
 
     await reconciler.act(async () => {
       renderer = render(

@@ -5,7 +5,7 @@ import { reconciler, Canvas } from 'react-ogl'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer: RenderResult
+    let renderer: RenderResult = null!
 
     await reconciler.act(async () => {
       renderer = render(

@@ -1,33 +1,13 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { COLORS, POINTER_EVENTS } from './constants'
+import { POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import {
-  DPR,
-  EventHandlers,
-  Instance,
-  InstanceProps,
-  ObjectMap,
-  RootState,
-  SetBlock,
-  UniformList,
-  UniformRepresentation,
-} from './types'
+import { DPR, EventHandlers, Instance, InstanceProps, RootState } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
  */
 export const toPascalCase = (str: string) => str.charAt(0).toUpperCase() + str.substring(1)
-
-/**
- * Converts a stringified color name into a Color.
- */
-export const toColor = (name: keyof typeof COLORS) => new OGL.Color(COLORS[name] ?? name)
-
-/**
- * Converts an array of integers into a Vector.
- */
-export const toVector = (values: number[]) => new OGL[`Vec${values.length}`](...values)
 
 /**
  * Checks for inheritance between two classes.
@@ -41,16 +21,21 @@ export const calculateDpr = (dpr: DPR) =>
   Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
 
 /**
- * Resolves a stringified attach type against an `Instance`.
+ * Resolves a potentially pierced key type against an object.
  */
-export const resolveAttach = (instance: Instance, key: string) => {
-  let target = instance
-  if (key.includes('-')) {
-    const entries = key.split('-')
-    const last = entries.pop() as string
-    target = entries.reduce((acc, key) => acc[key], instance)
-    return { target, key: last }
-  } else return { target, key }
+export const resolve = (root: any, key: string) => {
+  let target = root[key]
+  if (!key.includes('-')) return { root, key, target }
+
+  // Resolve pierced target
+  const chain = key.split('-')
+  target = chain.reduce((acc, key) => acc[key], root)
+  key = chain.pop()
+
+  // Switch root if atomic
+  if (!target?.set) root = chain.reduce((acc, key) => acc[key], root)
+
+  return { root, key, target }
 }
 
 // Checks if a dash-cased string ends with an integer
@@ -60,24 +45,19 @@ const INDEX_REGEX = /-\d+$/
  * Attaches an instance to a parent via its `attach` prop.
  */
 export const attach = (parent: Instance, child: Instance) => {
-  if (!child.attach) return
-
-  parent.__attached = parent.__attached ?? []
-  parent.__attached.push(child)
-
-  if (typeof child.attach === 'string') {
+  if (typeof child.props.attach === 'string') {
     // If attaching into an array (foo-0), create one
-    if (INDEX_REGEX.test(child.attach)) {
-      const root = child.attach.replace(INDEX_REGEX, '')
-      const { target, key } = resolveAttach(parent, root)
-      if (!Array.isArray(target[key])) target[key] = []
+    if (INDEX_REGEX.test(child.props.attach)) {
+      const target = child.props.attach.replace(INDEX_REGEX, '')
+      const { root, key } = resolve(parent.object, target)
+      if (!Array.isArray(root[key])) root[key] = []
     }
 
-    const { target, key } = resolveAttach(parent, child.attach)
-    child.__previousAttach = target[key]
-    target[key] = child
+    const { root, key } = resolve(parent.object, child.props.attach)
+    child.object.__previousAttach = root[key]
+    root[key] = child.object
   } else {
-    child.__previousAttach = child.attach(parent, child)
+    child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
 }
 
@@ -85,63 +65,43 @@ export const attach = (parent: Instance, child: Instance) => {
  * Removes an instance from a parent via its `attach` prop.
  */
 export const detach = (parent: Instance, child: Instance) => {
-  const attachIndex = parent?.__attached?.indexOf(child)
-  if (typeof attachIndex !== 'number' || attachIndex === -1) return
-
-  child.__previousAttach = undefined
-  parent.__attached.splice(attachIndex, 1)
-
-  if (typeof child.attach === 'string') {
-    const { target, key } = resolveAttach(parent, child.attach)
-    target[key] = child.__previousAttach
+  if (typeof child.props.attach === 'string') {
+    const { root, key } = resolve(parent.object, child.props.attach)
+    root[key] = child.object.__previousAttach
   } else {
-    child.__previousAttach?.(parent, child)
+    child.object.__previousAttach?.(parent.object, child.object)
   }
+
+  delete child.object.__previousAttach
 }
 
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps?: InstanceProps) => {
+export const applyProps = (object: any, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
-  for (let key in newProps) {
+  for (const prop in newProps) {
     // Don't mutate reserved keys
-    if (key === 'children') continue
+    if (prop === 'children') continue
 
     // Don't mutate unchanged keys
-    if (newProps[key] === oldProps?.[key]) continue
+    if (newProps[prop] === oldProps?.[prop]) continue
 
     // Collect event handlers
-    const isHandler = POINTER_EVENTS.includes(key as typeof POINTER_EVENTS[number])
+    const isHandler = POINTER_EVENTS.includes(prop as typeof POINTER_EVENTS[number])
     if (isHandler) {
-      instance.__handlers = { ...instance.__handlers, [key]: newProps[key] }
+      object.__handlers = { ...object.__handlers, [prop]: newProps[prop] }
       continue
     }
 
-    const value = newProps[key]
-    let root = instance
-    let target = root[key]
-
-    // Set deeply nested properties using piercing.
-    // <element prop1-prop2={...} /> => Element.prop1.prop2 = ...
-    if (key.includes('-')) {
-      // Build new target from chained props
-      const chain = key.split('-')
-      target = chain.reduce((acc, key) => acc[key], instance)
-
-      // Switch root of target if atomic
-      if (!target?.set) {
-        // We're modifying the first of the chain instead of element.
-        // Remove the key from the chain and target it instead.
-        key = chain.pop()
-        root = chain.reduce((acc, key) => acc[key], instance)
-      }
-    }
+    const value = newProps[prop]
+    const { root, key, target } = resolve(object, prop)
 
     // Prefer to use properties' copy and set methods
     // otherwise, mutate the property directly
-    if (target?.set) {
-      if (target.constructor.name === value.constructor.name) {
+    const isMathClass = typeof target?.set === 'function' && typeof target?.copy === 'function'
+    if (!ArrayBuffer.isView(value) && isMathClass) {
+      if (target.constructor === value.constructor) {
         target.copy(value)
       } else if (Array.isArray(value)) {
         target.set(...value)
@@ -152,22 +112,22 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
       }
     } else {
       // Allow shorthand values for uniforms
-      const uniformList = value as UniformList
+      const uniformList = value as any
       if (key === 'uniforms') {
         for (const uniform in uniformList) {
           // @ts-ignore
-          let uniformValue: UniformRepresentation = uniformList[uniform]?.value ?? uniformList[uniform]
+          let uniformValue = uniformList[uniform]?.value ?? uniformList[uniform]
 
           // Handle uniforms shorthand
           if (typeof uniformValue === 'string') {
             // Uniform is a string, convert it into a color
-            uniformValue = toColor(uniformValue as keyof typeof COLORS)
+            uniformValue = new OGL.Color(uniformValue)
           } else if (
             uniformValue?.constructor === Array &&
             (uniformValue as any[]).every((v: any) => typeof v === 'number')
           ) {
             // Uniform is an array, convert it into a vector
-            uniformValue = toVector(uniformValue as number[])
+            uniformValue = new OGL[`Vec${uniformValue.length}`](...uniformValue)
           }
 
           root.uniforms[uniform] = { value: uniformValue }
@@ -178,6 +138,11 @@ export const applyProps = (instance: Instance, newProps: InstanceProps, oldProps
       }
     }
   }
+}
+
+export interface ObjectMap {
+  nodes: { [name: string]: OGL.Transform }
+  programs: { [name: string]: OGL.Program }
 }
 
 /**
@@ -219,12 +184,12 @@ export const createEvents = (state: RootState) => {
     const interactive: OGL.Mesh[] = []
     state.scene.traverse((node: OGL.Mesh) => {
       // Mesh has registered events and a defined volume
-      if ((node as Instance).__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if (node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Instance[] = state.raycaster.intersectMeshes(interactive)
+    const intersects: OGL.Mesh[] = state.raycaster.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -232,7 +197,7 @@ export const createEvents = (state: RootState) => {
 
     // Trigger events for hovered elements
     for (const object of intersects) {
-      const handlers = object.__handlers
+      const handlers = object.__handlers as EventHandlers
 
       // Bail if object doesn't have handlers (managed externally)
       if (!handlers) continue
@@ -242,25 +207,25 @@ export const createEvents = (state: RootState) => {
         state.hovered.set(object.id, object)
 
         // Fire hover events
-        handlers.onPointerMove?.({ event, hit: object.hit })
-        handlers.onPointerOver?.({ event, hit: object.hit })
+        handlers.onPointerMove?.({ ...object.hit, nativeEvent: event })
+        handlers.onPointerOver?.({ ...object.hit, nativeEvent: event })
       } else {
         // Otherwise, fire its generic event
-        handlers[type]?.({ event, hit: object.hit })
+        handlers[type]?.({ ...object.hit, nativeEvent: event })
       }
     }
 
     // Cleanup stale hover events
     if (isHoverEvent || type === 'onPointerDown') {
-      state.hovered.forEach((object: Instance) => {
-        const handlers = object.__handlers
+      state.hovered.forEach((object: OGL.Mesh) => {
+        const handlers = object.__handlers as EventHandlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
           // Reset hover state
           state.hovered.delete(object.id)
 
           // Fire unhover event
-          if (handlers?.onPointerOut) handlers.onPointerOut({ event, hit: object.hit })
+          if (handlers?.onPointerOut) handlers.onPointerOut({ ...object.hit, nativeEvent: event })
         }
       })
     }
@@ -270,6 +235,8 @@ export const createEvents = (state: RootState) => {
 
   return { handleEvent }
 }
+
+export type SetBlock = false | Promise<null> | null
 
 /**
  * Used to block rendering via its `set` prop. Useful for suspenseful effects.
