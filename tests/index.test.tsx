@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 // @ts-ignore
 import * as OGL from 'ogl'
 import { renderAsync } from './utils'
-import { Node, extend, reconciler, RootState, createPortal } from '../src'
+import { Node, extend, reconciler, RootState, createPortal, unmountComponentAtNode } from 'react-ogl'
 
 class CustomElement extends OGL.Transform {}
 
@@ -132,13 +132,13 @@ describe('renderer', () => {
       state = await renderAsync(<Mesh value={false} />)
     })
 
-    expect(state.scene.children[0].program.uniforms.uniform.value).toBe(false)
+    expect((state.scene.children[0] as OGL.Mesh).program.uniforms.uniform.value).toBe(false)
 
     await reconciler.act(async () => {
       state = await renderAsync(<Mesh value={true} />)
     })
 
-    expect(state.scene.children[0].program.uniforms.uniform.value).toBe(true)
+    expect((state.scene.children[0] as OGL.Mesh).program.uniforms.uniform.value).toBe(true)
   })
 
   it('should accept shorthand props as uniforms', async () => {
