@@ -2,9 +2,9 @@ import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { Block, ErrorBoundary } from './utils'
+import { Block, SetBlock, ErrorBoundary } from './utils'
 import { events as createPointerEvents } from './events'
-import { RenderProps, SetBlock } from './types'
+import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
 export interface CanvasProps extends Omit<RenderProps, 'size'>, React.HTMLAttributes<HTMLDivElement> {

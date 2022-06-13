@@ -2,10 +2,10 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
-import { Catalogue, Fiber, Instance, InstanceProps } from './types'
+import { Fiber, Instance, InstanceProps } from './types'
 
 // Custom objects that extend the OGL namespace
-const catalogue: Catalogue = {}
+const catalogue: { [name: string]: any } = {}
 
 // Effectful catalogue elements that require a `WebGLRenderingContext`.
 const catalogueGL: any[] = [
@@ -30,7 +30,7 @@ const catalogueGL: any[] = [
  * Extends the OGL namespace, accepting an object of keys pointing to external classes.
  * `passGL` will flag the element to receive a `WebGLRenderingContext` on creation.
  */
-export const extend = (objects: Catalogue, passGL = false) => {
+export const extend = (objects: typeof catalogue, passGL = false) => {
   for (const key in objects) {
     const value = objects[key]
     catalogue[key] = value

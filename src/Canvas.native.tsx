@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet, LayoutChangeEvent } from 'react-native'
 import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
-import { Block, ErrorBoundary } from './utils'
+import { Block, SetBlock, ErrorBoundary } from './utils'
 import { events as createTouchEvents } from './events'
-import { RenderProps, SetBlock } from './types'
+import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 import '@expo/browser-polyfill'
 
