@@ -100,7 +100,7 @@ export const detach = (parent: Instance, child: Instance) => {
  */
 export const applyProps = (object: any, newProps: InstanceProps, oldProps?: InstanceProps) => {
   // Mutate our OGL element
-  for (let prop in newProps) {
+  for (const prop in newProps) {
     // Don't mutate reserved keys
     if (prop === 'children') continue
 
