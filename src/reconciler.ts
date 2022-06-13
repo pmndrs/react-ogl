@@ -143,15 +143,19 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
   const newInstance = createInstance(type, props, root)
 
   // Replace instance in scene-graph
-  removeChild(instance.parent, instance)
-  appendChild(instance.parent, newInstance)
+  const parent = instance.parent
+  removeChild(parent, instance)
+  appendChild(parent, newInstance)
 
+  // Commit new instance object
   commitInstance(newInstance)
 
-  if (newInstance.props.attach) {
-    attach(newInstance.parent, newInstance)
+  // Append to scene-graph
+  if (props.attach) {
+    detach(parent, instance)
+    attach(parent, newInstance)
   } else if (newInstance.object instanceof OGL.Transform) {
-    newInstance.object.setParent(newInstance.parent.object)
+    newInstance.object.setParent(parent.object)
   }
 
   // Move children to new instance
