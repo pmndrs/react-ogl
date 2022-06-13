@@ -50,12 +50,10 @@ export const resolve = (root: any, key: string) => {
   // Resolve pierced target
   const chain = key.split('-')
   target = chain.reduce((acc, key) => acc[key], root)
+  key = chain.pop()
 
   // Switch root if atomic
-  if (!target?.set) {
-    key = chain.pop()
-    root = chain.reduce((acc, key) => acc[key], root)
-  }
+  if (!target?.set) root = chain.reduce((acc, key) => acc[key], root)
 
   return { root, key, target }
 }
