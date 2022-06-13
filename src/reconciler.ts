@@ -86,7 +86,7 @@ const removeChild = (parent: Instance, child: Instance) => {
   if (child.props.attach) detach(parent, child)
   else if (child.object instanceof OGL.Transform) parent.object.removeChild(child.object)
 
-  child.object.dispose?.()
+  if (child.props.dispose !== null) child.object.dispose?.()
   child.object = null
 }
 
@@ -115,15 +115,20 @@ const commitInstance = (instance: Instance) => {
     }
   }
 
+  // Auto-attach geometry and programs to meshes
+  if (!instance.props.attach) {
+    if (instance.object instanceof OGL.Geometry) {
+      instance.props.attach = 'geometry'
+    } else if (instance.object instanceof OGL.Program) {
+      instance.props.attach = 'program'
+    }
+  }
+
   for (const child of instance.children) {
     if (child.props.attach) {
       attach(instance, child)
     } else if (child.object instanceof OGL.Transform) {
       child.object.setParent(instance.object)
-    } else if (child.object instanceof OGL.Geometry) {
-      instance.object.geometry = child.object
-    } else if (child.object instanceof OGL.Program) {
-      instance.object.program = child.object
     }
   }
 
@@ -147,10 +152,6 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
     attach(newInstance.parent, newInstance)
   } else if (newInstance.object instanceof OGL.Transform) {
     newInstance.object.setParent(newInstance.parent.object)
-  } else if (newInstance.object instanceof OGL.Geometry) {
-    newInstance.parent.object.geometry = newInstance.object
-  } else if (newInstance.object instanceof OGL.Program) {
-    newInstance.parent.object.program = newInstance.object
   }
 
   // Move children to new instance
