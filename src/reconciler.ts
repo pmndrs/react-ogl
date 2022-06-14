@@ -91,6 +91,9 @@ const removeChild = (parent: Instance, child: Instance) => {
 }
 
 const commitInstance = (instance: Instance) => {
+  // Don't handle commit for containers
+  if (!instance.parent) return
+
   if (instance.type !== 'primitive' && !instance.object) {
     const name = toPascalCase(instance.type)
     const target = catalogue[name] ?? OGL[name]
@@ -124,11 +127,21 @@ const commitInstance = (instance: Instance) => {
     }
   }
 
+  // Append children
   for (const child of instance.children) {
     if (child.props.attach) {
       attach(instance, child)
     } else if (child.object instanceof OGL.Transform) {
       child.object.setParent(instance.object)
+    }
+  }
+
+  // Append to container
+  if (!instance.parent.parent) {
+    if (instance.props.attach) {
+      attach(instance.parent, instance)
+    } else if (instance.object instanceof OGL.Transform) {
+      instance.object.setParent(instance.parent.object)
     }
   }
 
