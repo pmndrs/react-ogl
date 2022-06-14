@@ -18,3 +18,13 @@ export const RENDER_MODES = {
   blocking: 1,
   concurrent: 2,
 } as const
+
+/**
+ * React internal props.
+ */
+export const RESERVED_PROPS = ['children', 'key', 'ref', '__self', '__source'] as const
+
+/**
+ * react-ogl instance-specific props.
+ */
+export const INSTANCE_PROPS = ['args', 'object', 'dispose', 'attach']

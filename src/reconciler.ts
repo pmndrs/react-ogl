@@ -2,6 +2,7 @@ import Reconciler from 'react-reconciler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
+import { RESERVED_PROPS } from './constants'
 import { Fiber, Instance, InstanceProps } from './types'
 
 // Custom objects that extend the OGL namespace
@@ -231,7 +232,7 @@ const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: Instan
   // Sort through props
   for (const key in newProps) {
     // Skip reserved keys
-    if (key === 'children') continue
+    if (RESERVED_PROPS.includes(key as typeof RESERVED_PROPS[number])) continue
     // Skip primitives
     if (instance.type === 'primitive' && key === 'object') continue
     // Skip if props match

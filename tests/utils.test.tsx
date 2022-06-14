@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as OGL from 'ogl'
-import { resolve, applyProps } from '../src'
+import { resolve, applyProps, RESERVED_PROPS, INSTANCE_PROPS } from '../src'
 
 describe('resolve', () => {
   it('should resolve pierced props', () => {
@@ -165,5 +165,19 @@ describe('applyProps', () => {
     applyProps(target, { test })
 
     expect(target.test).toBe(test)
+  })
+
+  it('should not set react internal and react-ogl instance props', async () => {
+    const target: any = {}
+
+    applyProps(
+      target,
+      [...RESERVED_PROPS, ...INSTANCE_PROPS].reduce((acc, key, value) => ({ ...acc, [key]: value }), {}),
+    )
+
+    Object.keys(target).forEach((key) => {
+      expect(RESERVED_PROPS).not.toContain(key)
+      expect(INSTANCE_PROPS).not.toContain(key)
+    })
   })
 })
