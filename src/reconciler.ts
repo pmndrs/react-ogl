@@ -91,6 +91,9 @@ const removeChild = (parent: Instance, child: Instance) => {
 }
 
 const commitInstance = (instance: Instance) => {
+  // Don't handle commit for containers
+  if (instance.parent === null) return
+
   if (instance.type !== 'primitive' && !instance.object) {
     const name = toPascalCase(instance.type)
     const target = catalogue[name] ?? OGL[name]
@@ -113,23 +116,23 @@ const commitInstance = (instance: Instance) => {
     } else {
       instance.object = new target(...instance.props.args)
     }
+  }
 
-    // Auto-attach geometry and programs to meshes
-    if (!instance.props.attach) {
-      if (instance.object instanceof OGL.Geometry) {
-        instance.props.attach = 'geometry'
-      } else if (instance.object instanceof OGL.Program) {
-        instance.props.attach = 'program'
-      }
+  // Auto-attach geometry and programs to meshes
+  if (!instance.props.attach) {
+    if (instance.object instanceof OGL.Geometry) {
+      instance.props.attach = 'geometry'
+    } else if (instance.object instanceof OGL.Program) {
+      instance.props.attach = 'program'
     }
+  }
 
-    // Append children
-    for (const child of instance.children) {
-      if (child.props.attach) {
-        attach(instance, child)
-      } else if (child.object instanceof OGL.Transform) {
-        child.object.setParent(instance.object)
-      }
+  // Append children
+  for (const child of instance.children) {
+    if (child.props.attach) {
+      attach(instance, child)
+    } else if (child.object instanceof OGL.Transform) {
+      child.object.setParent(instance.object)
     }
   }
 
