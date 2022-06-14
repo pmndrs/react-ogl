@@ -113,22 +113,32 @@ const commitInstance = (instance: Instance) => {
     } else {
       instance.object = new target(...instance.props.args)
     }
-  }
 
-  // Auto-attach geometry and programs to meshes
-  if (!instance.props.attach) {
-    if (instance.object instanceof OGL.Geometry) {
-      instance.props.attach = 'geometry'
-    } else if (instance.object instanceof OGL.Program) {
-      instance.props.attach = 'program'
+    // Auto-attach geometry and programs to meshes
+    if (!instance.props.attach) {
+      if (instance.object instanceof OGL.Geometry) {
+        instance.props.attach = 'geometry'
+      } else if (instance.object instanceof OGL.Program) {
+        instance.props.attach = 'program'
+      }
+    }
+
+    // Append children
+    for (const child of instance.children) {
+      if (child.props.attach) {
+        attach(instance, child)
+      } else if (child.object instanceof OGL.Transform) {
+        child.object.setParent(instance.object)
+      }
     }
   }
 
-  for (const child of instance.children) {
-    if (child.props.attach) {
-      attach(instance, child)
-    } else if (child.object instanceof OGL.Transform) {
-      child.object.setParent(instance.object)
+  // Append to container
+  if (instance.parent?.object && instance.parent.parent === null) {
+    if (instance.props.attach) {
+      attach(instance.parent, instance)
+    } else if (instance.object instanceof OGL.Transform) {
+      instance.object.setParent(instance.parent.object)
     }
   }
 
