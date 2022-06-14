@@ -157,6 +157,7 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
 
   // Replace instance in scene-graph
   const parent = instance.parent
+  if (instance.props.attach) detach(parent, instance)
   removeChild(parent, instance)
   appendChild(parent, newInstance)
 
@@ -164,11 +165,12 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
   commitInstance(newInstance)
 
   // Append to scene-graph
-  if (props.attach) {
-    detach(parent, instance)
-    attach(parent, newInstance)
-  } else if (newInstance.object instanceof OGL.Transform) {
-    newInstance.object.setParent(parent.object)
+  if (parent.parent) {
+    if (newInstance.props.attach) {
+      attach(parent, newInstance)
+    } else if (newInstance.object instanceof OGL.Transform) {
+      newInstance.object.setParent(parent.object)
+    }
   }
 
   // Move children to new instance
