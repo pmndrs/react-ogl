@@ -259,31 +259,31 @@ const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) 
  * Centralizes and handles mutations through an OGL scene-graph.
  */
 export const reconciler = Reconciler({
-  now: typeof performance !== 'undefined' ? performance.now : Date.now,
+  // Configure renderer for tree-like mutation and interop w/react-dom
+  isPrimaryRenderer: false,
+  supportsMutation: true,
   supportsHydration: false,
   supportsPersistence: false,
+  // Add SSR time fallbacks
+  now: typeof performance !== 'undefined' ? performance.now : Date.now,
   scheduleTimeout: typeof setTimeout !== 'undefined' ? setTimeout : undefined,
   cancelTimeout: typeof clearTimeout !== 'undefined' ? clearTimeout : undefined,
   noTimeout: -1,
-  // OGL elements can be updated, so we inform the renderer
-  supportsMutation: true,
-  // We set this to false because this can work on top of react-dom
-  isPrimaryRenderer: false,
-  // We can modify the ref here, but we return it instead (no-op)
+  // Text isn't supported so we skip it
+  shouldSetTextContent: () => false,
+  createTextInstance: () => console.warn('Text is not allowed in the OGL scene-graph!'),
+  // Modifies the ref to return the instance object itself.
   getPublicInstance: (instance: Instance) => instance.object,
-  // This object that's passed into the reconciler is the host context.
-  // Don't expose the root though, only children for portalling
+  // We can optionally access different host contexts on instance creation/update.
+  // Instances' data structures are self-sufficient, so we don't make use of this
   getRootHostContext: () => null,
   getChildHostContext: (parentHostContext: any) => parentHostContext,
-  // Text isn't supported so we skip it
-  createTextInstance: () => console.warn('Text is not allowed in the OGL scene-graph!'),
-  // This lets us store stuff before React mutates our OGL elements.
-  // We don't do anything here
+  // We can optionally mutate portal containers here, but we do that in createPortal instead from state
+  preparePortalMount: (container: any) => container,
+  // This lets us store stuff at the container-level before/after React mutates our OGL elements.
+  // Elements are mutated in isolation, so we don't do anything here.
   prepareForCommit: () => null,
   resetAfterCommit: () => {},
-  // OGL elements don't have textContent, so we skip this
-  shouldSetTextContent: () => false,
-  preparePortalMount: (container: any) => container,
   // This can modify the container and clear children.
   // Might be useful for disposing on demand later
   clearContainer: () => false,
@@ -296,13 +296,13 @@ export const reconciler = Reconciler({
   // These methods remove elements from the scene
   removeChild,
   removeChildFromContainer: () => {},
-  // We can specify an order for children to be specified here.
+  // We can specify an order for children to be inserted here.
   // This is useful if you want to override stuff like materials
   insertBefore,
   insertInContainerBefore: () => {},
   // Used to calculate updates in the render phase or commitUpdate.
   // Greatly improves performance by reducing paint to rapid mutations.
-  // Returns [shouldReconstruct: boolean, changedProps]
+  // Returns [shouldReconstruct: boolean, changedProps: Record<string, any>]
   prepareUpdate(instance: Instance, type: string, oldProps: InstanceProps, newProps: InstanceProps) {
     // Element is a primitive. We must recreate it when its object prop is changed
     if (instance.type === 'primitive' && oldProps.object !== newProps.object) return [true]
@@ -320,7 +320,7 @@ export const reconciler = Reconciler({
       }
     }
 
-    // If the instance has new props or arguments, recreate it
+    // If the instance has new args, recreate it
     if (newProps.args?.some((value, index) => value !== oldProps.args[index])) return [true]
 
     // Diff through props and flag with changes
@@ -345,19 +345,18 @@ export const reconciler = Reconciler({
     // Handle attach update
     if (changedProps.attach) {
       if (oldProps.attach) detach(instance.parent, instance)
-
-      if (newProps.attach) {
-        instance.props.attach = newProps.attach
-        attach(instance.parent, instance)
-      }
+      instance.props.attach = newProps.attach
+      if (newProps.attach) attach(instance.parent, instance)
     }
 
     // Update instance props
-    Object.assign(instance.props, changedProps)
+    Object.assign(instance.props, newProps)
 
     // Apply changed props
-    applyProps(instance.object, changedProps)
+    applyProps(instance.object, newProps)
   },
+  // Methods to toggle instance visibility on demand.
+  // React uses this with React.Suspense to display fallback content
   hideInstance(instance: Instance) {
     if (instance.object instanceof OGL.Transform) {
       instance.object.visible = false
@@ -368,11 +367,14 @@ export const reconciler = Reconciler({
       instance.object.visible = instance.props.visible ?? true
     }
   },
+  // Configures a callback once finalized and instances are linked up to one another.
+  // This is a safe time to create instances' respective OGL elements without worrying
+  // about side-effects if react changes its mind and discards an instance (e.g. React.Suspense)
   finalizeInitialChildren: () => true,
   commitMount: commitInstance,
 })
 
-// Injects renderer meta into devtools.
+// Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
 reconciler.injectIntoDevTools({
   findFiberByHostInstance: (instance: Instance) => instance.root,
