@@ -57,6 +57,7 @@ const Measure = () => {
   const ref = (node: React.ReactNode) => {
     if (!node || element.current) return
 
+    // @ts-ignore
     element.current = node
   }
   return [ref, bounds]
@@ -72,7 +73,7 @@ jest.mock('react-native', () => ({
   View: React.memo(
     React.forwardRef(({ onLayout, ...props }: ViewProps, ref) => {
       React.useLayoutEffect(() => {
-        onLayout({
+        onLayout?.({
           nativeEvent: {
             layout: {
               x: 0,

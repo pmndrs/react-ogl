@@ -93,7 +93,7 @@ export interface RootState {
   frameloop: Frameloop
   renderer: OGL.Renderer
   gl: OGL.OGLRenderingContext
-  scene: Omit<OGL.Transform, 'children'> & { children: any[] }
+  scene: OGL.Transform
   camera: OGL.Camera
   priority: number
   subscribed: React.MutableRefObject<Subscription>[]

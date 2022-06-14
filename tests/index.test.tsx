@@ -55,20 +55,18 @@ describe('renderer', () => {
   })
 
   it('should set pierced props', async () => {
-    let state: RootState = null!
+    const mesh = React.createRef<OGL.Mesh>()
 
     await reconciler.act(async () => {
-      state = render(
-        <mesh>
+      render(
+        <mesh ref={mesh}>
           <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
           <normalProgram />
         </mesh>,
       )
     })
 
-    const [element] = state.scene.children
-
-    expect(Object.keys(element.geometry.attributes)).toStrictEqual(['test'])
+    expect(Object.keys(mesh.current.geometry.attributes)).toStrictEqual(['test'])
   })
 
   it('should handle attach', async () => {
@@ -94,7 +92,7 @@ describe('renderer', () => {
       )
     })
 
-    const [element1, element2] = state.scene.children
+    const [element1, element2] = state.scene.children as OGL.Mesh[]
 
     expect(element1.program).not.toBe(undefined)
     expect(element2.program).not.toBe(undefined)
@@ -127,52 +125,45 @@ describe('renderer', () => {
       )
     })
 
-    const [mesh] = state.scene.children
+    const [mesh] = state.scene.children as OGL.Mesh[]
 
     expect(mesh.program.vertex).toBe(vertex)
     expect(mesh.program.fragment).toBe(fragment)
   })
 
   it('should update program uniforms reactively', async () => {
-    let state: RootState = null!
+    const mesh = React.createRef<OGL.Mesh>()
 
-    const Mesh = ({ value }) => (
-      <mesh>
+    const Test = ({ value }) => (
+      <mesh ref={mesh}>
         <box />
         <normalProgram uniforms={{ uniform: { value } }} />
       </mesh>
     )
 
-    await reconciler.act(async () => {
-      state = render(<Mesh value={false} />)
-    })
+    await reconciler.act(async () => render(<Test value={false} />))
+    expect(mesh.current.program.uniforms.uniform.value).toBe(false)
 
-    expect(state.scene.children[0].program.uniforms.uniform.value).toBe(false)
-
-    await reconciler.act(async () => {
-      state = render(<Mesh value={true} />)
-    })
-
-    expect(state.scene.children[0].program.uniforms.uniform.value).toBe(true)
+    await reconciler.act(async () => render(<Test value={true} />))
+    expect(mesh.current.program.uniforms.uniform.value).toBe(true)
   })
 
   it('should accept shorthand props as uniforms', async () => {
-    let state: RootState = null!
+    const mesh = React.createRef<OGL.Mesh>()
 
     const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
     const texture = new OGL.Texture(renderer.gl)
 
     await reconciler.act(async () => {
-      state = render(
-        <mesh>
+      render(
+        <mesh ref={mesh}>
           <box />
           <normalProgram uniforms={{ color: 'white', vector: [0, 0, 0], textures: [texture, texture] }} />
         </mesh>,
       )
     })
 
-    const [mesh] = state.scene.children
-    const { color, vector, textures } = mesh.program.uniforms
+    const { color, vector, textures } = mesh.current.program.uniforms
 
     expect(color.value).toBeInstanceOf(OGL.Color)
     expect(vector.value).toBeInstanceOf(OGL.Vec3)
@@ -182,24 +173,22 @@ describe('renderer', () => {
   })
 
   it('should accept props as geometry attributes', async () => {
-    let state: RootState = null!
+    const mesh = React.createRef<OGL.Mesh>()
 
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
 
     await reconciler.act(async () => {
-      state = render(
-        <mesh>
+      render(
+        <mesh ref={mesh}>
           <geometry position={position} uv={uv} />
           <normalProgram />
         </mesh>,
       )
     })
 
-    const [mesh] = state.scene.children
-
-    expect(mesh.geometry.attributes.position).toBeDefined()
-    expect(mesh.geometry.attributes.uv).toBeDefined()
+    expect(mesh.current.geometry.attributes.position).toBeDefined()
+    expect(mesh.current.geometry.attributes.uv).toBeDefined()
   })
 
   it('should bind & unbind events', async () => {
@@ -236,14 +225,14 @@ describe('renderer', () => {
       state = render(<Test n={1} />)
     })
 
-    const [oldInstance] = state.scene.children
+    const [oldInstance] = state.scene.children as any[]
     oldInstance.original = true
 
     await reconciler.act(async () => {
       state = render(<Test n={2} />)
     })
 
-    const [newInstance] = state.scene.children
+    const [newInstance] = state.scene.children as any[]
     expect(newInstance.original).not.toBe(true) // Created a new instance
     expect(newInstance.children[0].visible).toBe(false) // Preserves scene hierarchy
     expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
