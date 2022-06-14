@@ -56,6 +56,7 @@ export const attach = (parent: Instance, child: Instance) => {
     const { root, key } = resolve(parent.object, child.props.attach)
     child.object.__previousAttach = root[key]
     root[key] = child.object
+    child.object.__currentAttach = parent.object.__currentAttach = root[key]
   } else {
     child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
@@ -66,13 +67,18 @@ export const attach = (parent: Instance, child: Instance) => {
  */
 export const detach = (parent: Instance, child: Instance) => {
   if (typeof child.props.attach === 'string') {
-    const { root, key } = resolve(parent.object, child.props.attach)
-    root[key] = child.object.__previousAttach
+    // Reset parent key if last attached
+    if (parent.object.__currentAttach === child.object.__currentAttach) {
+      const { root, key } = resolve(parent.object, child.props.attach)
+      root[key] = child.object.__previousAttach
+    }
   } else {
-    child.object.__previousAttach?.(parent.object, child.object)
+    child.object.__previousAttach(parent.object, child.object)
   }
 
   delete child.object.__previousAttach
+  delete child.object.__currentAttach
+  delete parent.object.__currentAttach
 }
 
 /**

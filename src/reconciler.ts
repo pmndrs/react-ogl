@@ -340,9 +340,23 @@ export const reconciler = Reconciler({
     root: Fiber,
   ) {
     // If flagged for recreation, swap to a new instance.
-    if (reconstruct) switchInstance(instance, type, newProps, root)
-    // Otherwise, just apply changed props
-    else applyProps(instance.object, changedProps)
+    if (reconstruct) return switchInstance(instance, type, newProps, root)
+
+    // Handle attach update
+    if (changedProps.attach) {
+      if (oldProps.attach) detach(instance.parent, instance)
+
+      if (newProps.attach) {
+        instance.props.attach = newProps.attach
+        attach(instance.parent, instance)
+      }
+    }
+
+    // Update instance props
+    Object.assign(instance.props, changedProps)
+
+    // Apply changed props
+    applyProps(instance.object, changedProps)
   },
   hideInstance(instance: Instance) {
     if (instance.object instanceof OGL.Transform) {
