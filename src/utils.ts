@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { POINTER_EVENTS } from './constants'
+import { RESERVED_PROPS, INSTANCE_PROPS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { DPR, EventHandlers, Instance, InstanceProps, RootState } from './types'
+import { DPR, EventHandlers, Instance, RootState } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -78,11 +78,12 @@ export const detach = (parent: Instance, child: Instance) => {
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (object: any, newProps: InstanceProps, oldProps?: InstanceProps) => {
+export const applyProps = (object: any, newProps: any, oldProps?: any) => {
   // Mutate our OGL element
   for (const prop in newProps) {
     // Don't mutate reserved keys
-    if (prop === 'children') continue
+    if (RESERVED_PROPS.includes(prop as typeof RESERVED_PROPS[number])) continue
+    if (INSTANCE_PROPS.includes(prop as typeof INSTANCE_PROPS[number])) continue
 
     // Don't mutate unchanged keys
     if (newProps[prop] === oldProps?.[prop]) continue
