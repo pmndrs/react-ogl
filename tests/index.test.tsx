@@ -221,7 +221,7 @@ describe('renderer', () => {
     expect(unbind).toBe(true)
   })
 
-  it('will create an identical instance when reconstructing', async () => {
+  it('should create an identical instance when reconstructing', async () => {
     let state: RootState = null!
 
     const Test = ({ n }: { n: number }) => (
@@ -249,7 +249,7 @@ describe('renderer', () => {
     expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
   })
 
-  it('will prepare foreign objects when portaling', async () => {
+  it('should prepare foreign objects when portaling', async () => {
     let state: RootState = null!
     const object = new OGL.Transform()
     const mesh = React.createRef<OGL.Mesh>()
@@ -269,5 +269,31 @@ describe('renderer', () => {
     expect(state.scene.children.length).toBe(0)
     expect(object.children.length).not.toBe(0)
     expect(mesh.current.parent).toBe(object)
+  })
+
+  it('should update attach reactively', async () => {
+    const mesh = React.createRef<OGL.Mesh>()
+    const program1 = React.createRef<OGL.Program>()
+    const program2 = React.createRef<OGL.Program>()
+
+    const Test = ({ first = false, mono = false }) => (
+      <mesh ref={mesh}>
+        <box />
+        <normalProgram ref={program1} attach={first ? 'program' : 'oldprogram1'} />
+        {!mono && <normalProgram ref={program2} attach={first ? 'oldprogram2' : 'program'} />}
+      </mesh>
+    )
+
+    await reconciler.act(async () => render(<Test first mono />))
+    expect(mesh.current.program).toBe(program1.current)
+
+    await reconciler.act(async () => render(<Test mono />, { frameloop: 'never' }))
+    expect(mesh.current.program).toBe(undefined)
+
+    await reconciler.act(async () => render(<Test first />))
+    expect(mesh.current.program).toBe(program1.current)
+
+    await reconciler.act(async () => render(<Test />))
+    expect(mesh.current.program).toBe(program2.current)
   })
 })
