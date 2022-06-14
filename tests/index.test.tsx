@@ -38,6 +38,22 @@ describe('renderer', () => {
     expect(element instanceof CustomElement).toBe(true)
   })
 
+  it('should complete view on mount', async () => {
+    const lifecycle: string[] = []
+
+    function Test() {
+      React.useLayoutEffect(() => void lifecycle.push('useLayoutEffect'), [])
+      React.useEffect(() => void lifecycle.push('useEffect'), [])
+      return <transform attach={() => (lifecycle.push('attach'), () => {})} />
+    }
+
+    await reconciler.act(async () => {
+      render(<Test />)
+    })
+
+    expect(lifecycle).toStrictEqual(['attach', 'useLayoutEffect', 'useEffect'])
+  })
+
   it('should set pierced props', async () => {
     let state: RootState = null!
 
