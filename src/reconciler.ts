@@ -92,7 +92,7 @@ const removeChild = (parent: Instance, child: Instance) => {
 
 const commitInstance = (instance: Instance) => {
   // Don't handle commit for containers
-  if (instance.parent === null) return
+  if (!instance.parent) return
 
   if (instance.type !== 'primitive' && !instance.object) {
     const name = toPascalCase(instance.type)
@@ -137,7 +137,7 @@ const commitInstance = (instance: Instance) => {
   }
 
   // Append to container
-  if (instance.parent?.object && instance.parent.parent === null) {
+  if (!instance.parent.parent) {
     if (instance.props.attach) {
       attach(instance.parent, instance)
     } else if (instance.object instanceof OGL.Transform) {
