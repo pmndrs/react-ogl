@@ -14,7 +14,7 @@ export default defineConfig({
     minify: false,
     outDir: path.resolve(process.cwd(), 'dist'),
     emptyOutDir: true,
-    target: 'esnext',
+    target: 'es2018',
     lib: {
       formats: ['es', 'cjs'],
       entry: path.resolve(process.cwd(), 'src/index.ts'),
