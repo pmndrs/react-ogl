@@ -82,7 +82,7 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
           }
 
           // Bind events
-          setBind(state.events?.connected)
+          setBind((state.events?.connected as any)?.getEventHandlers())
 
           return onCreated?.(state)
         },
