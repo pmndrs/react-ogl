@@ -109,6 +109,9 @@ const commitInstance = (instance: Instance) => {
 
       // Accept props as args
       const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
+        // Don't include non-attributes for geometry
+        if (instance.type === 'geometry' && !(value as OGL.Attribute).data) return acc
+        // Include non-pierced props
         if (!key.includes('-')) acc[key] = value
         return acc
       }, attrs)
@@ -302,9 +305,10 @@ export const reconciler = Reconciler({
     }
 
     // Element is a geometry. Check whether its attribute props changed to recreate.
-    if (instance instanceof OGL.Geometry) {
+    if (type === 'geometry') {
       for (const key in oldProps) {
-        if (!key.startsWith('attributes-') && oldProps[key] !== newProps[key]) return [true]
+        const isAttribute = (oldProps[key] as OGL.Attribute)?.data || (newProps[key] as OGL.Attribute)?.data
+        if (isAttribute && oldProps[key] !== newProps[key]) return [true]
       }
     }
 
