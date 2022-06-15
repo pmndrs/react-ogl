@@ -95,7 +95,7 @@ export const render = (
           // Unsubscribe callback
           const { subscribed } = get()
           const index = subscribed.indexOf(refCallback)
-          if (index !== -1) subscribed.splice(index, 0)
+          if (index !== -1) subscribed.splice(index, 1)
 
           // Disable manual rendering if renderPriority is positive
           set((state) => ({ priority: state.priority - renderPriority }))
