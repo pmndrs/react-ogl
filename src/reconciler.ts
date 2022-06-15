@@ -121,31 +121,23 @@ const commitInstance = (instance: Instance) => {
 
   // Auto-attach geometry and programs to meshes
   if (!instance.props.attach) {
-    if (instance.object instanceof OGL.Geometry) {
-      instance.props.attach = 'geometry'
-    } else if (instance.object instanceof OGL.Program) {
-      instance.props.attach = 'program'
-    }
+    if (instance.object instanceof OGL.Geometry) instance.props.attach = 'geometry'
+    else if (instance.object instanceof OGL.Program) instance.props.attach = 'program'
   }
 
   // Append children
   for (const child of instance.children) {
-    if (child.props.attach) {
-      attach(instance, child)
-    } else if (child.object instanceof OGL.Transform) {
-      child.object.setParent(instance.object)
-    }
+    if (child.props.attach) attach(instance, child)
+    else if (child.object instanceof OGL.Transform) child.object.setParent(instance.object)
   }
 
   // Append to container
   if (!instance.parent.parent) {
-    if (instance.props.attach) {
-      attach(instance.parent, instance)
-    } else if (instance.object instanceof OGL.Transform) {
-      instance.object.setParent(instance.parent.object)
-    }
+    if (instance.props.attach) attach(instance.parent, instance)
+    else if (instance.object instanceof OGL.Transform) instance.object.setParent(instance.parent.object)
   }
 
+  // Apply props to OGL object
   applyProps(instance.object, instance.props)
 }
 
@@ -158,7 +150,6 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
 
   // Replace instance in scene-graph
   const parent = instance.parent
-  if (instance.props.attach) detach(parent, instance)
   removeChild(parent, instance)
   appendChild(parent, newInstance)
 
@@ -167,11 +158,8 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
 
   // Append to scene-graph
   if (parent.parent) {
-    if (newInstance.props.attach) {
-      attach(parent, newInstance)
-    } else if (newInstance.object instanceof OGL.Transform) {
-      newInstance.object.setParent(parent.object)
-    }
+    if (newInstance.props.attach) attach(parent, newInstance)
+    else if (newInstance.object instanceof OGL.Transform) newInstance.object.setParent(parent.object)
   }
 
   // Move children to new instance
