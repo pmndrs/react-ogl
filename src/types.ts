@@ -121,6 +121,7 @@ export type RenderProps = {
   gl?: OGL.OGLRenderingContext
   dpr?: DPR
   camera?: OGL.Camera | WithOGLProps<OGL.Camera> | Partial<OGL.CameraOptions>
+  scene?: OGL.Transform
   events?: EventManager
   onCreated?: (state: RootState) => any
   mode?: keyof typeof RENDER_MODES

@@ -79,7 +79,7 @@ export const render = (
         orthographic,
         gl,
         camera,
-        scene: new OGL.Transform(),
+        scene: config.scene ?? new OGL.Transform(),
         priority: 0,
         subscribed: [],
         // Subscribe/unsubscribe elements to the render loop
