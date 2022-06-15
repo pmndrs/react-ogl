@@ -105,18 +105,22 @@ const commitInstance = (instance: Instance) => {
     if (isGLInstance) {
       const { gl } = instance.root.getState()
       const { args, ...props } = instance.props
-      const attrs = args.find((arg) => arg !== gl) ?? {}
+      const filtered = args.filter((arg) => arg !== gl)
 
-      // Accept props as args
-      const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
-        // Don't include non-attributes for geometry
-        if (instance.type === 'geometry' && !(value as OGL.Attribute)?.data) return acc
-        // Include non-pierced props
-        if (!key.includes('-')) acc[key] = value
-        return acc
-      }, attrs)
+      // Accept props as args for programs & geometry
+      if (instance.type === 'program' || instance.type === 'geometry') {
+        const attrs = Object.entries(props).reduce((acc, [key, value]) => {
+          // Don't include non-attributes for geometry
+          if (instance.type === 'geometry' && !(value as OGL.Attribute)?.data) return acc
+          // Include non-pierced props
+          if (!key.includes('-')) acc[key] = value
+          return acc
+        }, filtered[0] ?? {})
 
-      instance.object = new target(gl, propAttrs)
+        instance.object = new target(gl, attrs)
+      } else {
+        instance.object = new target(gl, ...args)
+      }
     } else {
       instance.object = new target(...instance.props.args)
     }
@@ -183,7 +187,7 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
-        if (typeof fiber.ref === 'function') ((fiber as unknown) as any).ref(newInstance.object)
+        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance.object)
         else (fiber.ref as Reconciler.RefObject).current = newInstance.object
       }
     }
