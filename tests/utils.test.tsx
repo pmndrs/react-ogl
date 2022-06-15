@@ -24,7 +24,7 @@ describe('resolve', () => {
 describe('applyProps', () => {
   it('should accept shorthand uniforms', async () => {
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
+    const gl = canvas.getContext('webgl2')! as OGL.OGLRenderingContext
     const program = new OGL.Program(gl, {
       vertex: ' ',
       fragment: ' ',
@@ -43,7 +43,7 @@ describe('applyProps', () => {
 
   it('should convert CSS color names to color uniforms', async () => {
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
+    const gl = canvas.getContext('webgl2')! as OGL.OGLRenderingContext
     const program = new OGL.Program(gl, {
       vertex: ' ',
       fragment: ' ',
@@ -61,7 +61,7 @@ describe('applyProps', () => {
 
   it('should convert arrays into vector uniforms', async () => {
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
+    const gl = canvas.getContext('webgl2')! as OGL.OGLRenderingContext
     const program = new OGL.Program(gl, {
       vertex: ' ',
       fragment: ' ',
@@ -79,7 +79,7 @@ describe('applyProps', () => {
 
   it('should diff & merge uniforms', async () => {
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
+    const gl = canvas.getContext('webgl2')! as OGL.OGLRenderingContext
     const program = new OGL.Program(gl, {
       vertex: ' ',
       fragment: ' ',
@@ -100,7 +100,7 @@ describe('applyProps', () => {
 
   it('should pierce into nested properties', async () => {
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
+    const gl = canvas.getContext('webgl2')! as OGL.OGLRenderingContext
     const program = new OGL.Program(gl, {
       vertex: ' ',
       fragment: ' ',

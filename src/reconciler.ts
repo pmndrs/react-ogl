@@ -364,7 +364,7 @@ export const reconciler = Reconciler({
   },
   unhideInstance(instance: Instance) {
     if (instance.object instanceof OGL.Transform) {
-      instance.object.visible = instance.props.visible ?? true
+      instance.object.visible = (instance.props.visible as boolean) ?? true
     }
   },
   // Configures a callback once finalized and instances are linked up to one another.

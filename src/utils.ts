@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { RESERVED_PROPS, INSTANCE_PROPS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { DPR, EventHandlers, Instance, RootState } from './types'
+import { DPR, EventHandlers, Instance, Interactive, RootState } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -188,15 +188,15 @@ export const createEvents = (state: RootState) => {
     state.mouse.y = -(event.offsetY / state.renderer.height) * 2 + 1
 
     // Filter to interactive meshes
-    const interactive: OGL.Mesh[] = []
-    state.scene.traverse((node: OGL.Mesh) => {
+    const interactive: Interactive[] = []
+    state.scene.traverse((node: OGL.Transform | Interactive) => {
       // Mesh has registered events and a defined volume
-      if (node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if (node instanceof OGL.Mesh && node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
     state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: OGL.Mesh[] = state.raycaster.intersectMeshes(interactive)
+    const intersects: Interactive[] = state.raycaster.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -204,7 +204,7 @@ export const createEvents = (state: RootState) => {
 
     // Trigger events for hovered elements
     for (const object of intersects) {
-      const handlers = object.__handlers as EventHandlers
+      const handlers = object.__handlers
 
       // Bail if object doesn't have handlers (managed externally)
       if (!handlers) continue
@@ -224,8 +224,8 @@ export const createEvents = (state: RootState) => {
 
     // Cleanup stale hover events
     if (isHoverEvent || type === 'onPointerDown') {
-      state.hovered.forEach((object: OGL.Mesh) => {
-        const handlers = object.__handlers as EventHandlers
+      state.hovered.forEach((object) => {
+        const handlers = object.__handlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
           // Reset hover state
@@ -260,7 +260,7 @@ export const Block = ({ set }: { set: React.Dispatch<React.SetStateAction<SetBlo
 /**
  * Generic error boundary. Calls its `set` prop on error.
  */
-export class ErrorBoundary extends React.Component<{ set: React.Dispatch<any> }, { error: boolean }> {
+export class ErrorBoundary extends React.Component<{ set: React.Dispatch<any>, children: React.ReactNode }, { error: boolean }> {
   state = { error: false }
   static getDerivedStateFromError = () => ({ error: true })
   componentDidCatch(error: any) {

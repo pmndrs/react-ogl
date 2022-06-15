@@ -41,7 +41,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "expo-gl": "^11.1.1",
     "jest": "^27.4.7",
-    "ogl": "^0.0.81",
+    "ogl": "^0.0.93",
     "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -55,8 +55,8 @@
   "dependencies": {
     "@expo/browser-polyfill": "^1.0.0",
     "@types/react-reconciler": "^0.26.4",
+    "@types/ogl": "npm:ogl-types@^0.0.93",
     "@types/webxr": "^0.4.0",
-    "ogl-typescript": "^0.1.40",
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
     "suspend-react": "^0.0.8",
