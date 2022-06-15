@@ -98,13 +98,13 @@ const commitInstance = (instance: Instance) => {
   if (instance.type !== 'primitive' && !instance.object) {
     const name = toPascalCase(instance.type)
     const target = catalogue[name] ?? OGL[name]
+    const { args, ...props } = instance.props
 
     // Pass internal state to elements which depend on it.
     // This lets them be immutable upon creation and use props
     const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
     if (isGLInstance) {
       const { gl } = instance.root.getState()
-      const { args, ...props } = instance.props
       const filtered = args.filter((arg) => arg !== gl)
 
       // Accept props as args for programs & geometry
@@ -119,10 +119,10 @@ const commitInstance = (instance: Instance) => {
 
         instance.object = new target(gl, attrs)
       } else {
-        instance.object = new target(gl, ...args)
+        instance.object = new target(gl, ...filtered)
       }
     } else {
-      instance.object = new target(...instance.props.args)
+      instance.object = new target(...args)
     }
   }
 
