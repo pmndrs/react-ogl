@@ -45,7 +45,7 @@ export const render = (
               canvas: target,
             })
       if (config.renderer && typeof config.renderer !== 'function')
-        applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
+        applyProps((renderer as unknown) as Instance, config.renderer as InstanceProps)
 
       renderer.dpr = calculateDpr(dpr)
 

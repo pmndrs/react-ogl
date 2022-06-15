@@ -72,7 +72,7 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
         events,
         onCreated(state) {
           // Flush frame for native
-          const gl = state.gl as unknown as ExpoWebGLRenderingContext | WebGL2RenderingContext
+          const gl = (state.gl as unknown) as ExpoWebGLRenderingContext | WebGL2RenderingContext
           if ('endFrameEXP' in gl) {
             const renderFrame = state.renderer.render.bind(state.renderer)
             state.renderer.render = (...args) => {

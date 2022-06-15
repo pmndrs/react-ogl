@@ -260,7 +260,10 @@ export const Block = ({ set }: { set: React.Dispatch<React.SetStateAction<SetBlo
 /**
  * Generic error boundary. Calls its `set` prop on error.
  */
-export class ErrorBoundary extends React.Component<{ set: React.Dispatch<any>, children: React.ReactNode }, { error: boolean }> {
+export class ErrorBoundary extends React.Component<
+  { set: React.Dispatch<any>; children: React.ReactNode },
+  { error: boolean }
+> {
   state = { error: false }
   static getDerivedStateFromError = () => ({ error: true })
   componentDidCatch(error: any) {

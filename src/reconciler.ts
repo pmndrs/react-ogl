@@ -110,7 +110,7 @@ const commitInstance = (instance: Instance) => {
       // Accept props as args
       const propAttrs = Object.entries(props).reduce((acc, [key, value]) => {
         // Don't include non-attributes for geometry
-        if (instance.type === 'geometry' && !(value as OGL.Attribute).data) return acc
+        if (instance.type === 'geometry' && !(value as OGL.Attribute)?.data) return acc
         // Include non-pierced props
         if (!key.includes('-')) acc[key] = value
         return acc
@@ -183,7 +183,7 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
-        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance.object)
+        if (typeof fiber.ref === 'function') ((fiber as unknown) as any).ref(newInstance.object)
         else (fiber.ref as Reconciler.RefObject).current = newInstance.object
       }
     }

@@ -30,7 +30,7 @@ export function useStore() {
  * Returns the internal OGL state.
  */
 export function useOGL<T = RootState>(
-  selector: StateSelector<RootState, T> = (state) => state as unknown as T,
+  selector: StateSelector<RootState, T> = (state) => (state as unknown) as T,
   equalityFn?: EqualityChecker<T>,
 ) {
   return useStore()(selector, equalityFn)
