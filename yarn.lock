@@ -1642,6 +1642,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.13.tgz#5ed7ed7c662948335fcad6c412bb42d99ea754e3"
   integrity sha512-Y86MAxASe25hNzlDbsviXl8jQHb0RDvKt4c40ZJQ1Don0AAL0STLZSs4N+6gLEO55pedy7r2cLwS+ZDxPm/2Bw==
 
+"@types/ogl@npm:ogl-types@^0.0.93":
+  version "0.0.93"
+  resolved "https://registry.yarnpkg.com/ogl-types/-/ogl-types-0.0.93.tgz#6c438ad6e2565914d22ceac746604f538f277e06"
+  integrity sha512-QC4EFD8xJavYWQG/rjXoXuwrRmgsqRJvBjFmstogAH0lUEx03oY7doIm8C/9Nj9MucJdIPfNvmZ0RwTsshcrGw==
+
 "@types/prettier@^2.1.5":
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.4.3.tgz#a3c65525b91fca7da00ab1a3ac2b5a2a4afbffbf"
@@ -5741,15 +5746,10 @@ object.values@^1.1.5:
     define-properties "^1.1.3"
     es-abstract "^1.19.1"
 
-ogl-typescript@^0.1.40:
-  version "0.1.40"
-  resolved "https://registry.yarnpkg.com/ogl-typescript/-/ogl-typescript-0.1.40.tgz#511f99f7e924e428552cc8203a1fb92efe807abc"
-  integrity sha512-7lpT8u35jd9W7Q48enrcCEL4H0x4co6pn5t6rXZgQN7UT39mcdzRsSr4ucZDOvfwKkUT+UvH2zw83/9mT59bFQ==
-
-ogl@^0.0.81:
-  version "0.0.81"
-  resolved "https://registry.yarnpkg.com/ogl/-/ogl-0.0.81.tgz#1f1ec32ecb60d4a7e264fc9dec9adfb0424573ec"
-  integrity sha512-w7aEUXgqaFfoiflMWdofWEGa7mgfixVJ/V2BCn7vT1O7cKiwhjpCvH77NkuV8PsN/UebxF/EJPUAvDRcdACLlw==
+ogl@^0.0.93:
+  version "0.0.93"
+  resolved "https://registry.yarnpkg.com/ogl/-/ogl-0.0.93.tgz#9deb437ac292364d0c6dd97ee016c430dc3a1793"
+  integrity sha512-HmkC2s7Ew53kQc3DpGo69M1H0rJXiz/oOTE+gJUFBX68SQcujKO/5NzJdI680edAHOYSpBVQwW/6E/Dk2+nFRQ==
 
 on-finished@~2.3.0:
   version "2.3.0"

@@ -1,20 +1,12 @@
 /// <reference types="webxr" />
 import type { Fiber as ReconcilerFiber } from 'react-reconciler'
-import type * as OGL from 'ogl-typescript'
-import type { MutableRefObject } from 'react'
+import type * as OGL from 'ogl'
+import type * as React from 'react'
 import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
-import { RENDER_MODES } from './constants'
+import type { RENDER_MODES } from './constants'
 
-export interface OGLEvent<TEvent extends Event> {
+export interface OGLEvent<TEvent extends Event> extends Partial<OGL.RaycastHit> {
   nativeEvent: TEvent
-  localPoint: OGL.Vec3
-  point: OGL.Vec3
-  distance: number
-  faceNormal?: OGL.Vec3
-  localFaceNormal?: OGL.Vec3
-  localNormal?: OGL.Vec3
-  normal?: OGL.Vec3
-  uv?: OGL.Vec2
 }
 
 export interface EventHandlers {
@@ -84,6 +76,8 @@ export type Frameloop = 'always' | 'never'
 
 export type Subscription = (state: RootState, time: number, frame?: XRFrame) => any
 
+export type Interactive = OGL.Mesh & { __handlers?: Partial<EventHandlers> }
+
 export interface RootState {
   set: SetState<RootState>
   get: GetState<RootState>
@@ -97,12 +91,12 @@ export interface RootState {
   camera: OGL.Camera
   priority: number
   subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: MutableRefObject<Subscription>, renderPriority?: number) => void
+  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
   events?: EventManager
   mouse?: OGL.Vec2
   raycaster?: OGL.Raycast
-  hovered?: Map<number, OGL.Mesh>
+  hovered?: Map<number, Interactive>
   [key: string]: any
 }
 
@@ -178,7 +172,7 @@ export type Node<T, P> = WithOGLProps<
     dispose?: null
     attach?: Attach
     children?: React.ReactNode
-    ref?: React.Ref<P>
+    ref?: React.Ref<T>
     key?: React.Key
   } & (T extends OGL.Mesh ? EventHandlers : {})
 >
@@ -216,7 +210,7 @@ declare global {
       cylinder: Node<OGL.Cylinder, typeof OGL.Cylinder>
       triangle: Node<OGL.Triangle, typeof OGL.Triangle>
       torus: Node<OGL.Torus, typeof OGL.Torus>
-      // orbit: Node<OGL.Orbit, typeof OGL.Orbit>
+      orbit: Node<OGL.Orbit, typeof OGL.Orbit>
       raycast: Node<OGL.Raycast, typeof OGL.Raycast>
       curve: Node<OGL.Curve, typeof OGL.Curve>
       post: Node<OGL.Post, typeof OGL.Post>
@@ -232,7 +226,7 @@ declare global {
       textureLoader: Node<OGL.TextureLoader, typeof OGL.TextureLoader>
       gLTFLoader: Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
       gLTFSkin: Node<OGL.GLTFSkin, typeof OGL.GLTFSkin>
-      // basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
+      basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
     }
   }
 }

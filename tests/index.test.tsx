@@ -66,7 +66,7 @@ describe('renderer', () => {
       )
     })
 
-    expect(Object.keys(mesh.current.geometry.attributes)).toStrictEqual(['test'])
+    expect(Object.keys(mesh.current!.geometry.attributes)).toStrictEqual(['test'])
   })
 
   it('should handle attach', async () => {
@@ -127,8 +127,8 @@ describe('renderer', () => {
 
     const [mesh] = state.scene.children as OGL.Mesh[]
 
-    expect(mesh.program.vertex).toBe(vertex)
-    expect(mesh.program.fragment).toBe(fragment)
+    expect((mesh.program as any).vertex).toBe(vertex)
+    expect((mesh.program as any).fragment).toBe(fragment)
   })
 
   it('should update program uniforms reactively', async () => {
@@ -142,10 +142,10 @@ describe('renderer', () => {
     )
 
     await reconciler.act(async () => render(<Test value={false} />))
-    expect(mesh.current.program.uniforms.uniform.value).toBe(false)
+    expect(mesh.current!.program.uniforms.uniform.value).toBe(false)
 
     await reconciler.act(async () => render(<Test value={true} />))
-    expect(mesh.current.program.uniforms.uniform.value).toBe(true)
+    expect(mesh.current!.program.uniforms.uniform.value).toBe(true)
   })
 
   it('should accept shorthand props as uniforms', async () => {
@@ -163,7 +163,7 @@ describe('renderer', () => {
       )
     })
 
-    const { color, vector, textures } = mesh.current.program.uniforms
+    const { color, vector, textures } = mesh.current!.program.uniforms
 
     expect(color.value).toBeInstanceOf(OGL.Color)
     expect(vector.value).toBeInstanceOf(OGL.Vec3)
@@ -187,8 +187,8 @@ describe('renderer', () => {
       )
     })
 
-    expect(mesh.current.geometry.attributes.position).toBeDefined()
-    expect(mesh.current.geometry.attributes.uv).toBeDefined()
+    expect(mesh.current!.geometry.attributes.position).toBeDefined()
+    expect(mesh.current!.geometry.attributes.uv).toBeDefined()
   })
 
   it('should bind & unbind events', async () => {
@@ -257,7 +257,7 @@ describe('renderer', () => {
 
     expect(state.scene.children.length).toBe(0)
     expect(object.children.length).not.toBe(0)
-    expect(mesh.current.parent).toBe(object)
+    expect(mesh.current!.parent).toBe(object)
   })
 
   it('should update attach reactively', async () => {
@@ -274,15 +274,15 @@ describe('renderer', () => {
     )
 
     await reconciler.act(async () => render(<Test first mono />))
-    expect(mesh.current.program).toBe(program1.current)
+    expect(mesh.current!.program).toBe(program1.current)
 
     await reconciler.act(async () => render(<Test mono />, { frameloop: 'never' }))
-    expect(mesh.current.program).toBe(undefined)
+    expect(mesh.current!.program).toBe(undefined)
 
     await reconciler.act(async () => render(<Test first />))
-    expect(mesh.current.program).toBe(program1.current)
+    expect(mesh.current!.program).toBe(program1.current)
 
     await reconciler.act(async () => render(<Test />))
-    expect(mesh.current.program).toBe(program2.current)
+    expect(mesh.current!.program).toBe(program2.current)
   })
 })
