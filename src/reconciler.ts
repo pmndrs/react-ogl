@@ -146,7 +146,7 @@ const commitInstance = (instance: Instance) => {
  */
 const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: Fiber) => {
   // Create a new instance
-  const newInstance = createInstance(type, props, root)
+  const newInstance = createInstance(type, props, instance.root)
 
   // Replace instance in scene-graph
   const parent = instance.parent
