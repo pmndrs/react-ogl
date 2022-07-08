@@ -23,7 +23,7 @@ export const calculateDpr = (dpr: DPR) =>
 /**
  * Resolves a potentially pierced key type against an object.
  */
-export const resolve = (root: any, key: string) => {
+export function resolve(root: any, key: string) {
   let target = root[key]
   if (!key.includes('-')) return { root, key, target }
 
@@ -44,7 +44,7 @@ const INDEX_REGEX = /-\d+$/
 /**
  * Attaches an instance to a parent via its `attach` prop.
  */
-export const attach = (parent: Instance, child: Instance) => {
+export function attach(parent: Instance, child: Instance) {
   if (typeof child.props.attach === 'string') {
     // If attaching into an array (foo-0), create one
     if (INDEX_REGEX.test(child.props.attach)) {
@@ -65,7 +65,7 @@ export const attach = (parent: Instance, child: Instance) => {
 /**
  * Removes an instance from a parent via its `attach` prop.
  */
-export const detach = (parent: Instance, child: Instance) => {
+export function detach(parent: Instance, child: Instance) {
   if (typeof child.props.attach === 'string') {
     // Reset parent key if last attached
     if (parent.object.__currentAttach === child.object.__currentAttach) {
@@ -84,7 +84,7 @@ export const detach = (parent: Instance, child: Instance) => {
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export const applyProps = (object: any, newProps: any, oldProps?: any) => {
+export function applyProps(object: any, newProps: any, oldProps?: any) {
   // Mutate our OGL element
   for (const prop in newProps) {
     // Don't mutate reserved keys
@@ -155,7 +155,7 @@ export interface ObjectMap {
 /**
  * Collects nodes and programs from a Mesh.
  */
-export const buildGraph = (object: OGL.Transform) => {
+export function buildGraph(object: OGL.Transform) {
   const data: ObjectMap = { nodes: {}, programs: {} }
 
   if (object) {
@@ -176,7 +176,7 @@ export const buildGraph = (object: OGL.Transform) => {
 /**
  * Creates event handlers, returning an event handler method.
  */
-export const createEvents = (state: RootState) => {
+export function createEvents(state: RootState) {
   // Init event state
   state.mouse = new OGL.Vec2()
   state.raycaster = new OGL.Raycast(state.gl)
@@ -248,7 +248,7 @@ export type SetBlock = false | Promise<null> | null
 /**
  * Used to block rendering via its `set` prop. Useful for suspenseful effects.
  */
-export const Block = ({ set }: { set: React.Dispatch<React.SetStateAction<SetBlock>> }) => {
+export function Block({ set }: { set: React.Dispatch<React.SetStateAction<SetBlock>> }) {
   useIsomorphicLayoutEffect(() => {
     set(new Promise(() => null))
     return () => set(false)
