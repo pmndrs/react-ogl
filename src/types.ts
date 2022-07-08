@@ -22,7 +22,7 @@ export type Attach = string | ((parent: any, self: any) => () => void)
 
 export type Fiber = RootStore & ReconcilerFiber
 
-export type Catalogue = Record<keyof OGLElements, { new (...args: any): any }>
+export type Catalogue = Record<Capitalize<keyof OGLElements>, { new (...args: any): any }>
 
 export type InstanceProps = {
   [key: string]: unknown
