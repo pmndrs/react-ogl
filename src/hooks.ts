@@ -65,7 +65,7 @@ export function useFrame(callback: Subscription, renderPriority = 0) {
  * Loads assets suspensefully.
  */
 export const useLoader = (loader: any, input: string | string[], extensions?: (loader: any) => void) => {
-  const { gl } = useOGL()
+  const gl = useOGL((state) => state.gl)
 
   // Put keys into an array so their contents are spread and cached with suspend
   const keys = Array.isArray(input) ? input : [input]
