@@ -55,7 +55,7 @@
   "dependencies": {
     "@expo/browser-polyfill": "^1.0.0",
     "@types/react-reconciler": "^0.26.4",
-    "@types/ogl": "npm:ogl-types@^0.0.93",
+    "@types/ogl": "npm:ogl-types@^0.0.95",
     "@types/webxr": "^0.4.0",
     "react-reconciler": "^0.26.2",
     "react-use-measure": "^2.1.1",
@@ -64,7 +64,7 @@
   },
   "peerDependencies": {
     "expo-gl": ">=11.0",
-    "ogl": ">=0.0.72",
+    "ogl": ">=0.0.95",
     "react": ">=17.0",
     "react-dom": ">=17.0",
     "react-native": ">=0.64"

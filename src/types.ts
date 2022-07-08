@@ -228,6 +228,11 @@ export interface OGLElements {
   gLTFLoader: Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
   gLTFSkin: Node<OGL.GLTFSkin, typeof OGL.GLTFSkin>
   basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
+  axesHelper: Node<OGL.AxesHelper, typeof OGL.AxesHelper>
+  faceNormalsHelper: Node<OGL.FaceNormalsHelper, typeof OGL.FaceNormalsHelper>
+  gridHelper: Node<OGL.GridHelper, typeof OGL.GridHelper>
+  vertexNormalsHelper: Node<OGL.VertexNormalsHelper, typeof OGL.VertexNormalsHelper>
+  wireMesh: Node<OGL.WireMesh, typeof OGL.WireMesh>
 }
 
 declare global {

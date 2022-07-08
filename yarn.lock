@@ -1642,10 +1642,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.13.tgz#5ed7ed7c662948335fcad6c412bb42d99ea754e3"
   integrity sha512-Y86MAxASe25hNzlDbsviXl8jQHb0RDvKt4c40ZJQ1Don0AAL0STLZSs4N+6gLEO55pedy7r2cLwS+ZDxPm/2Bw==
 
-"@types/ogl@npm:ogl-types@^0.0.93":
-  version "0.0.93"
-  resolved "https://registry.yarnpkg.com/ogl-types/-/ogl-types-0.0.93.tgz#6c438ad6e2565914d22ceac746604f538f277e06"
-  integrity sha512-QC4EFD8xJavYWQG/rjXoXuwrRmgsqRJvBjFmstogAH0lUEx03oY7doIm8C/9Nj9MucJdIPfNvmZ0RwTsshcrGw==
+"@types/ogl@npm:ogl-types@^0.0.95":
+  version "0.0.95"
+  resolved "https://registry.yarnpkg.com/ogl-types/-/ogl-types-0.0.95.tgz#773d9a204f1ae550a041dd8f1eb3a720369792b6"
+  integrity sha512-7W5qKOitQtND4h8AkT/S0rEGPUffuOdImiHppjnO6NU/7YVasdQNJt7sUcmUYralELlmBeFo45gPSFAgqqnb9A==
 
 "@types/prettier@^2.1.5":
   version "2.4.3"
