@@ -3,10 +3,10 @@ import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
 import { RESERVED_PROPS } from './constants'
-import { Fiber, Instance, InstanceProps } from './types'
+import { Catalogue, Fiber, Instance, InstanceProps, OGLElements } from './types'
 
 // Custom objects that extend the OGL namespace
-const catalogue: { [name: string]: any } = {}
+const catalogue = { ...OGL } as unknown as Catalogue
 
 // Effectful catalogue elements that require a `WebGLRenderingContext`.
 const catalogueGL: any[] = [
@@ -28,26 +28,26 @@ const catalogueGL: any[] = [
 ]
 
 /**
- * Extends the OGL namespace, accepting an object of keys pointing to external classes.
- * `passGL` will flag the element to receive a `WebGLRenderingContext` on creation.
+ * Extends the OGL catalogue, accepting an object of keys pointing to external classes.
+ * `gl` will flag `objects` to receive a `WebGLRenderingContext` on creation.
  */
-export const extend = (objects: typeof catalogue, passGL = false) => {
+export function extend(objects: Partial<Catalogue>, gl = false) {
   for (const key in objects) {
     const value = objects[key]
     catalogue[key] = value
-    if (passGL) catalogueGL.push(value)
+    if (gl) catalogueGL.push(value)
   }
 }
 
 /**
  * Creates an OGL element from a React node.
  */
-const createInstance = (type: string, { object = null, args = [], ...props }: InstanceProps, root: Fiber) => {
+function createInstance(type: keyof OGLElements, { object = null, args = [], ...props }: InstanceProps, root: Fiber) {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type)
 
-  // Get class from extended OGL namespace
-  const target = catalogue[name] ?? OGL[name]
+  // Get class from extended OGL catalogue
+  const target = catalogue[name]
 
   // Validate OGL elements
   if (type !== 'primitive' && !target) throw `${type} is not a part of the OGL catalogue! Did you forget to extend?`
@@ -79,7 +79,7 @@ const appendChild = (parent: Instance, child: Instance) => {
 /**
  * Removes elements from scene and disposes of them.
  */
-const removeChild = (parent: Instance, child: Instance) => {
+function removeChild(parent: Instance, child: Instance) {
   child.parent = null
   const childIndex = parent.children.indexOf(child)
   if (childIndex !== -1) parent.children.splice(childIndex, 1)
@@ -91,13 +91,13 @@ const removeChild = (parent: Instance, child: Instance) => {
   child.object = null
 }
 
-const commitInstance = (instance: Instance) => {
+function commitInstance(instance: Instance) {
   // Don't handle commit for containers
   if (!instance.parent) return
 
   if (instance.type !== 'primitive' && !instance.object) {
     const name = toPascalCase(instance.type)
-    const target = catalogue[name] ?? OGL[name]
+    const target = catalogue[name]
     const { args, ...props } = instance.props
 
     // Pass internal state to elements which depend on it.
@@ -151,7 +151,7 @@ const commitInstance = (instance: Instance) => {
 /**
  * Switches instance to a new one, moving over children.
  */
-const switchInstance = (instance: Instance, type: string, props: InstanceProps, root: Fiber) => {
+function switchInstance(instance: Instance, type: keyof OGLElements, props: InstanceProps, root: Fiber) {
   // Create a new instance
   const newInstance = createInstance(type, props, instance.root)
 
@@ -199,7 +199,7 @@ const switchInstance = (instance: Instance, type: string, props: InstanceProps, 
 /**
  * Shallow checks objects.
  */
-const checkShallow = (a: any, b: any) => {
+function checkShallow(a: any, b: any) {
   // If comparing arrays, shallow compare
   if (Array.isArray(a)) {
     // Check if types match
@@ -221,7 +221,7 @@ const checkShallow = (a: any, b: any) => {
 /**
  * Prepares a set of changes to be applied to the instance.
  */
-const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) => {
+function diffProps(instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) {
   const changedProps: InstanceProps = {}
 
   // Sort through props
@@ -243,7 +243,7 @@ const diffProps = (instance: Instance, newProps: InstanceProps, oldProps: Instan
 /**
  * Inserts an instance between instances of a ReactNode.
  */
-const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) => {
+function insertBefore(parent: Instance, child: Instance, beforeChild: Instance) {
   if (!child) return
 
   child.parent = parent
@@ -253,28 +253,62 @@ const insertBefore = (parent: Instance, child: Instance, beforeChild: Instance) 
 /**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
-export const reconciler = Reconciler({
+export const reconciler = Reconciler<
+  // Instance type
+  keyof OGLElements,
+  // Instance props
+  InstanceProps,
+  // Fiber container
+  Fiber,
+  // Normal instance
+  Instance,
+  // Text instance
+  never,
+  // Suspense instance
+  Instance,
+  // Hydratable instance
+  never,
+  // Public (ref) instance
+  Instance['object'],
+  // Host context
+  null,
+  // applyProps diff sets
+  null | [boolean] | [boolean, InstanceProps],
+  // Hydration child set
+  never,
+  // Timeout id handle
+  typeof setTimeout | undefined,
+  // NoTimeout
+  -1
+>({
   // Configure renderer for tree-like mutation and interop w/react-dom
   isPrimaryRenderer: false,
   supportsMutation: true,
   supportsHydration: false,
   supportsPersistence: false,
   // Add SSR time fallbacks
-  now: typeof performance !== 'undefined' ? performance.now : Date.now,
-  scheduleTimeout: typeof setTimeout !== 'undefined' ? setTimeout : undefined,
-  cancelTimeout: typeof clearTimeout !== 'undefined' ? clearTimeout : undefined,
+  scheduleTimeout: () => (typeof setTimeout !== 'undefined' ? setTimeout : undefined),
+  cancelTimeout: () => (typeof clearTimeout !== 'undefined' ? clearTimeout : undefined),
   noTimeout: -1,
+  now: typeof performance !== 'undefined' ? performance.now : Date.now,
   // Text isn't supported so we skip it
   shouldSetTextContent: () => false,
-  createTextInstance: () => console.warn('Text is not allowed in the OGL scene-graph!'),
+  resetTextContent: () => {},
+  createTextInstance() {
+    throw new Error('Text is not allowed in the OGL scene-graph!')
+  },
+  hideTextInstance() {
+    throw new Error('Text is not allowed in the OGL scene-graph!')
+  },
+  unhideTextInstance: () => {},
   // Modifies the ref to return the instance object itself.
-  getPublicInstance: (instance: Instance) => instance.object,
+  getPublicInstance: (instance) => instance.object,
   // We can optionally access different host contexts on instance creation/update.
   // Instances' data structures are self-sufficient, so we don't make use of this
   getRootHostContext: () => null,
-  getChildHostContext: (parentHostContext: any) => parentHostContext,
+  getChildHostContext: (parentHostContext) => parentHostContext,
   // We can optionally mutate portal containers here, but we do that in createPortal instead from state
-  preparePortalMount: (container: any) => container,
+  preparePortalMount: (container) => container,
   // This lets us store stuff at the container-level before/after React mutates our OGL elements.
   // Elements are mutated in isolation, so we don't do anything here.
   prepareForCommit: () => null,
@@ -297,8 +331,7 @@ export const reconciler = Reconciler({
   insertInContainerBefore: () => {},
   // Used to calculate updates in the render phase or commitUpdate.
   // Greatly improves performance by reducing paint to rapid mutations.
-  // Returns [shouldReconstruct: boolean, changedProps: Record<string, any>]
-  prepareUpdate(instance: Instance, type: string, oldProps: InstanceProps, newProps: InstanceProps) {
+  prepareUpdate(instance, type, oldProps, newProps) {
     // Element is a primitive. We must recreate it when its object prop is changed
     if (instance.type === 'primitive' && oldProps.object !== newProps.object) return [true]
 
@@ -327,14 +360,7 @@ export const reconciler = Reconciler({
     return null
   },
   // This is where we mutate OGL elements in the render phase
-  commitUpdate(
-    instance: Instance,
-    [reconstruct, changedProps]: [boolean, InstanceProps],
-    type: string,
-    oldProps: InstanceProps,
-    newProps: InstanceProps,
-    root: Fiber,
-  ) {
+  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps, root) {
     // If flagged for recreation, swap to a new instance.
     if (reconstruct) return switchInstance(instance, type, newProps, root)
 
@@ -353,12 +379,12 @@ export const reconciler = Reconciler({
   },
   // Methods to toggle instance visibility on demand.
   // React uses this with React.Suspense to display fallback content
-  hideInstance(instance: Instance) {
+  hideInstance(instance) {
     if (instance.object instanceof OGL.Transform) {
       instance.object.visible = false
     }
   },
-  unhideInstance(instance: Instance) {
+  unhideInstance(instance) {
     if (instance.object instanceof OGL.Transform) {
       instance.object.visible = (instance.props.visible as boolean) ?? true
     }
@@ -373,7 +399,7 @@ export const reconciler = Reconciler({
 // Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
 reconciler.injectIntoDevTools({
-  findFiberByHostInstance: (instance: Instance) => instance.root,
+  findFiberByHostInstance: (instance) => instance.root,
   bundleType: isProd ? 0 : 1,
   version: React.version,
   rendererPackageName: 'react-ogl',

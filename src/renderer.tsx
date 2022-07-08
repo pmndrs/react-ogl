@@ -1,20 +1,20 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { Fiber, ReactPortal } from 'react-reconciler'
+import { ReactPortal } from 'react-reconciler'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { RENDER_MODES } from './constants'
 import { OGLContext, useStore } from './hooks'
-import { Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
+import { Fiber, Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps, calculateDpr } from './utils'
 
 // Store roots here since we can render to multiple targets
-const roots = new Map<HTMLCanvasElement, { fiber: Fiber; store: RootStore }>()
+const roots = new Map<HTMLCanvasElement, { container: any; store: RootStore }>()
 
 /**
  * Renders React elements into OGL elements.
  */
-export const render = (
+export function render(
   element: React.ReactNode,
   target: HTMLCanvasElement,
   {
@@ -26,7 +26,7 @@ export const render = (
     events,
     ...config
   }: RenderProps = {},
-) => {
+) {
   // Check for existing root, create on first run
   let root = roots.get(target)
   if (!root) {
@@ -148,11 +148,11 @@ export const render = (
     store.subscribe(onResize)
     onResize(state)
 
-    // Create root fiber
-    const fiber = reconciler.createContainer(store, RENDER_MODES[mode] ?? RENDER_MODES['blocking'], false, null)
+    // Create root container
+    const container = reconciler.createContainer(store as Fiber, RENDER_MODES[mode], false, null)
 
     // Set root
-    root = { fiber, store }
+    root = { container, store }
     roots.set(target, root)
   }
 
@@ -162,12 +162,12 @@ export const render = (
   if (state.frameloop !== frameloop) state.set(() => ({ frameloop }))
   if (state.orthographic !== orthographic) state.set(() => ({ orthographic }))
 
-  // Update fiber
+  // Update contanier
   reconciler.updateContainer(
     <OGLContext.Provider value={root.store}>
       <primitive object={state.scene}>{element}</primitive>
     </OGLContext.Provider>,
-    root.fiber,
+    root.container,
     null,
     () => undefined,
   )
@@ -178,12 +178,12 @@ export const render = (
 /**
  * Removes and cleans up internals on unmount.
  */
-export const unmountComponentAtNode = (target: HTMLCanvasElement) => {
+export function unmountComponentAtNode(target: HTMLCanvasElement) {
   const root = roots.get(target)
   if (!root) return
 
   // Clear container
-  reconciler.updateContainer(null, root.fiber, null, () => {
+  reconciler.updateContainer(null, root.container, null, () => {
     // Delete root
     roots.delete(target)
 
@@ -220,7 +220,7 @@ function PortalRoot({ children, target, container }: PortalRootProps) {
 /**
  * Portals into a remote OGL element.
  */
-export const createPortal = (children: React.ReactElement, target: OGL.Transform): ReactPortal => {
+export function createPortal(children: React.ReactElement, target: OGL.Transform): ReactPortal {
   const container = {}
   return reconciler.createPortal(
     <PortalRoot target={target} container={container}>

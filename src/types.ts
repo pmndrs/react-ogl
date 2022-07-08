@@ -20,7 +20,9 @@ export interface EventHandlers {
 
 export type Attach = string | ((parent: any, self: any) => () => void)
 
-export type Fiber = ReconcilerFiber & RootStore
+export type Fiber = RootStore & ReconcilerFiber
+
+export type Catalogue = Record<keyof OGLElements, { new (...args: any): any }>
 
 export type InstanceProps = {
   [key: string]: unknown
@@ -38,7 +40,7 @@ export interface Instance {
   root: Fiber
   parent: Instance | null
   children: Instance[]
-  type: string
+  type: keyof OGLElements
   props: InstanceProps
   object: any | null
 }
@@ -178,56 +180,58 @@ export type Node<T, P> = WithOGLProps<
   } & (T extends OGL.Mesh ? EventHandlers : {})
 >
 
+export interface OGLElements {
+  // primitive
+  primitive: Omit<Node<{}, {}>, 'args'> & { object: any }
+
+  // Core
+  geometry: Node<OGL.Geometry, typeof OGL.Geometry>
+  program: Node<OGL.Program, typeof OGL.Program>
+  renderer: Node<OGL.Renderer, typeof OGL.Renderer>
+  camera: Node<OGL.Camera, typeof OGL.Camera>
+  transform: Node<OGL.Transform, typeof OGL.Transform>
+  mesh: Node<OGL.Mesh, typeof OGL.Mesh>
+  texture: Node<OGL.Texture, typeof OGL.Texture>
+  renderTarget: Node<OGL.RenderTarget, typeof OGL.RenderTarget>
+
+  // Math
+  color: Node<OGL.Color, typeof OGL.Color>
+  euler: Node<OGL.Euler, typeof OGL.Euler>
+  mat3: Node<OGL.Mat3, typeof OGL.Mat3>
+  mat4: Node<OGL.Mat4, typeof OGL.Mat4>
+  quat: Node<OGL.Quat, typeof OGL.Quat>
+  vec2: Node<OGL.Vec2, typeof OGL.Vec2>
+  vec3: Node<OGL.Vec3, typeof OGL.Vec3>
+  vec4: Node<OGL.Vec4, typeof OGL.Vec4>
+
+  // Extra
+  plane: Node<OGL.Plane, typeof OGL.Plane>
+  box: Node<OGL.Box, typeof OGL.Box>
+  sphere: Node<OGL.Sphere, typeof OGL.Sphere>
+  cylinder: Node<OGL.Cylinder, typeof OGL.Cylinder>
+  triangle: Node<OGL.Triangle, typeof OGL.Triangle>
+  torus: Node<OGL.Torus, typeof OGL.Torus>
+  orbit: Node<OGL.Orbit, typeof OGL.Orbit>
+  raycast: Node<OGL.Raycast, typeof OGL.Raycast>
+  curve: Node<OGL.Curve, typeof OGL.Curve>
+  post: Node<OGL.Post, typeof OGL.Post>
+  skin: Node<OGL.Skin, typeof OGL.Skin>
+  animation: Node<OGL.Animation, typeof OGL.Animation>
+  text: Node<OGL.Text, typeof OGL.Text>
+  normalProgram: Node<OGL.Program, typeof OGL.Program>
+  flowmap: Node<OGL.Flowmap, typeof OGL.Flowmap>
+  gPGPU: Node<OGL.GPGPU, typeof OGL.GPGPU>
+  polyline: Node<OGL.Polyline, typeof OGL.Polyline>
+  shadow: Node<OGL.Shadow, typeof OGL.Shadow>
+  kTXTexture: Node<OGL.KTXTexture, typeof OGL.KTXTexture>
+  textureLoader: Node<OGL.TextureLoader, typeof OGL.TextureLoader>
+  gLTFLoader: Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
+  gLTFSkin: Node<OGL.GLTFSkin, typeof OGL.GLTFSkin>
+  basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
+}
+
 declare global {
   namespace JSX {
-    interface IntrinsicElements {
-      // primitive
-      primitive: Omit<Node<{}, {}>, 'args'> & { object: any }
-
-      // Core
-      geometry: Node<OGL.Geometry, typeof OGL.Geometry>
-      program: Node<OGL.Program, typeof OGL.Program>
-      renderer: Node<OGL.Renderer, typeof OGL.Renderer>
-      camera: Node<OGL.Camera, typeof OGL.Camera>
-      transform: Node<OGL.Transform, typeof OGL.Transform>
-      mesh: Node<OGL.Mesh, typeof OGL.Mesh>
-      texture: Node<OGL.Texture, typeof OGL.Texture>
-      renderTarget: Node<OGL.RenderTarget, typeof OGL.RenderTarget>
-
-      // Math
-      color: Node<OGL.Color, typeof OGL.Color>
-      euler: Node<OGL.Euler, typeof OGL.Euler>
-      mat3: Node<OGL.Mat3, typeof OGL.Mat3>
-      mat4: Node<OGL.Mat4, typeof OGL.Mat4>
-      quat: Node<OGL.Quat, typeof OGL.Quat>
-      vec2: Node<OGL.Vec2, typeof OGL.Vec2>
-      vec3: Node<OGL.Vec3, typeof OGL.Vec3>
-      vec4: Node<OGL.Vec4, typeof OGL.Vec4>
-
-      // Extra
-      plane: Node<OGL.Plane, typeof OGL.Plane>
-      box: Node<OGL.Box, typeof OGL.Box>
-      sphere: Node<OGL.Sphere, typeof OGL.Sphere>
-      cylinder: Node<OGL.Cylinder, typeof OGL.Cylinder>
-      triangle: Node<OGL.Triangle, typeof OGL.Triangle>
-      torus: Node<OGL.Torus, typeof OGL.Torus>
-      orbit: Node<OGL.Orbit, typeof OGL.Orbit>
-      raycast: Node<OGL.Raycast, typeof OGL.Raycast>
-      curve: Node<OGL.Curve, typeof OGL.Curve>
-      post: Node<OGL.Post, typeof OGL.Post>
-      skin: Node<OGL.Skin, typeof OGL.Skin>
-      animation: Node<OGL.Animation, typeof OGL.Animation>
-      // text: Node<OGL.Text, typeof OGL.Text>
-      normalProgram: Node<OGL.Program, typeof OGL.Program>
-      flowmap: Node<OGL.Flowmap, typeof OGL.Flowmap>
-      gPGPU: Node<OGL.GPGPU, typeof OGL.GPGPU>
-      // polyline: Node<OGL.Polyline, typeof OGL.Polyline>
-      shadow: Node<OGL.Shadow, typeof OGL.Shadow>
-      kTXTexture: Node<OGL.KTXTexture, typeof OGL.KTXTexture>
-      textureLoader: Node<OGL.TextureLoader, typeof OGL.TextureLoader>
-      gLTFLoader: Node<OGL.GLTFLoader, typeof OGL.GLTFLoader>
-      gLTFSkin: Node<OGL.GLTFSkin, typeof OGL.GLTFSkin>
-      basisManager: Node<OGL.BasisManager, typeof OGL.BasisManager>
-    }
+    interface IntrinsicElements extends OGLElements {}
   }
 }
