@@ -5,28 +5,26 @@
 [![Twitter](https://img.shields.io/twitter/follow/pmndrs?label=%40pmndrs&style=flat&colorA=000000&colorB=000000&logo=twitter&logoColor=000000)](https://twitter.com/pmndrs)
 [![Discord](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=000000)](https://discord.gg/poimandres)
 
-Declaratively create scenes with re-usable OGL components that have their own state and effects and can tap into React's infinite ecosystem.
+🦴 A barebones react renderer for ogl.
 
-### Installation
+## Installation
 
 ```bash
+# NPM
 npm install ogl react-ogl
+
+# Yarn
+yarn add ogl react-ogl
+
+# PNPM
+pnpm add ogl react-ogl
 ```
 
-### What is it?
+## What is it?
 
-react-ogl is a barebones [react renderer](https://reactjs.org/docs/codebase-overview.html#renderers) for [`ogl`](https://npmjs.com/ogl) with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as ogl elements — `<mesh />` becomes `new OGL.Mesh()`. This happens dynamically; there's no wrapper involved.
+react-ogl is a barebones [react renderer](https://reactjs.org/docs/codebase-overview.html#renderers) for [ogl](https://npmjs.com/ogl) with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as ogl elements — `<mesh />` becomes `new OGL.Mesh()`. This happens dynamically; there's no wrapper involved.
 
-### How does this compare to [`@react-three/fiber`](https://github.com/pmndrs/react-three-fiber)?
-
-react-ogl is a complete re-architecture of @react-three/fiber with:
-
-- **no defaults**; you have complete control. No default renderer, camera, etc. For library/engine authors, this allows components to be completely transformative of rendering behavior and API. But this freedom leads to boilerplate. For both users and authors, there are —
-- **extendable helpers**; react-ogl exports helper components and hooks for both web and native with an API familiar to @react-three/fiber, but these helpers are also modular. This enables you to change or extend rendering behavior and API while maintaining interop with the react-ogl ecosystem.
-
-The API is the same as @react-three/fiber, but react-ogl is completely modular.
-
-### What does it look like?
+## What does it look like?
 
 The following takes complete control and declaratively renders a mesh that can react to state.
 
@@ -50,50 +48,15 @@ const root = createRoot(canvas, { renderer, camera, scene })
 root.render(
   <mesh>
     <box />
-    <program
-      vertex={`
-        attribute vec3 position;
-        attribute vec3 normal;
-
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        uniform mat3 normalMatrix;
-
-        varying vec3 vNormal;
-
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `}
-      fragment={`
-        precision highp float;
-
-        uniform vec3 uColor;
-        varying vec3 vNormal;
-
-        void main() {
-          vec3 normal = normalize(vNormal);
-          float lighting = dot(normal, normalize(vec3(10)));
-
-          gl_FragColor.rgb = uColor + lighting * 0.1;
-          gl_FragColor.a = 1.0;
-        }
-      `}
-      uniforms={{ uColor: 'white' }}
-    />
+    <normalProgram />
   </mesh>,
 )
 
 // Render to screen
-const animate = () => {
-  requestAnimationFrame(animate)
-  renderer.render({ scene, camera })
-}
-animate()
+renderer.render({ scene, camera })
 ```
 
-react-ogl itself is super minimal, but you can use the familiar @react-three/fiber API with some helpers targeted for different platforms:
+react-ogl itself is super minimal, but you can use the familiar [@react-three/fiber](https://github.com/pmndrs/react-three-fiber) API with some helpers targeted for different platforms:
 
 <details>
   <summary>Usage with react-dom</summary>
@@ -114,20 +77,22 @@ npm install ogl react-ogl
 npm run start
 ```
 
-Inside of our app, we can use the same API as @react-three/fiber but with OGL elements and methods.
+The following creates a re-usable component that has its own state, reacts to events and participates a shared render-loop.
 
 ```jsx
-import { useRef, useState } from 'react'
+import * as React from 'react'
 import { useFrame, Canvas } from 'react-ogl'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
-const Box = (props) => {
-  const mesh = useRef()
-  const [hovered, setHover] = useState(false)
-  const [active, setActive] = useState(false)
-
+function Box(props) {
+  // This reference will give us direct access to the mesh
+  const mesh = React.useRef()
+  // Set up state for the hovered and active state
+  const [hovered, setHover] = React.useState(false)
+  const [active, setActive] = React.useState(false)
+  // Subscribe this component to the render-loop, rotate the mesh every frame
   useFrame(() => (mesh.current.rotation.x += 0.01))
-
+  // Return view, these are regular ogl elements expressed in JSX
   return (
     <mesh
       {...props}
@@ -174,12 +139,11 @@ const Box = (props) => {
   )
 }
 
-render(
+createRoot(document.getElementById('root')).render(
   <Canvas camera={{ position: [0, 0, 8] }}>
     <Box position={[-1.2, 0, 0]} />
     <Box position={[1.2, 0, 0]} />
   </Canvas>,
-  document.getElementById('root'),
 )
 ```
 
@@ -198,7 +162,7 @@ npx expo init my-app # or npx react-native init my-app
 cd my-app
 
 # Automatically install & link expo modules
-npx install-expo-modules
+npx install-expo-modules@latest
 expo install expo-gl
 
 # Install NPM dependencies
@@ -222,16 +186,18 @@ module.exports = {
 Inside of our app, you can use the same API as web while running on native OpenGL ES — no webview needed.
 
 ```js
-import React, { useRef, useState } from 'react'
+import * as React from 'react'
 import { useFrame, Canvas } from 'react-ogl'
 
-const Box = (props) => {
-  const mesh = useRef()
-  const [hovered, setHover] = useState(false)
-  const [active, setActive] = useState(false)
-
+function Box(props) {
+  // This reference will give us direct access to the mesh
+  const mesh = React.useRef()
+  // Set up state for the hovered and active state
+  const [hovered, setHover] = React.useState(false)
+  const [active, setActive] = React.useState(false)
+  // Subscribe this component to the render-loop, rotate the mesh every frame
   useFrame(() => (mesh.current.rotation.x += 0.01))
-
+  // Return view, these are regular ogl elements expressed in JSX
   return (
     <mesh
       {...props}
@@ -278,14 +244,12 @@ const Box = (props) => {
   )
 }
 
-const App = () => (
+export default () => (
   <Canvas camera={{ position: [0, 0, 8] }}>
     <Box position={[-1.2, 0, 0]} />
     <Box position={[1.2, 0, 0]} />
   </Canvas>
 )
-
-export default App
 ```
 
 </details>
