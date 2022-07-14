@@ -18,7 +18,7 @@ export default defineConfig({
     lib: {
       formats: ['es', 'cjs'],
       entry: path.resolve(process.cwd(), 'src/index.ts'),
-      fileName: (format) => (format === 'es' ? '[name].mjs' : '[name].js'),
+      fileName: '[name]',
     },
     rollupOptions: {
       external: (id) => !id.startsWith('.') && !path.isAbsolute(id),
