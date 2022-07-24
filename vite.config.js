@@ -12,7 +12,7 @@ export default defineConfig({
   build: {
     minify: false,
     outDir: path.resolve(process.cwd(), 'dist'),
-    emptyOutDir: true,
+    emptyOutDir: false,
     target: 'es2018',
     lib: {
       formats: ['es'],
