@@ -1,9 +1,8 @@
 import path from 'path'
+import fs from 'fs'
 import { defineConfig } from 'vite'
-import includeAll from 'rollup-include-all'
 
 export default defineConfig({
-  plugins: [includeAll()],
   root: 'examples',
   resolve: {
     alias: {
@@ -16,16 +15,14 @@ export default defineConfig({
     emptyOutDir: true,
     target: 'es2018',
     lib: {
-      formats: ['es', 'cjs'],
-      entry: path.resolve(process.cwd(), 'src/index.ts'),
+      formats: ['es'],
+      entry: fs.existsSync(path.resolve(process.cwd(), 'dist'))
+        ? path.resolve(process.cwd(), 'src/index.native.ts')
+        : path.resolve(process.cwd(), 'src/index.ts'),
       fileName: '[name]',
     },
     rollupOptions: {
       external: (id) => !id.startsWith('.') && !path.isAbsolute(id),
-      output: {
-        preserveModules: true,
-        preserveModulesRoot: path.resolve(process.cwd(), 'src'),
-      },
     },
   },
 })
