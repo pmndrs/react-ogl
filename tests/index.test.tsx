@@ -1,16 +1,13 @@
 import * as React from 'react'
-// @ts-ignore
 import * as OGL from 'ogl'
 import { render } from './utils'
 import { Node, extend, reconciler, RootState, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      customElement: Node<CustomElement, typeof CustomElement>
-    }
+declare module '../src' {
+  interface OGLElements {
+    customElement: Node<CustomElement, typeof CustomElement>
   }
 }
 
@@ -213,12 +210,17 @@ describe('renderer', () => {
   it('should create an identical instance when reconstructing', async () => {
     let state: RootState = null!
 
+    const object1 = new OGL.Transform()
+    const object2 = new OGL.Transform()
+
+    object1.addChild(new OGL.Transform())
+    object2.addChild(new OGL.Transform())
+
     const Test = ({ n }: { n: number }) => (
-      // @ts-ignore args isn't a valid prop but changing it will swap
-      <transform args={[n]}>
+      <primitive object={n === 1 ? object1 : object2}>
         <transform attach="test" />
         <transform visible={false} />
-      </transform>
+      </primitive>
     )
 
     await reconciler.act(async () => {
@@ -226,15 +228,15 @@ describe('renderer', () => {
     })
 
     const [oldInstance] = state.scene.children as any[]
-    oldInstance.original = true
+    expect(oldInstance).toBe(object1)
 
     await reconciler.act(async () => {
       state = render(<Test n={2} />)
     })
 
     const [newInstance] = state.scene.children as any[]
-    expect(newInstance.original).not.toBe(true) // Created a new instance
-    expect(newInstance.children[0].visible).toBe(false) // Preserves scene hierarchy
+    expect(newInstance).toBe(object2) // Swapped to new instance
+    expect(newInstance.children[1].visible).toBe(false) // Preserves scene hierarchy
     expect(newInstance.test.visible).toBe(true) // Preserves scene hierarchy through attach
   })
 

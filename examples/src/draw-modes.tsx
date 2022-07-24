@@ -16,7 +16,7 @@ const Program = () => {
 
   return (
     <program
-      cullFace={null}
+      cullFace={false}
       uniforms-uTime={uTime.current}
       vertex={`
         attribute vec2 uv;

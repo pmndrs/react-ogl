@@ -30,7 +30,7 @@ export function resolve(root: any, key: string) {
   // Resolve pierced target
   const chain = key.split('-')
   target = chain.reduce((acc, key) => acc[key], root)
-  key = chain.pop()
+  key = chain.pop()!
 
   // Switch root if atomic
   if (!target?.set) root = chain.reduce((acc, key) => acc[key], root)
@@ -57,7 +57,7 @@ export function attach(parent: Instance, child: Instance) {
     child.object.__previousAttach = root[key]
     root[key] = child.object
     child.object.__currentAttach = parent.object.__currentAttach = root[key]
-  } else {
+  } else if (typeof child.props.attach === 'function') {
     child.object.__previousAttach = child.props.attach(parent.object, child.object)
   }
 }
@@ -133,7 +133,7 @@ export function applyProps(object: any, newProps: any, oldProps?: any) {
             uniformValue?.constructor === Array &&
             (uniformValue as any[]).every((v: any) => typeof v === 'number')
           ) {
-            // Uniform is an array, convert it into a vector
+            // @ts-ignore Uniform is an array, convert it into a vector
             uniformValue = new OGL[`Vec${uniformValue.length}`](...uniformValue)
           }
 
@@ -147,45 +147,14 @@ export function applyProps(object: any, newProps: any, oldProps?: any) {
   }
 }
 
-export interface ObjectMap {
-  nodes: { [name: string]: OGL.Transform }
-  programs: { [name: string]: OGL.Program }
-}
-
-/**
- * Collects nodes and programs from a Mesh.
- */
-export function buildGraph(object: OGL.Transform) {
-  const data: ObjectMap = { nodes: {}, programs: {} }
-
-  if (object) {
-    object.traverse((obj: any) => {
-      if (obj.name) {
-        data.nodes[obj.name] = obj
-      }
-
-      if (obj.program?.gltfMaterial && !data.programs[obj.program.gltfMaterial.name]) {
-        data.programs[obj.program.gltfMaterial.name] = obj.program
-      }
-    })
-  }
-
-  return data
-}
-
 /**
  * Creates event handlers, returning an event handler method.
  */
 export function createEvents(state: RootState) {
-  // Init event state
-  state.mouse = new OGL.Vec2()
-  state.raycaster = new OGL.Raycast(state.gl)
-  state.hovered = new Map()
-
   const handleEvent = (event: PointerEvent, type: keyof EventHandlers) => {
     // Convert mouse coordinates
-    state.mouse.x = (event.offsetX / state.renderer.width) * 2 - 1
-    state.mouse.y = -(event.offsetY / state.renderer.height) * 2 + 1
+    state.mouse!.x = (event.offsetX / state.size.width) * 2 - 1
+    state.mouse!.y = -(event.offsetY / state.size.height) * 2 + 1
 
     // Filter to interactive meshes
     const interactive: Interactive[] = []
@@ -195,8 +164,8 @@ export function createEvents(state: RootState) {
     })
 
     // Get elements that intersect with our pointer
-    state.raycaster.castMouse(state.camera, state.mouse)
-    const intersects: Interactive[] = state.raycaster.intersectMeshes(interactive)
+    state.raycaster!.castMouse(state.camera, state.mouse)
+    const intersects: Interactive[] = state.raycaster!.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
@@ -209,9 +178,9 @@ export function createEvents(state: RootState) {
       // Bail if object doesn't have handlers (managed externally)
       if (!handlers) continue
 
-      if (isHoverEvent && !state.hovered.get(object.id)) {
+      if (isHoverEvent && !state.hovered!.get(object.id)) {
         // Mark object as hovered and fire its hover events
-        state.hovered.set(object.id, object)
+        state.hovered!.set(object.id, object)
 
         // Fire hover events
         handlers.onPointerMove?.({ ...object.hit, nativeEvent: event })
@@ -224,12 +193,12 @@ export function createEvents(state: RootState) {
 
     // Cleanup stale hover events
     if (isHoverEvent || type === 'onPointerDown') {
-      state.hovered.forEach((object) => {
+      state.hovered!.forEach((object) => {
         const handlers = object.__handlers
 
         if (!intersects.length || !intersects.find((i) => i === object)) {
           // Reset hover state
-          state.hovered.delete(object.id)
+          state.hovered!.delete(object.id)
 
           // Fire unhover event
           if (handlers?.onPointerOut) handlers.onPointerOut({ ...object.hit, nativeEvent: event })

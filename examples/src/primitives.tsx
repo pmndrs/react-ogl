@@ -4,7 +4,7 @@ import Controls from './components/Controls'
 
 const Program = () => (
   <program
-    cullFace={null}
+    cullFace={false}
     vertex={`
       attribute vec3 position;
       attribute vec3 normal;

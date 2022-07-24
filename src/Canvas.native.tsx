@@ -7,8 +7,6 @@ import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 import '@expo/browser-polyfill'
 
-export type GLContext = ExpoWebGLRenderingContext | WebGLRenderingContext
-
 export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProps {
   children: React.ReactNode
   style?: ViewStyle

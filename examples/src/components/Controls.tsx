@@ -3,7 +3,7 @@ import * as OGL from 'ogl'
 import { useFrame, useOGL } from 'react-ogl'
 
 function Controls() {
-  const controls = React.useRef<OGL.Orbit>()
+  const controls = React.useRef<OGL.Orbit>(null!)
   const gl = useOGL((state) => state.gl)
   const camera = useOGL((state) => state.camera)
 

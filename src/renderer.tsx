@@ -39,6 +39,7 @@ export function render(
           : typeof config.renderer === 'function'
           ? config.renderer(target)
           : new OGL.Renderer({
+              alpha: true,
               antialias: true,
               powerPreference: 'high-performance',
               ...(config.renderer as any),
@@ -101,6 +102,9 @@ export function render(
           set((state) => ({ priority: state.priority - renderPriority }))
         },
         events,
+        mouse: new OGL.Vec2(),
+        raycaster: new OGL.Raycast(gl),
+        hovered: new Map(),
         set,
         get,
       } as RootState
@@ -115,7 +119,7 @@ export function render(
 
     // Toggle rendering modes
     let nextFrame: number
-    const animate = (time = 0, frame?: XRFrame) => {
+    function animate(time = 0, frame?: XRFrame) {
       // Toggle XR rendering
       const state = store.getState()
       const mode = state.xr.session ?? window
@@ -136,7 +140,7 @@ export function render(
     if (state.frameloop !== 'never') animate()
 
     // Handle resize
-    const onResize = (state: RootState) => {
+    function onResize(state: RootState) {
       const { width, height } = state.size
       const projection = state.orthographic ? 'orthographic' : 'perspective'
 

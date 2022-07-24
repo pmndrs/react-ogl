@@ -10,11 +10,17 @@ export interface OGLEvent<TEvent extends Event> extends Partial<OGL.RaycastHit> 
 }
 
 export interface EventHandlers {
+  /** Fired when the mesh is clicked or tapped. */
   onClick?: (event: OGLEvent<MouseEvent>) => void
+  /** Fired when a pointer becomes inactive over the mesh. */
   onPointerUp?: (event: OGLEvent<PointerEvent>) => void
+  /** Fired when a pointer becomes active over the mesh. */
   onPointerDown?: (event: OGLEvent<PointerEvent>) => void
+  /** Fired when a pointer moves over the mesh. */
   onPointerMove?: (event: OGLEvent<PointerEvent>) => void
+  /** Fired when a pointer enters the mesh's bounds. */
   onPointerOver?: (event: OGLEvent<PointerEvent>) => void
+  /** Fired when a pointer leaves the mesh's bounds. */
   onPointerOut?: (event: OGLEvent<PointerEvent>) => void
 }
 
@@ -27,10 +33,14 @@ export type Catalogue = Record<Capitalize<keyof OGLElements>, { new (...args: an
 export type InstanceProps = {
   [key: string]: unknown
 } & {
+  /** Used to instantiate the underlying OGL object. Changing `args` will reconstruct the object and update any associated refs */
   args?: any[]
+  /** An external OGL object to attach this element to */
   object?: any
-  dispose?: null
+  /** Describes how to attach this element via a property or set of add & remove callbacks */
   attach?: Attach
+  /** Optionally opt-out of disposal with `dispose={null}` */
+  dispose?: null
 }
 
 /**
@@ -45,16 +55,6 @@ export interface Instance {
   object: any | null
 }
 
-/**
- * Base react-ogl events.
- */
-export type Events = {
-  onClick: EventListener
-  onPointerUp: EventListener
-  onPointerDown: EventListener
-  onPointerMove: EventListener
-}
-
 export interface XRManager {
   session: XRSession | null
   setSession(session: XRSession | null): void
@@ -64,9 +64,9 @@ export interface XRManager {
 
 export interface EventManager {
   connected: boolean
-  handlers?: any
-  connect?: (target: HTMLCanvasElement, state: RootState) => void
-  disconnect?: (target: HTMLCanvasElement, state: RootState) => void
+  connect: (target: HTMLCanvasElement, state: RootState) => void
+  disconnect: (target: HTMLCanvasElement, state: RootState) => void
+  [name: string]: any
 }
 
 export interface Size {
@@ -150,7 +150,7 @@ interface MathRepresentation extends Array<number> {
   set(...args: any): any
 }
 type MathProps<T extends MathRepresentation> = T | Parameters<T['set']> | number
-type WithMathProps<T> = { [K in keyof T]: T[K] extends MathRepresentation | undefined ? MathProps<T[K]> : T[K] }
+type WithMathProps<T> = { [K in keyof T]: T[K] extends MathRepresentation ? MathProps<T[K]> : T[K] }
 type WithProgramProps<T> = T extends OGL.Program
   ? Omit<T, 'vertex' | 'fragment' | 'uniforms'> & {
       vertex?: string
@@ -177,7 +177,7 @@ export type Node<T, P> = WithOGLProps<
     children?: React.ReactNode
     ref?: React.Ref<T>
     key?: React.Key
-  } & (T extends OGL.Mesh ? EventHandlers : {})
+  } & (T extends OGL.Mesh ? Partial<EventHandlers> : {})
 >
 
 export interface OGLElements {
