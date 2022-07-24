@@ -79,9 +79,9 @@ export function useFrame(callback: Subscription, renderPriority = 0) {
   // This allows the callback to dynamically update without blocking
   // the render loop.
   const ref = React.useRef(callback)
-  React.useLayoutEffect(() => void (ref.current = callback), [callback])
+  useIsomorphicLayoutEffect(() => void (ref.current = callback), [callback])
   // Subscribe on mount and unsubscribe on unmount
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     subscribe(ref, renderPriority)
     return () => void unsubscribe(ref, renderPriority)
   }, [subscribe, unsubscribe, renderPriority])
