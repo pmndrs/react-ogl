@@ -2,8 +2,8 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import type { StateSelector, EqualityChecker } from 'zustand'
-import { RootState, RootStore, Subscription } from './types'
-import { buildGraph, classExtends } from './utils'
+import type { RootState, RootStore, Subscription } from './types'
+import { classExtends } from './utils'
 
 /**
  * An SSR-friendly useLayoutEffect.
@@ -15,7 +15,7 @@ export const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayo
 /**
  * Internal OGL context.
  */
-export const OGLContext = React.createContext<RootStore>(null)
+export const OGLContext = React.createContext<RootStore>(null!)
 
 /**
  * Returns the internal OGL store.
@@ -36,11 +36,30 @@ export function useOGL<T = RootState>(
   return useStore()(selector, equalityFn)
 }
 
+export interface ObjectMap {
+  nodes: Record<string, OGL.Mesh>
+  programs: Record<string, OGL.Program>
+}
+
 /**
  * Creates an `ObjectMap` from an object.
  */
 export function useGraph(object: OGL.Transform) {
-  return React.useMemo(() => buildGraph(object), [object])
+  return React.useMemo(() => {
+    const data: ObjectMap = { nodes: {}, programs: {} }
+
+    object.traverse((obj: OGL.Transform | OGL.Mesh) => {
+      if (!(obj instanceof OGL.Mesh)) return
+
+      if (obj.name) data.nodes[obj.name] = obj
+
+      if (obj.program.gltfMaterial && !data.programs[obj.program.gltfMaterial.name]) {
+        data.programs[obj.program.gltfMaterial.name] = obj.program
+      }
+    })
+
+    return data
+  }, [object])
 }
 
 /**
@@ -61,42 +80,42 @@ export function useFrame(callback: Subscription, renderPriority = 0) {
   }, [subscribe, unsubscribe, renderPriority])
 }
 
+export type LoaderRepresentation =
+  | { load(gl: OGL.OGLRenderingContext, url: string): Promise<any> }
+  | Pick<typeof OGL.TextureLoader, 'load'>
+
+export type LoaderResult<L extends LoaderRepresentation> = Awaited<ReturnType<L['load']>>
+
 /**
  * Loads assets suspensefully.
  */
-export const useLoader = (loader: any, input: string | string[], extensions?: (loader: any) => void) => {
+export function useLoader<L extends LoaderRepresentation, I extends string | string[], R = LoaderResult<L>>(
+  loader: L,
+  input: I,
+  extensions?: (loader: L) => void,
+): I extends any[] ? R[] : R {
   const gl = useOGL((state) => state.gl)
 
   // Put keys into an array so their contents are spread and cached with suspend
   const keys = Array.isArray(input) ? input : [input]
 
   return suspend(
-    async (loader, ...urls) => {
+    async (gl, loader, ...urls) => {
       // Call extensions
       extensions?.(loader)
 
       const result = await Promise.all(
-        urls.map(async (url) => {
-          // OGL's loaders don't have a consistent signature
+        urls.map(async (url: string) => {
+          // @ts-ignore OGL's loaders don't have a consistent signature
           if (classExtends(loader, OGL.TextureLoader)) return loader.load(gl, { url })
 
-          const data = await loader.load(gl, url)
-
-          // Cleanup GLTF and build a graph
-          if (data.scene) {
-            const scene = data.scene.length ? data.scene[0] : data.scene
-            const graph = buildGraph(scene)
-
-            Object.assign(data, { scene, ...graph })
-          }
-
-          return data
+          return await loader.load(gl, url)
         }),
       )
 
       // Return result | result[], mirroring input | input[]
       return Array.isArray(input) ? result : result[0]
     },
-    [loader, ...keys],
+    [gl, loader, ...keys],
   )
 }

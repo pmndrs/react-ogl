@@ -1,6 +1,6 @@
-// @ts-ignore
 import * as OGL from 'ogl'
-import { resolve, applyProps, RESERVED_PROPS, INSTANCE_PROPS } from '../src'
+import { resolve, applyProps } from '../src/utils'
+import { RESERVED_PROPS, INSTANCE_PROPS } from '../src/constants'
 
 describe('resolve', () => {
   it('should resolve pierced props', () => {

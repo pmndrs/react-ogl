@@ -25,6 +25,9 @@ const catalogueGL: any[] = [
   OGL.Polyline,
   OGL.Post,
   OGL.Shadow,
+  OGL.AxesHelper,
+  OGL.GridHelper,
+  OGL.WireMesh,
 ]
 
 /**
@@ -33,8 +36,8 @@ const catalogueGL: any[] = [
  */
 export function extend(objects: Partial<Catalogue>, gl = false) {
   for (const key in objects) {
-    const value = objects[key]
-    catalogue[key] = value
+    const value = objects[key as keyof Catalogue]!
+    catalogue[key as keyof Catalogue] = value
     if (gl) catalogueGL.push(value)
   }
 }
@@ -44,7 +47,7 @@ export function extend(objects: Partial<Catalogue>, gl = false) {
  */
 function createInstance(type: keyof OGLElements, { object = null, args = [], ...props }: InstanceProps, root: Fiber) {
   // Convert lowercase primitive to PascalCase
-  const name = toPascalCase(type)
+  const name = toPascalCase(type) as keyof Catalogue
 
   // Get class from extended OGL catalogue
   const target = catalogue[name]
@@ -96,9 +99,9 @@ function commitInstance(instance: Instance) {
   if (!instance.parent) return
 
   if (instance.type !== 'primitive' && !instance.object) {
-    const name = toPascalCase(instance.type)
+    const name = toPascalCase(instance.type) as keyof Catalogue
     const target = catalogue[name]
-    const { args, ...props } = instance.props
+    const { args = [], ...props } = instance.props
 
     // Pass internal state to elements which depend on it.
     // This lets them be immutable upon creation and use props
@@ -156,7 +159,7 @@ function switchInstance(instance: Instance, type: keyof OGLElements, props: Inst
   const newInstance = createInstance(type, props, instance.root)
 
   // Replace instance in scene-graph
-  const parent = instance.parent
+  const parent = instance.parent!
   removeChild(parent, instance)
   appendChild(parent, newInstance)
 
@@ -170,16 +173,14 @@ function switchInstance(instance: Instance, type: keyof OGLElements, props: Inst
   }
 
   // Move children to new instance
-  if (instance.type !== 'primitive') {
-    for (const child of instance.children) {
-      appendChild(newInstance, child)
-      if (child.props.attach) {
-        detach(instance, child)
-        attach(newInstance, child)
-      }
+  for (const child of instance.children) {
+    appendChild(newInstance, child)
+    if (child.props.attach) {
+      detach(instance, child)
+      attach(newInstance, child)
     }
-    instance.children = []
   }
+  instance.children = []
 
   // Switches the react-internal fiber node
   // https://github.com/facebook/react/issues/14983
@@ -350,7 +351,7 @@ export const reconciler = Reconciler<
     }
 
     // If the instance has new args, recreate it
-    if (newProps.args?.some((value, index) => value !== oldProps.args[index])) return [true]
+    if (newProps.args?.some((value, index) => value !== oldProps.args?.[index])) return [true]
 
     // Diff through props and flag with changes
     const changedProps = diffProps(instance, newProps, oldProps)
@@ -360,15 +361,17 @@ export const reconciler = Reconciler<
     return null
   },
   // This is where we mutate OGL elements in the render phase
-  commitUpdate(instance, [reconstruct, changedProps], type, oldProps, newProps, root) {
+  commitUpdate(instance, payload, type, oldProps, newProps, root) {
+    const [reconstruct, changedProps] = payload!
+
     // If flagged for recreation, swap to a new instance.
     if (reconstruct) return switchInstance(instance, type, newProps, root)
 
     // Handle attach update
-    if (changedProps.attach) {
-      if (oldProps.attach) detach(instance.parent, instance)
+    if (changedProps?.attach) {
+      if (oldProps.attach) detach(instance.parent!, instance)
       instance.props.attach = newProps.attach
-      if (newProps.attach) attach(instance.parent, instance)
+      if (newProps.attach) attach(instance.parent!, instance)
     }
 
     // Update instance props

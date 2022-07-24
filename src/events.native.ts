@@ -1,4 +1,5 @@
 import { GestureResponderEvent } from 'react-native'
+// @ts-ignore
 import Pressability from 'react-native/Libraries/Pressability/Pressability'
 import { createEvents } from './utils'
 import { EventHandlers, EventManager } from './types'
@@ -23,7 +24,7 @@ export const events: EventManager = {
    */
   connect(canvas, state) {
     // Cleanup old handlers
-    state.events.disconnect?.(canvas, state)
+    state.events!.disconnect?.(canvas, state)
 
     // Event handlers
     const { handleEvent } = createEvents(state)
@@ -41,8 +42,8 @@ export const events: EventManager = {
     }
 
     // Init handlers
-    state.events.handlers = Object.entries(EVENTS).reduce(
-      (acc, [name, type]: [keyof typeof EVENTS, typeof EVENTS[keyof typeof EVENTS]]) => ({
+    state.events!.handlers = Object.entries(EVENTS).reduce(
+      (acc, [name, type]) => ({
         ...acc,
         [name]: (event: GestureResponderEvent) => handleTouch(event, type),
       }),
@@ -50,13 +51,13 @@ export const events: EventManager = {
     )
 
     // Create event manager
-    state.events.connected = new Pressability(state.events.handlers)
+    state.events!.connected = new Pressability(state.events!.handlers)
   },
   /**
    * Deletes and disconnects event listeners from canvas.
    */
-  disconnect(canvas, state) {
+  disconnect(_, state) {
     // Disconnect handlers
-    ;(state.events.connected as any)?.reset?.()
+    ;(state.events!.connected as any)?.reset?.()
   },
 }
