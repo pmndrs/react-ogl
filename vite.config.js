@@ -2,8 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import { defineConfig } from 'vite'
 
-const NATIVE = fs.existsSync(path.resolve(process.cwd(), 'dist'))
-const entry = NATIVE ? 'index.native' : 'index'
+const entry = fs.existsSync(path.resolve(process.cwd(), 'dist')) ? 'index.native' : 'index'
 
 export default defineConfig({
   root: process.argv[2] ? undefined : 'examples',
@@ -24,8 +23,11 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => !id.startsWith('.') && !path.isAbsolute(id),
-      preserveModules: !NATIVE,
-      sourcemapExcludeSources: true,
+      treeshake: false,
+      output: {
+        preserveModules: true,
+        sourcemapExcludeSources: true,
+      },
     },
   },
   plugins: [
