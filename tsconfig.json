@@ -10,12 +10,10 @@
     "pretty": true,
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
+    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "react-ogl": ["./src"]
     }
-  },
-  "include": ["src/**/*"]
+  }
 }

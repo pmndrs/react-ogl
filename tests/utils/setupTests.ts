@@ -97,7 +97,7 @@ jest.mock('react-native', () => ({
 jest.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
 jest.mock('@expo/browser-polyfill', () => ({}))
 jest.mock('expo-gl', () => ({
-  GLView: ({ onContextCreate }) => {
+  GLView: ({ onContextCreate }: { onContextCreate: any }) => {
     React.useLayoutEffect(() => {
       const gl = new WebGLRenderingContext({ width: 1280, height: 800 } as HTMLCanvasElement)
       onContextCreate(gl)

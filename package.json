@@ -21,7 +21,8 @@
   "react-native": "./dist/index.native.mjs",
   "sideEffects": false,
   "files": [
-    "dist/*"
+    "dist/*",
+    "src/*"
   ],
   "devDependencies": {
     "@swc/cli": "^0.1.57",
@@ -83,9 +84,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "rimraf dist && vite build && vite build && tsc",
+    "build": "rimraf dist && vite build && vite build",
     "test": "jest",
-    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint": "eslint src/**/*.{ts,tsx} && tsc",
     "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}"
   }
 }

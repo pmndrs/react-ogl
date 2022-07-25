@@ -131,7 +131,7 @@ describe('renderer', () => {
   it('should update program uniforms reactively', async () => {
     const mesh = React.createRef<OGL.Mesh>()
 
-    const Test = ({ value }) => (
+    const Test = ({ value }: { value: any }) => (
       <mesh ref={mesh}>
         <box />
         <normalProgram uniforms={{ uniform: { value } }} />
