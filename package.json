@@ -84,9 +84,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "rimraf dist && vite build && vite build",
+    "build": "rimraf dist && vite build && vite build && tsc",
     "test": "jest",
-    "lint": "eslint src/**/*.{ts,tsx} && tsc",
+    "lint": "eslint src/**/*.{ts,tsx}",
     "lint-fix": "prettier . --write && eslint --fix src/**/*.{ts,tsx}"
   }
 }
