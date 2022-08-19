@@ -30,11 +30,4 @@ export default defineConfig({
       },
     },
   },
-  plugins: [
-    {
-      generateBundle() {
-        this.emitFile({ type: 'asset', fileName: `${entry}.d.ts`, source: `export * from '../src/${entry}'` })
-      },
-    },
-  ],
 })
