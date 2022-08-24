@@ -1,29 +1,29 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { render, RenderAPI } from '@testing-library/react-native'
-import { reconciler } from '../src'
+import { create, ReactTestRenderer } from 'react-test-renderer'
+import { act } from '../src'
 import { Canvas } from '../src/Canvas.native' // explicitly require native module
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
-    let renderer: RenderAPI = null!
+    let renderer: ReactTestRenderer = null!
 
-    await reconciler.act(async () => {
-      renderer = render(
+    await act(async () => {
+      renderer = create(
         <Canvas>
           <transform />
         </Canvas>,
       )
     })
 
-    expect(renderer.container).toMatchSnapshot()
+    expect(renderer.toTree()).toMatchSnapshot()
   })
 
   it('should forward ref', async () => {
     const ref = React.createRef<View>()
 
-    await reconciler.act(async () => {
-      render(
+    await act(async () => {
+      create(
         <Canvas ref={ref}>
           <transform />
         </Canvas>,
@@ -34,10 +34,10 @@ describe('Canvas', () => {
   })
 
   it('should correctly unmount', async () => {
-    let renderer: RenderAPI
+    let renderer: ReactTestRenderer
 
-    await reconciler.act(async () => {
-      renderer = render(
+    await act(async () => {
+      renderer = create(
         <Canvas>
           <transform />
         </Canvas>,

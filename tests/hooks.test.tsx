@@ -1,7 +1,7 @@
 import * as React from 'react'
 import create from 'zustand'
 import { render } from './utils'
-import { reconciler, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
+import { act, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
@@ -12,7 +12,7 @@ describe('useOGL', () => {
       return null
     }
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ test: 'test' })) as any}>
           <Test />
@@ -53,7 +53,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
@@ -77,7 +77,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />

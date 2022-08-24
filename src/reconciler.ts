@@ -1,9 +1,10 @@
 import Reconciler from 'react-reconciler'
+import { DefaultEventPriority } from 'react-reconciler/constants'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
 import { RESERVED_PROPS } from './constants'
-import { Catalogue, Fiber, Instance, InstanceProps, OGLElements } from './types'
+import { Act, Catalogue, Fiber, Instance, InstanceProps, OGLElements } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue = { ...OGL } as unknown as Catalogue
@@ -291,7 +292,6 @@ export const reconciler = Reconciler<
   scheduleTimeout: () => (typeof setTimeout !== 'undefined' ? setTimeout : undefined),
   cancelTimeout: () => (typeof clearTimeout !== 'undefined' ? clearTimeout : undefined),
   noTimeout: -1,
-  now: typeof performance !== 'undefined' ? performance.now : Date.now,
   // Text isn't supported so we skip it
   shouldSetTextContent: () => false,
   resetTextContent: () => {},
@@ -397,7 +397,14 @@ export const reconciler = Reconciler<
   // about side-effects if react changes its mind and discards an instance (e.g. React.Suspense)
   finalizeInitialChildren: () => true,
   commitMount: commitInstance,
+  // @ts-ignore
+  getCurrentEventPriority: () => DefaultEventPriority,
+  beforeActiveInstanceBlur: () => {},
+  afterActiveInstanceBlur: () => {},
+  detachDeletedInstance: () => {},
 })
+
+export const act: Act = (React as any).unstable_act
 
 // Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
