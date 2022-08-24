@@ -41,7 +41,7 @@
   </head>
   <body>
     <script type="module">
-      import { render } from 'react-dom'
+      import { createRoot } from 'react-dom/client'
 
       const demos = import.meta.glob('./src/*.tsx')
 
@@ -75,7 +75,7 @@
             const root = entry.target.querySelector('div')
             const loadDemo = demos[root.getAttribute('data-key')]
 
-            render((await loadDemo()).default, root)
+            createRoot(root).render((await loadDemo()).default)
 
             entry.target.removeAttribute('data-key')
             observer.unobserve(entry.target)
