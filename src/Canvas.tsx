@@ -20,7 +20,6 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
     resize,
     children,
     style,
-    mode,
     renderer,
     dpr,
     camera,
@@ -57,7 +56,6 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
       canvas,
       {
         size: { width, height },
-        mode,
         orthographic,
         frameloop,
         renderer,

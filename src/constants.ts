@@ -11,15 +11,6 @@ export const POINTER_EVENTS = [
 ] as const
 
 /**
- * React rendering modes (defaults to blocking).
- */
-export const RENDER_MODES = {
-  legacy: 0,
-  blocking: 1,
-  concurrent: 2,
-} as const
-
-/**
  * React internal props.
  */
 export const RESERVED_PROPS = ['children', 'key', 'ref', '__self', '__source'] as const
