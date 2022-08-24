@@ -16,7 +16,7 @@ export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProp
  * A resizeable canvas whose children are declarative OGL elements.
  */
 export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
-  { children, style, mode, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
+  { children, style, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
   forwardedRef,
 ) {
   const [{ width, height }, setSize] = React.useState({ width: 0, height: 0 })
@@ -59,7 +59,6 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
       canvas,
       {
         size: { width, height },
-        mode,
         orthographic,
         frameloop,
         renderer,

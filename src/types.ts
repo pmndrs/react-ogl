@@ -3,7 +3,6 @@ import type { Fiber as ReconcilerFiber } from 'react-reconciler'
 import type * as OGL from 'ogl'
 import type * as React from 'react'
 import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
-import type { RENDER_MODES } from './constants'
 
 export interface OGLEvent<TEvent extends Event> extends Partial<OGL.RaycastHit> {
   nativeEvent: TEvent
@@ -102,7 +101,9 @@ export interface RootState {
   [key: string]: any
 }
 
-export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
+export type Act = (cb: () => Promise<any>) => Promise<any>
+
+export type RootStore = UseBoundStore<StoreApi<RootState>>
 
 export interface Root {
   render: (element: React.ReactNode) => RootStore
@@ -126,7 +127,6 @@ export type RenderProps = {
   scene?: OGL.Transform
   events?: EventManager
   onCreated?: (state: RootState) => any
-  mode?: keyof typeof RENDER_MODES
 }
 
 type NonFunctionKeys<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]

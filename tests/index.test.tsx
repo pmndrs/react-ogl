@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { Node, extend, reconciler, RootState, createPortal } from '../src'
+import { Node, extend, act, RootState, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
@@ -15,7 +15,7 @@ describe('renderer', () => {
   it('should render JSX', async () => {
     let state: RootState = null!
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(<transform />)
     })
 
@@ -25,7 +25,7 @@ describe('renderer', () => {
   it('should render extended elements', async () => {
     let state: RootState = null!
 
-    await reconciler.act(async () => {
+    await act(async () => {
       extend({ CustomElement })
       state = render(<customElement />)
     })
@@ -44,7 +44,7 @@ describe('renderer', () => {
       return <transform attach={() => (lifecycle.push('attach'), () => {})} />
     }
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(<Test />)
     })
 
@@ -54,7 +54,7 @@ describe('renderer', () => {
   it('should set pierced props', async () => {
     const mesh = React.createRef<OGL.Mesh>()
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <mesh ref={mesh}>
           <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
@@ -69,7 +69,7 @@ describe('renderer', () => {
   it('should handle attach', async () => {
     let state: RootState = null!
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(
         <>
           <mesh>
@@ -99,7 +99,7 @@ describe('renderer', () => {
     let crashed = false
 
     try {
-      await reconciler.act(async () => render(<box />))
+      await act(async () => render(<box />))
     } catch (_) {
       crashed = true
     }
@@ -113,7 +113,7 @@ describe('renderer', () => {
     const vertex = 'vertex'
     const fragment = 'fragment'
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(
         <mesh>
           <box />
@@ -138,10 +138,10 @@ describe('renderer', () => {
       </mesh>
     )
 
-    await reconciler.act(async () => render(<Test value={false} />))
+    await act(async () => render(<Test value={false} />))
     expect(mesh.current!.program.uniforms.uniform.value).toBe(false)
 
-    await reconciler.act(async () => render(<Test value={true} />))
+    await act(async () => render(<Test value={true} />))
     expect(mesh.current!.program.uniforms.uniform.value).toBe(true)
   })
 
@@ -151,7 +151,7 @@ describe('renderer', () => {
     const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
     const texture = new OGL.Texture(renderer.gl)
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <mesh ref={mesh}>
           <box />
@@ -175,7 +175,7 @@ describe('renderer', () => {
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
 
-    await reconciler.act(async () => {
+    await act(async () => {
       render(
         <mesh ref={mesh}>
           <geometry position={position} uv={uv} />
@@ -192,7 +192,7 @@ describe('renderer', () => {
     let bind = false
     let unbind = false
 
-    await reconciler.act(async () => {
+    await act(async () => {
       const state = render(<transform />, {
         events: {
           connected: false,
@@ -223,14 +223,14 @@ describe('renderer', () => {
       </primitive>
     )
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(<Test n={1} />)
     })
 
     const [oldInstance] = state.scene.children as any[]
     expect(oldInstance).toBe(object1)
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(<Test n={2} />)
     })
 
@@ -245,7 +245,7 @@ describe('renderer', () => {
     const object = new OGL.Transform()
     const mesh = React.createRef<OGL.Mesh>()
 
-    await reconciler.act(async () => {
+    await act(async () => {
       state = render(
         createPortal(
           <mesh ref={mesh}>
@@ -275,16 +275,16 @@ describe('renderer', () => {
       </mesh>
     )
 
-    await reconciler.act(async () => render(<Test first mono />))
+    await act(async () => render(<Test first mono />))
     expect(mesh.current!.program).toBe(program1.current)
 
-    await reconciler.act(async () => render(<Test mono />, { frameloop: 'never' }))
+    await act(async () => render(<Test mono />, { frameloop: 'never' }))
     expect(mesh.current!.program).toBe(undefined)
 
-    await reconciler.act(async () => render(<Test first />))
+    await act(async () => render(<Test first />))
     expect(mesh.current!.program).toBe(program1.current)
 
-    await reconciler.act(async () => render(<Test />))
+    await act(async () => render(<Test />))
     expect(mesh.current!.program).toBe(program2.current)
   })
 })

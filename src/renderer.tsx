@@ -1,9 +1,9 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { ReactPortal } from 'react-reconciler'
+import { ConcurrentRoot } from 'react-reconciler/constants'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
-import { RENDER_MODES } from './constants'
 import { OGLContext, useStore } from './hooks'
 import { Fiber, Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps, calculateDpr } from './utils'
@@ -18,7 +18,6 @@ export function render(
   element: React.ReactNode,
   target: HTMLCanvasElement,
   {
-    mode = 'blocking',
     dpr = [1, 2],
     size = { width: target.parentElement?.clientWidth ?? 0, height: target.parentElement?.clientHeight ?? 0 },
     frameloop = 'always',
@@ -152,8 +151,20 @@ export function render(
     store.subscribe(onResize)
     onResize(state)
 
+    // Report when an error was detected in a previous render
+    const logRecoverableError = typeof reportError === 'function' ? reportError : console.error
+
     // Create root container
-    const container = reconciler.createContainer(store as Fiber, RENDER_MODES[mode], false, null)
+    const container = reconciler.createContainer(
+      store as Fiber,
+      ConcurrentRoot,
+      null,
+      false,
+      null,
+      '',
+      logRecoverableError,
+      null,
+    )
 
     // Set root
     root = { container, store }
