@@ -103,7 +103,7 @@ export interface RootState {
 
 export type Act = (cb: () => Promise<any>) => Promise<any>
 
-export type RootStore = UseBoundStore<StoreApi<RootState>>
+export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
 
 export interface Root {
   render: (element: React.ReactNode) => RootStore
