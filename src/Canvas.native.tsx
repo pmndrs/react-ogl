@@ -5,7 +5,6 @@ import { Block, SetBlock, ErrorBoundary } from './utils'
 import { events as createTouchEvents } from './events'
 import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
-import '@expo/browser-polyfill'
 
 export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProps {
   children: React.ReactNode
