@@ -1,6 +1,6 @@
 {
   "name": "react-ogl",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A barebones react renderer for OGL.",
   "bugs": {
     "url": "https://github.com/pmndrs/react-ogl/issues"
