@@ -1,7 +1,7 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { ReactPortal } from 'react-reconciler'
-import { ConcurrentRoot } from 'react-reconciler/constants'
+import { ConcurrentRoot } from 'react-reconciler/constants.js'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { OGLContext, useStore } from './hooks'

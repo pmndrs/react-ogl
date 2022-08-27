@@ -1,5 +1,5 @@
 import Reconciler from 'react-reconciler'
-import { DefaultEventPriority } from 'react-reconciler/constants'
+import { DefaultEventPriority } from 'react-reconciler/constants.js'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
