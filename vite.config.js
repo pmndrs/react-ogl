@@ -4,8 +4,8 @@ import { defineConfig } from 'vite'
 
 const entry = fs.existsSync(path.resolve(process.cwd(), 'dist')) ? 'index.native' : 'index'
 
-export default defineConfig({
-  root: process.argv[2] ? undefined : 'examples',
+export default defineConfig(({ command }) => ({
+  root: command === 'serve' ? 'examples' : undefined,
   resolve: {
     alias: {
       'react-ogl': path.resolve(process.cwd(), 'src'),
@@ -30,4 +30,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))
