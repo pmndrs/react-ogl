@@ -1,12 +1,17 @@
-# react-ogl
-
 [![Size](https://img.shields.io/bundlephobia/minzip/react-ogl?label=gzip&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/package/react-ogl)
 [![Version](https://img.shields.io/npm/v/react-ogl?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/react-ogl)
 [![Downloads](https://img.shields.io/npm/dt/react-ogl.svg?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/react-ogl)
 [![Twitter](https://img.shields.io/twitter/follow/pmndrs?label=%40pmndrs&style=flat&colorA=000000&colorB=000000&logo=twitter&logoColor=000000)](https://twitter.com/pmndrs)
 [![Discord](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=000000)](https://discord.gg/poimandres)
 
-react-ogl is a barebones [react renderer](https://reactjs.org/docs/codebase-overview.html#renderers) for [OGL](https://github.com/oframe/ogl) with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as OGL elements — `<mesh />` becomes `new OGL.Mesh()`. This happens dynamically; there's no wrapper involved.
+<p align="left">
+  <a id="cover" href="#cover">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/dark.svg">
+      <img alt="react-ogl, a barebones react renderer for OGL. Build OGL scenes declaratively with re-usable, self-contained components that react to state, are readily interactive and can participate in React's ecosystem." src=".github/light.svg">
+    </picture>
+  </a>
+</p>
 
 ## Table of Contents
 
