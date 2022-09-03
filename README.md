@@ -7,7 +7,6 @@
 <p align="left">
   <a id="cover" href="#cover">
     <picture>
-      <source srcset="https://github.com/pmndrs/react-ogl/raw/main/.github/light.svg">
       <source media="(prefers-color-scheme: dark)" srcset=".github/dark.svg">
       <img alt="react-ogl, a barebones react renderer for OGL. Build OGL scenes declaratively with re-usable, self-contained components that react to state, are readily interactive and can participate in React's ecosystem." src=".github/light.svg">
     </picture>
