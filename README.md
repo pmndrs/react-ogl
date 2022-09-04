@@ -8,7 +8,7 @@
   <a id="cover" href="#cover">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset=".github/dark.svg">
-      <img alt="react-ogl, a barebones react renderer for OGL. Build OGL scenes declaratively with re-usable, self-contained components that react to state, are readily interactive and can participate in React's ecosystem." src=".github/light.svg">
+      <img style="white-space:pre-wrap" alt="Build OGL scenes declaratively with re-usable, self-contained components that react to state, are readily interactive and can participate in React's ecosystem.&#10&#10react-ogl is a barebones react renderer for OGL with an emphasis on minimalism and modularity. Its reconciler simply expresses JSX as OGL elements — <mesh /> becomes new OGL.Mesh(). This happens dynamically; there's no wrapper involved.">
     </picture>
   </a>
 </p>
