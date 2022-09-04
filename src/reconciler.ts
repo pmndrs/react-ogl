@@ -92,6 +92,7 @@ function removeChild(parent: Instance, child: Instance) {
   else if (child.object instanceof OGL.Transform) parent.object.removeChild(child.object)
 
   if (child.props.dispose !== null) child.object.dispose?.()
+  delete child.object.__ogl
   child.object = null
 }
 
@@ -129,6 +130,9 @@ function commitInstance(instance: Instance) {
       instance.object = new target(...args)
     }
   }
+
+  // Link instance handle
+  instance.object.__ogl = instance
 
   // Auto-attach geometry and programs to meshes
   if (!instance.props.attach) {

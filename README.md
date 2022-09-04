@@ -36,6 +36,7 @@
   - [Loading assets via `useLoader`](#loading-assets-via-useloader)
   - [Object traversal via `useGraph`](#object-traversal-via-usegraph)
   - [Transient updates via `useStore`](#transient-updates-via-usestore)
+  - [Access internals via `useInstanceHandle`](#access-internals-via-useinstancehandle)
 - [Events](#events)
   - [Custom Events](#custom-events)
 
@@ -633,6 +634,23 @@ Returns the internal [Zustand](https://github.com/pmndrs/zustand) store. Useful 
 ```tsx
 const store = useStore()
 React.useLayoutEffect(() => store.subscribe(state => ...), [store])
+```
+
+### Access internals via `useInstanceHandle`
+
+Exposes an object's react-internal `Instance` state from a ref.
+
+> **Note**: this is an escape hatch to react-internal fields. Expect this to change significantly between versions.
+
+```tsx
+const ref = React.useRef()
+const instance = useInstanceHandle(ref)
+
+React.useLayoutEffect(() => {
+  instance.parent.object.foo()
+}, [])
+
+<transform ref={ref} />
 ```
 
 ## Events

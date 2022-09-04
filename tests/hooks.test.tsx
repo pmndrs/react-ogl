@@ -1,7 +1,7 @@
 import * as React from 'react'
 import create from 'zustand'
 import { render } from './utils'
-import { act, OGLContext, useOGL, useFrame, RootState, Subscription } from '../src'
+import { act, OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
@@ -86,5 +86,20 @@ describe('useFrame', () => {
     })
 
     expect(priority).not.toBe(0)
+  })
+})
+
+describe('useInstanceHandle', () => {
+  it('should return Instance state', async () => {
+    const ref = React.createRef<OGL.Transform>()
+    let instance!: React.MutableRefObject<Instance>
+
+    const Component = () => {
+      instance = useInstanceHandle(ref)
+      return <transform ref={ref} />
+    }
+    await act(async () => render(<Component />))
+
+    expect(instance.current).toBe((ref.current as unknown as any).__ogl)
   })
 })

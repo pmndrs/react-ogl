@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
 import type { StateSelector, EqualityChecker } from 'zustand'
-import type { RootState, RootStore, Subscription } from './types'
+import type { Instance, RootState, RootStore, Subscription } from './types'
 import { classExtends } from './utils'
 
 /**
@@ -18,6 +18,17 @@ export const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' && (window.document?.createElement || window.navigator?.product === 'ReactNative')
     ? React.useLayoutEffect
     : React.useEffect
+
+/**
+ * Exposes an object's {@link Instance}.
+ *
+ * **Note**: this is an escape hatch to react-internal fields. Expect this to change significantly between versions.
+ */
+export function useInstanceHandle<O>(ref: React.MutableRefObject<O>): React.MutableRefObject<Instance> {
+  const instance = React.useRef<Instance>(null!)
+  useIsomorphicLayoutEffect(() => void (instance.current = (ref.current as unknown as any).__ogl), [ref])
+  return instance
+}
 
 /**
  * Internal OGL context.
