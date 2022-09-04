@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { RESERVED_PROPS, INSTANCE_PROPS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { DPR, EventHandlers, Instance, Interactive, RootState } from './types'
+import { ConstructorRepresentation, DPR, EventHandlers, Instance, RootState } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -84,7 +84,11 @@ export function detach(parent: Instance, child: Instance) {
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export function applyProps(object: any, newProps: any, oldProps?: any) {
+export function applyProps<T extends ConstructorRepresentation = any>(
+  object: Instance<T>['object'],
+  newProps: Instance<T>['props'],
+  oldProps?: Instance<T>['props'],
+): void {
   // Mutate our OGL element
   for (const prop in newProps) {
     // Don't mutate reserved keys
@@ -108,7 +112,7 @@ export function applyProps(object: any, newProps: any, oldProps?: any) {
     // otherwise, mutate the property directly
     const isMathClass = typeof target?.set === 'function' && typeof target?.copy === 'function'
     if (!ArrayBuffer.isView(value) && isMathClass) {
-      if (target.constructor === value.constructor) {
+      if (target.constructor === (value as ConstructorRepresentation).constructor) {
         target.copy(value)
       } else if (Array.isArray(value)) {
         target.set(...value)
@@ -157,26 +161,32 @@ export function createEvents(state: RootState) {
     state.mouse!.y = -(event.offsetY / state.size.height) * 2 + 1
 
     // Filter to interactive meshes
-    const interactive: Interactive[] = []
-    state.scene.traverse((node: OGL.Transform | Interactive) => {
+    const interactive: OGL.Mesh[] = []
+    state.scene.traverse((node: OGL.Transform) => {
       // Mesh has registered events and a defined volume
-      if (node instanceof OGL.Mesh && node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
+      if (
+        node instanceof OGL.Mesh &&
+        (node as Instance<OGL.Mesh>['object']).__handlers &&
+        node.geometry?.attributes?.position
+      )
+        interactive.push(node)
     })
 
     // Get elements that intersect with our pointer
     state.raycaster!.castMouse(state.camera, state.mouse)
-    const intersects: Interactive[] = state.raycaster!.intersectMeshes(interactive)
+    const intersects: OGL.Mesh[] = state.raycaster!.intersectMeshes(interactive)
 
     // Used to discern between generic events and custom hover events.
     // We hijack the pointermove event to handle hover state
     const isHoverEvent = type === 'onPointerMove'
 
     // Trigger events for hovered elements
-    for (const object of intersects) {
-      const handlers = object.__handlers
-
+    for (const entry of intersects) {
       // Bail if object doesn't have handlers (managed externally)
-      if (!handlers) continue
+      if (!(entry as unknown as any).__handlers) continue
+
+      const object = entry as Instance<OGL.Mesh>['object']
+      const handlers = object.__handlers
 
       if (isHoverEvent && !state.hovered!.get(object.id)) {
         // Mark object as hovered and fire its hover events
