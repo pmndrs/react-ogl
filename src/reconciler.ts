@@ -130,6 +130,9 @@ function commitInstance(instance: Instance) {
     }
   }
 
+  // Link instance handle
+  instance.object.__ogl = instance
+
   // Auto-attach geometry and programs to meshes
   if (!instance.props.attach) {
     if (instance.object instanceof OGL.Geometry) instance.props.attach = 'geometry'
