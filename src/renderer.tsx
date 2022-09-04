@@ -5,7 +5,7 @@ import { ConcurrentRoot } from 'react-reconciler/constants.js'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
 import { OGLContext, useStore } from './hooks'
-import { Fiber, Instance, InstanceProps, RenderProps, Root, RootState, RootStore, Subscription } from './types'
+import { RenderProps, Root, RootState, RootStore, Subscription } from './types'
 import { applyProps, calculateDpr } from './utils'
 
 // Store roots here since we can render to multiple targets
@@ -44,8 +44,7 @@ export function render(
               ...(config.renderer as any),
               canvas: target,
             })
-      if (config.renderer && typeof config.renderer !== 'function')
-        applyProps(renderer as unknown as Instance, config.renderer as InstanceProps)
+      if (config.renderer && typeof config.renderer !== 'function') applyProps(renderer as any, config.renderer as any)
 
       renderer.dpr = calculateDpr(dpr)
 
@@ -58,7 +57,7 @@ export function render(
           ? config.camera
           : new OGL.Camera(gl, { fov: 75, near: 1, far: 1000, ...(config.camera as any) })
       camera.position.z = 5
-      if (config.camera) applyProps(camera, config.camera as InstanceProps)
+      if (config.camera) applyProps(camera as any, config.camera as any)
 
       return {
         size,
@@ -156,7 +155,7 @@ export function render(
 
     // Create root container
     const container = reconciler.createContainer(
-      store as Fiber,
+      store,
       ConcurrentRoot,
       null,
       false,

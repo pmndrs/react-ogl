@@ -4,13 +4,13 @@ import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
 import { RESERVED_PROPS } from './constants'
-import { Act, Catalogue, Fiber, Instance, InstanceProps, OGLElements } from './types'
+import { Act, Catalogue, ConstructorRepresentation, Instance, InstanceProps, OGLElements, RootStore } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue = { ...OGL } as unknown as Catalogue
 
 // Effectful catalogue elements that require a `WebGLRenderingContext`.
-const catalogueGL: any[] = [
+const catalogueGL: ConstructorRepresentation[] = [
   // Core
   OGL.Camera,
   OGL.Geometry,
@@ -46,7 +46,11 @@ export function extend(objects: Partial<Catalogue>, gl = false) {
 /**
  * Creates an OGL element from a React node.
  */
-function createInstance(type: keyof OGLElements, { object = null, args = [], ...props }: InstanceProps, root: Fiber) {
+function createInstance(
+  type: keyof OGLElements,
+  { object = null, args = [], ...props }: InstanceProps,
+  root: RootStore,
+) {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type) as keyof Catalogue
 
@@ -67,6 +71,7 @@ function createInstance(type: keyof OGLElements, { object = null, args = [], ...
     type,
     props: { ...props, args },
     object,
+    isHidden: false,
   }
 
   return instance
@@ -159,7 +164,7 @@ function commitInstance(instance: Instance) {
 /**
  * Switches instance to a new one, moving over children.
  */
-function switchInstance(instance: Instance, type: keyof OGLElements, props: InstanceProps, root: Fiber) {
+function switchInstance(instance: Instance, type: keyof OGLElements, props: InstanceProps, fiber: Reconciler.Fiber) {
   // Create a new instance
   const newInstance = createInstance(type, props, instance.root)
 
@@ -189,7 +194,7 @@ function switchInstance(instance: Instance, type: keyof OGLElements, props: Inst
 
   // Switches the react-internal fiber node
   // https://github.com/facebook/react/issues/14983
-  ;[root, root.alternate].forEach((fiber) => {
+  ;[fiber, fiber.alternate].forEach((fiber) => {
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
@@ -227,8 +232,12 @@ function checkShallow(a: any, b: any) {
 /**
  * Prepares a set of changes to be applied to the instance.
  */
-function diffProps(instance: Instance, newProps: InstanceProps, oldProps: InstanceProps) {
-  const changedProps: InstanceProps = {}
+function diffProps<T extends ConstructorRepresentation = any>(
+  instance: Instance<T>,
+  newProps: Instance<T>['props'],
+  oldProps: Instance<T>['props'],
+): Instance<T>['props'] {
+  const changedProps: Instance<T>['props'] = {}
 
   // Sort through props
   for (const key in newProps) {
@@ -263,9 +272,9 @@ export const reconciler = Reconciler<
   // Instance type
   keyof OGLElements,
   // Instance props
-  InstanceProps,
-  // Fiber container
-  Fiber,
+  Instance['props'],
+  // Root Store
+  RootStore,
   // Normal instance
   Instance,
   // Text instance
@@ -390,11 +399,15 @@ export const reconciler = Reconciler<
     if (instance.object instanceof OGL.Transform) {
       instance.object.visible = false
     }
+
+    instance.isHidden = true
   },
   unhideInstance(instance) {
-    if (instance.object instanceof OGL.Transform) {
-      instance.object.visible = (instance.props.visible as boolean) ?? true
+    if (instance.isHidden && instance.object instanceof OGL.Transform && instance.props.visible !== false) {
+      instance.object.visible = true
     }
+
+    instance.isHidden = false
   },
   // Configures a callback once finalized and instances are linked up to one another.
   // This is a safe time to create instances' respective OGL elements without worrying
@@ -413,7 +426,7 @@ export const act: Act = (React as any).unstable_act
 // Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
 reconciler.injectIntoDevTools({
-  findFiberByHostInstance: (instance) => instance.root,
+  findFiberByHostInstance: () => null,
   bundleType: isProd ? 0 : 1,
   version: React.version,
   rendererPackageName: 'react-ogl',

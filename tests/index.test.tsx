@@ -1,13 +1,13 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { Node, extend, act, RootState, createPortal } from '../src'
+import { OGLElement, extend, act, RootState, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
 declare module '../src' {
   interface OGLElements {
-    customElement: Node<CustomElement, typeof CustomElement>
+    customElement: OGLElement<typeof CustomElement>
   }
 }
 

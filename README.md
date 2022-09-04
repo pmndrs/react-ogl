@@ -382,7 +382,7 @@ interface RootState {
   events?: EventManager
   mouse: OGL.Vec2
   raycaster: OGL.Raycast
-  hovered: Map<number, Interactive>
+  hovered: Map<number, Instance<OGL.Mesh>['object']>
 }
 ```
 
@@ -520,13 +520,13 @@ extend({ CustomElement })
 TypeScript users will need to extend the `OGLElements` interface to describe custom elements and their properties.
 
 ```tsx
-import { Node, extend } from 'react-ogl'
+import { OGLElement, extend } from 'react-ogl'
 
 class CustomElement {}
 
 declare module 'react-ogl' {
   interface OGLElements {
-    customElement: Node<CustomElement, typeof CustomElement>
+    customElement: OGLElement<typeof CustomElement>
   }
 }
 
@@ -643,7 +643,7 @@ Exposes an object's react-internal `Instance` state from a ref.
 > **Note**: this is an escape hatch to react-internal fields. Expect this to change significantly between versions.
 
 ```tsx
-const ref = React.useRef()
+const ref = React.useRef<OGL.Transform>()
 const instance = useInstanceHandle(ref)
 
 React.useLayoutEffect(() => {
@@ -727,20 +727,30 @@ const events = {
         state.mouse.y = -(event.offsetY / state.size.height) * 2 + 1
 
         // Filter to interactive meshes
-        const interactive: Interactive[] = []
-        state.scene.traverse((node: OGL.Transform | Interactive) => {
+        const interactive: OGL.Mesh[] = []
+        state.scene.traverse((node: OGL.Transform) => {
           // Mesh has registered events and a defined volume
-          if (node instanceof OGL.Mesh && node.__handlers && node.geometry?.attributes?.position) interactive.push(node)
+          if (
+            node instanceof OGL.Mesh &&
+            (node as Instance<OGL.Mesh>['object']).__handlers &&
+            node.geometry?.attributes?.position
+          )
+            interactive.push(node)
         })
 
         // Get elements that intersect with our pointer
-        state.raycaster.castMouse(state.camera, state.mouse)
-        const intersects: Interactive[] = state.raycaster.intersectMeshes(interactive)
+        state.raycaster!.castMouse(state.camera, state.mouse)
+        const intersects: OGL.Mesh[] = state.raycaster!.intersectMeshes(interactive)
 
         // Call mesh handlers
-        for (const object of intersects) {
-          const handlers = object.__handlers
-          handlers?.onPointerMove?.({ ...object.hit, nativeEvent: event })
+        for (const entry of intersects) {
+          if ((entry as unknown as any).__handlers) {
+            const object = entry as Instance<OGL.Mesh>['object']
+            const handlers = object.__handlers
+
+            const handlers = object.__handlers
+            handlers?.onPointerMove?.({ ...object.hit, nativeEvent: event })
+          }
         }
       },
     }
