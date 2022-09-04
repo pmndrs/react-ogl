@@ -92,6 +92,7 @@ function removeChild(parent: Instance, child: Instance) {
   else if (child.object instanceof OGL.Transform) parent.object.removeChild(child.object)
 
   if (child.props.dispose !== null) child.object.dispose?.()
+  delete child.object.__ogl
   child.object = null
 }
 
