@@ -125,7 +125,7 @@ export function useLoader<L extends LoaderRepresentation, I extends string | str
       const result = await Promise.all(
         urls.map(async (url: string) => {
           // @ts-ignore OGL's loaders don't have a consistent signature
-          if (classExtends(loader, OGL.TextureLoader)) return loader.load(gl, { url })
+          if (classExtends(loader, OGL.TextureLoader)) return loader.load(gl, { src: url })
 
           return await loader.load(gl, url)
         }),
