@@ -17,6 +17,7 @@
   "author": "Cody Bennett (https://github.com/codyjasonbennett)",
   "license": "MIT",
   "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
   "exports": "./dist/index.mjs",
   "react-native": "./dist/index.native.mjs",
   "sideEffects": false,
