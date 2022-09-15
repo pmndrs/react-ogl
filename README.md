@@ -791,7 +791,7 @@ const camera = new OGL.Camera()
 
 ## Testing
 
-In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an internal `act` which can be used to safely flush async effects in tests. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
+In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an `act` method which can be used to safely flush async effects in tests. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
 
 ```tsx
 import * as React from 'react'
