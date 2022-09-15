@@ -1582,10 +1582,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.13.tgz#23e6c5168333480d454243378b69e861ab5c011a"
   integrity sha512-46yIhxSe5xEaJZXWdIBP7GU4HDTG8/eo0qd9atdiL+lFpA03y8KS+lkTN834TWJj5767GbWv4n/P6efyTFt1Dw==
 
-"@types/ogl@npm:ogl-types@^0.0.97":
-  version "0.0.97"
-  resolved "https://registry.yarnpkg.com/ogl-types/-/ogl-types-0.0.97.tgz#49db895f5779c7e6ab5b6dcd514c024b74ed11cc"
-  integrity sha512-0PrjDK4yYoPA1Jm66BUQjnexwNXswzKtnZFdxjSE9IV5oheDWQB/U1Oga0x8dl4RXQ38y+gbsgboXK7B35knGA==
+"@types/ogl@npm:ogl-types@^0.0.99":
+  version "0.0.99"
+  resolved "https://registry.yarnpkg.com/ogl-types/-/ogl-types-0.0.99.tgz#495d38fc3323cb61882daca9e8084e4693cd0f47"
+  integrity sha512-pY1+0VTIIAMGtiBzn4LBy+wjgQv0Nf7BEeE1XGnjvPKS9QhhWwWW+Ys6BnKCiQZgaNPbYeHBg5ln2J9bQEnWCA==
 
 "@types/parse5@^6.0.3":
   version "6.0.3"

@@ -54,7 +54,7 @@
     "vite": "^3.0.9"
   },
   "dependencies": {
-    "@types/ogl": "npm:ogl-types@^0.0.97",
+    "@types/ogl": "npm:ogl-types@^0.0.99",
     "@types/react-reconciler": "^0.26.7",
     "@types/webxr": "^0.5.0",
     "react-reconciler": "^0.27.0",

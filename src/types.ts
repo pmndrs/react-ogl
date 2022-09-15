@@ -157,14 +157,6 @@ export type OGLElement<T extends ConstructorRepresentation> = Mutable<
   Overwrite<OGLElementProps<T>, Omit<InstanceProps<InstanceType<T>>, 'object'>>
 >
 
-// TODO: fix in next types release
-declare module 'ogl' {
-  // @ts-ignore
-  class NormalProgram extends OGL.Program {
-    constructor(gl: OGL.OGLRenderingContext)
-  }
-}
-
 type OGLExports = typeof OGL
 type OGLElementsImpl = {
   [K in keyof OGLExports as Uncapitalize<K>]: OGLExports[K] extends ConstructorRepresentation
