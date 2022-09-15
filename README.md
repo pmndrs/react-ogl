@@ -38,6 +38,7 @@
   - [Access internals via `useInstanceHandle`](#access-internals-via-useinstancehandle)
 - [Events](#events)
   - [Custom Events](#custom-events)
+- [Portals](#portals)
 - [Testing](#testing)
 
 ## Installation
@@ -769,6 +770,24 @@ const events = {
 ```
 
 </details>
+
+## Portals
+
+Portal children into a foreign OGL element via `createPortal`, which can modify children's `RootState`. This is particularly useful for postprocessing and complex render effects.
+
+```tsx
+function Component {
+  // scene & camera are inherited from portal parameters
+  const { scene, camera, ... } = useOGL()
+}
+
+const scene = new OGL.Transform()
+const camera = new OGL.Camera()
+
+<transform>
+  {createPortal(<Component />, scene, { camera })
+</transform>
+```
 
 ## Testing
 
