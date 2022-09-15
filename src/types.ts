@@ -78,7 +78,7 @@ export interface RootState {
   [key: string]: any
 }
 
-export type Act = (cb: () => Promise<any>) => Promise<any>
+export type Act = <T = any>(cb: () => Promise<T>) => Promise<T>
 
 export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
 

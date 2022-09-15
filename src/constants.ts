@@ -13,7 +13,7 @@ export const POINTER_EVENTS = [
 /**
  * React internal props.
  */
-export const RESERVED_PROPS = ['children', 'key', 'ref', '__self', '__source'] as const
+export const RESERVED_PROPS = ['children', 'key', 'ref', '__self', '__source']
 
 /**
  * react-ogl instance-specific props.

@@ -1,10 +1,11 @@
 import Reconciler from 'react-reconciler'
 import { DefaultEventPriority } from 'react-reconciler/constants.js'
+import { unstable_IdlePriority as idlePriority, unstable_scheduleCallback as scheduleCallback } from 'scheduler'
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { toPascalCase, applyProps, attach, detach, classExtends } from './utils'
+import { toPascalCase, applyProps, attach, detach, classExtends, prepare } from './utils'
 import { RESERVED_PROPS } from './constants'
-import { Act, Catalogue, ConstructorRepresentation, Instance, InstanceProps, OGLElements, RootStore } from './types'
+import { Act, Catalogue, ConstructorRepresentation, Instance, OGLElements, RootStore } from './types'
 
 // Custom objects that extend the OGL namespace
 const catalogue = { ...OGL } as unknown as Catalogue
@@ -43,14 +44,73 @@ export function extend(objects: Partial<Catalogue>, gl = false) {
   }
 }
 
+// https://github.com/facebook/react/issues/20271
+// This will make sure events and attach are only handled once when trees are complete
+function handleContainerEffects(parent: Instance, child: Instance) {
+  // Bail if tree isn't mounted or parent is not a container.
+  // This ensures that the tree is finalized and React won't discard results to Suspense
+  const state = child.root.getState()
+  if (!parent.parent && parent.object !== state.scene) return
+
+  // Create instance object
+  if (child.type !== 'primitive') {
+    const name = toPascalCase(child.type) as keyof Catalogue
+    const target = catalogue[name]
+    const { args = [], ...props } = child.props
+
+    // Pass internal state to elements which depend on it.
+    // This lets them be immutable upon creation and use props
+    const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
+    if (isGLInstance) {
+      const { gl } = child.root.getState()
+      const filtered = args.filter((arg) => arg !== gl)
+
+      // Accept props as args for programs & geometry
+      if (child.type === 'program' || child.type === 'geometry') {
+        const attrs = Object.entries(props).reduce((acc, [key, value]) => {
+          // Don't include non-attributes for geometry
+          if (child.type === 'geometry' && !(value as OGL.Attribute)?.data) return acc
+          // Include non-pierced props
+          if (!key.includes('-')) acc[key] = value
+          return acc
+        }, filtered[0] ?? {})
+
+        child.object = new target(gl, attrs)
+      } else {
+        child.object = new target(gl, ...filtered)
+      }
+    } else {
+      child.object = new target(...args)
+    }
+  }
+
+  // Link instance handle
+  child.object.__ogl = child
+
+  // Auto-attach geometry and programs to meshes
+  if (!child.props.attach) {
+    if (child.object instanceof OGL.Geometry) child.props.attach = 'geometry'
+    else if (child.object instanceof OGL.Program) child.props.attach = 'program'
+  }
+
+  // Apply props to OGL object
+  applyProps(child.object, child.props)
+
+  // Handle attach
+  if (child.props.attach) {
+    attach(parent, child)
+  } else if (child.object instanceof OGL.Transform && parent.object instanceof OGL.Transform) {
+    child.object.setParent(parent.object)
+  }
+
+  // Link subtree
+  for (const childInstance of child.children) handleContainerEffects(child, childInstance)
+}
+
 /**
  * Creates an OGL element from a React node.
  */
-function createInstance(
-  type: keyof OGLElements,
-  { object = null, args = [], ...props }: InstanceProps,
-  root: RootStore,
-) {
+function createInstance(type: keyof OGLElements, props: Instance['props'], root: RootStore) {
   // Convert lowercase primitive to PascalCase
   const name = toPascalCase(type) as keyof Catalogue
 
@@ -61,18 +121,10 @@ function createInstance(
   if (type !== 'primitive' && !target) throw `${type} is not a part of the OGL catalogue! Did you forget to extend?`
 
   // Validate primitives
-  if (type === 'primitive' && !object) throw `"object" must be set when using primitives.`
+  if (type === 'primitive' && !props.object) throw `"object" must be set when using primitives.`
 
   // Create instance
-  const instance: Instance = {
-    root,
-    parent: null,
-    children: [],
-    type,
-    props: { ...props, args },
-    object,
-    isHidden: false,
-  }
+  const instance = prepare(props.object, root, type, props)
 
   return instance
 }
@@ -81,116 +133,90 @@ function createInstance(
  * Adds elements to our scene and attaches children to their parents.
  */
 const appendChild = (parent: Instance, child: Instance) => {
+  // Link instances
   child.parent = parent
   parent.children.push(child)
+
+  // Attach tree once complete
+  handleContainerEffects(parent, child)
 }
 
 /**
  * Removes elements from scene and disposes of them.
  */
-function removeChild(parent: Instance, child: Instance) {
+function removeChild(parent: Instance, child: Instance, dispose?: boolean, recursive?: boolean) {
+  // Unlink instances
   child.parent = null
-  const childIndex = parent.children.indexOf(child)
-  if (childIndex !== -1) parent.children.splice(childIndex, 1)
+  if (recursive === undefined) {
+    const childIndex = parent.children.indexOf(child)
+    if (childIndex !== -1) parent.children.splice(childIndex, 1)
+  }
 
-  if (child.props.attach) detach(parent, child)
-  else if (child.object instanceof OGL.Transform) parent.object.removeChild(child.object)
+  // Remove instance objects
+  if (child.props.attach) {
+    detach(parent, child)
+  } else if (parent.object instanceof OGL.Transform && child.object instanceof OGL.Transform) {
+    parent.object.removeChild(child.object)
+  }
 
-  if (child.props.dispose !== null) child.object.dispose?.()
-  delete child.object.__ogl
-  child.object = null
+  // Allow objects to bail out of unmount disposal with dispose={null}
+  const shouldDispose = child.props.dispose !== null && dispose !== false
+
+  // Recursively remove instance children
+  if (recursive !== false) {
+    for (const node of child.children) removeChild(child, node, shouldDispose, true)
+    child.children = []
+  }
+
+  // Dispose if able
+  if (shouldDispose) {
+    const object = child.object
+    scheduleCallback(idlePriority, () => object.dispose?.())
+    delete child.object.__ogl
+    child.object = null
+  }
 }
 
-function commitInstance(instance: Instance) {
-  // Don't handle commit for containers
-  if (!instance.parent) return
+/**
+ * Inserts an instance between instances of a ReactNode.
+ */
+function insertBefore(parent: Instance, child: Instance, beforeChild: Instance, replace = false) {
+  if (!child) return
 
-  if (instance.type !== 'primitive' && !instance.object) {
-    const name = toPascalCase(instance.type) as keyof Catalogue
-    const target = catalogue[name]
-    const { args = [], ...props } = instance.props
+  // Link instances
+  child.parent = parent
+  const childIndex = parent.children.indexOf(beforeChild)
+  if (childIndex !== -1) parent.children.splice(childIndex, replace ? 1 : 0, child)
+  if (replace) beforeChild.parent = null
 
-    // Pass internal state to elements which depend on it.
-    // This lets them be immutable upon creation and use props
-    const isGLInstance = Object.values(catalogueGL).some((elem) => classExtends(elem, target))
-    if (isGLInstance) {
-      const { gl } = instance.root.getState()
-      const filtered = args.filter((arg) => arg !== gl)
-
-      // Accept props as args for programs & geometry
-      if (instance.type === 'program' || instance.type === 'geometry') {
-        const attrs = Object.entries(props).reduce((acc, [key, value]) => {
-          // Don't include non-attributes for geometry
-          if (instance.type === 'geometry' && !(value as OGL.Attribute)?.data) return acc
-          // Include non-pierced props
-          if (!key.includes('-')) acc[key] = value
-          return acc
-        }, filtered[0] ?? {})
-
-        instance.object = new target(gl, attrs)
-      } else {
-        instance.object = new target(gl, ...filtered)
-      }
-    } else {
-      instance.object = new target(...args)
-    }
-  }
-
-  // Link instance handle
-  instance.object.__ogl = instance
-
-  // Auto-attach geometry and programs to meshes
-  if (!instance.props.attach) {
-    if (instance.object instanceof OGL.Geometry) instance.props.attach = 'geometry'
-    else if (instance.object instanceof OGL.Program) instance.props.attach = 'program'
-  }
-
-  // Append children
-  for (const child of instance.children) {
-    if (child.props.attach) attach(instance, child)
-    else if (child.object instanceof OGL.Transform) child.object.setParent(instance.object)
-  }
-
-  // Append to container
-  if (!instance.parent.parent) {
-    if (instance.props.attach) attach(instance.parent, instance)
-    else if (instance.object instanceof OGL.Transform) instance.object.setParent(instance.parent.object)
-  }
-
-  // Apply props to OGL object
-  applyProps(instance.object, instance.props)
+  // Attach tree once complete
+  handleContainerEffects(parent, child)
 }
 
 /**
  * Switches instance to a new one, moving over children.
  */
-function switchInstance(instance: Instance, type: keyof OGLElements, props: InstanceProps, fiber: Reconciler.Fiber) {
+function switchInstance(
+  oldInstance: Instance,
+  type: keyof OGLElements,
+  props: Instance['props'],
+  fiber: Reconciler.Fiber,
+) {
   // Create a new instance
-  const newInstance = createInstance(type, props, instance.root)
-
-  // Replace instance in scene-graph
-  const parent = instance.parent!
-  removeChild(parent, instance)
-  appendChild(parent, newInstance)
-
-  // Commit new instance object
-  commitInstance(newInstance)
-
-  // Append to scene-graph
-  if (parent.parent) {
-    if (newInstance.props.attach) attach(parent, newInstance)
-    else if (newInstance.object instanceof OGL.Transform) newInstance.object.setParent(parent.object)
-  }
+  const newInstance = createInstance(type, props, oldInstance.root)
 
   // Move children to new instance
-  for (const child of instance.children) {
+  for (const child of oldInstance.children) {
+    removeChild(oldInstance, child, false, false)
     appendChild(newInstance, child)
-    if (child.props.attach) {
-      detach(instance, child)
-      attach(newInstance, child)
-    }
   }
-  instance.children = []
+  oldInstance.children = []
+
+  // Link up new instance
+  const parent = oldInstance.parent
+  if (parent) {
+    insertBefore(parent, newInstance, oldInstance, true)
+  }
 
   // Switches the react-internal fiber node
   // https://github.com/facebook/react/issues/14983
@@ -198,8 +224,8 @@ function switchInstance(instance: Instance, type: keyof OGLElements, props: Inst
     if (fiber !== null) {
       fiber.stateNode = newInstance
       if (fiber.ref) {
-        if (typeof fiber.ref === 'function') (fiber as unknown as any).ref(newInstance.object)
-        else (fiber.ref as Reconciler.RefObject).current = newInstance.object
+        if (typeof fiber.ref === 'function') fiber.ref(newInstance.object)
+        else fiber.ref.current = newInstance.object
       }
     }
   })
@@ -256,16 +282,6 @@ function diffProps<T extends ConstructorRepresentation = any>(
 }
 
 /**
- * Inserts an instance between instances of a ReactNode.
- */
-function insertBefore(parent: Instance, child: Instance, beforeChild: Instance) {
-  if (!child) return
-
-  child.parent = parent
-  parent.children.splice(parent.children.indexOf(beforeChild), 0, child)
-}
-
-/**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
 export const reconciler = Reconciler<
@@ -288,7 +304,7 @@ export const reconciler = Reconciler<
   // Host context
   null,
   // applyProps diff sets
-  null | [boolean] | [boolean, InstanceProps],
+  null | [true] | [false, Instance['props']],
   // Hydration child set
   never,
   // Timeout id handle
@@ -322,7 +338,7 @@ export const reconciler = Reconciler<
   getRootHostContext: () => null,
   getChildHostContext: (parentHostContext) => parentHostContext,
   // We can optionally mutate portal containers here, but we do that in createPortal instead from state
-  preparePortalMount: (container) => container,
+  preparePortalMount: (container) => prepare(container.getState().scene, container, '', {}),
   // This lets us store stuff at the container-level before/after React mutates our OGL elements.
   // Elements are mutated in isolation, so we don't do anything here.
   prepareForCommit: () => null,
@@ -335,14 +351,29 @@ export const reconciler = Reconciler<
   // These methods add elements to the scene
   appendChild,
   appendInitialChild: appendChild,
-  appendChildToContainer: () => {},
-  // These methods remove elements from the scene
-  removeChild,
-  removeChildFromContainer: () => {},
+  appendChildToContainer(container, child) {
+    const scene = (container.getState().scene as unknown as Instance<OGL.Transform>['object']).__ogl
+    if (!child || !scene) return
+
+    appendChild(scene, child)
+  },
   // We can specify an order for children to be inserted here.
   // This is useful if you want to override stuff like materials
   insertBefore,
-  insertInContainerBefore: () => {},
+  insertInContainerBefore(container, child, beforeChild) {
+    const scene = (container.getState().scene as unknown as Instance<OGL.Transform>['object']).__ogl
+    if (!child || !beforeChild || !scene) return
+
+    insertBefore(scene, child, beforeChild)
+  },
+  // These methods remove elements from the scene
+  removeChild,
+  removeChildFromContainer(container, child) {
+    const scene = (container.getState().scene as unknown as Instance<OGL.Transform>['object']).__ogl
+    if (!child || !scene) return
+
+    removeChild(scene, child)
+  },
   // Used to calculate updates in the render phase or commitUpdate.
   // Greatly improves performance by reducing paint to rapid mutations.
   prepareUpdate(instance, type, oldProps, newProps) {
@@ -364,6 +395,7 @@ export const reconciler = Reconciler<
     }
 
     // If the instance has new args, recreate it
+    if (newProps.args?.length !== oldProps.args?.length) return [true]
     if (newProps.args?.some((value, index) => value !== oldProps.args?.[index])) return [true]
 
     // Diff through props and flag with changes
@@ -388,10 +420,10 @@ export const reconciler = Reconciler<
     }
 
     // Update instance props
-    Object.assign(instance.props, newProps)
+    Object.assign(instance.props, changedProps)
 
     // Apply changed props
-    applyProps(instance.object, newProps)
+    applyProps(instance.object, changedProps)
   },
   // Methods to toggle instance visibility on demand.
   // React uses this with React.Suspense to display fallback content
@@ -409,11 +441,9 @@ export const reconciler = Reconciler<
 
     instance.isHidden = false
   },
-  // Configures a callback once finalized and instances are linked up to one another.
-  // This is a safe time to create instances' respective OGL elements without worrying
-  // about side-effects if react changes its mind and discards an instance (e.g. React.Suspense)
-  finalizeInitialChildren: () => true,
-  commitMount: commitInstance,
+  // Configures a callback once the tree is finalized after commit-effects are fired
+  finalizeInitialChildren: () => false,
+  commitMount() {},
   // @ts-ignore
   getCurrentEventPriority: () => DefaultEventPriority,
   beforeActiveInstanceBlur: () => {},
@@ -421,6 +451,9 @@ export const reconciler = Reconciler<
   detachDeletedInstance: () => {},
 })
 
+/**
+ * Safely flush async effects when testing, simulating a legacy root.
+ */
 export const act: Act = (React as any).unstable_act
 
 // Inject renderer meta into devtools

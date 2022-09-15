@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { OGLElement, extend, act, RootState, createPortal } from '../src'
+import { OGLElement, extend, act, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
@@ -13,42 +13,43 @@ declare module '../src' {
 
 describe('renderer', () => {
   it('should render JSX', async () => {
-    let state: RootState = null!
-
-    await act(async () => {
-      state = render(<transform />)
-    })
-
+    const state = await act(async () => render(<transform />))
     expect(state.scene.children.length).not.toBe(0)
   })
 
   it('should render extended elements', async () => {
-    let state: RootState = null!
-
-    await act(async () => {
-      extend({ CustomElement })
-      state = render(<customElement />)
-    })
-
-    const [element] = state.scene.children
-
-    expect(element instanceof CustomElement).toBe(true)
+    extend({ CustomElement })
+    const state = await act(async () => render(<customElement />))
+    expect(state.scene.children[0]).toBeInstanceOf(CustomElement)
   })
 
-  it('should complete view on mount', async () => {
+  it('should go through lifecycle', async () => {
     const lifecycle: string[] = []
 
     function Test() {
+      React.useInsertionEffect(() => void lifecycle.push('useInsertionEffect'), [])
+      React.useImperativeHandle(React.useRef(), () => void lifecycle.push('refCallback'))
       React.useLayoutEffect(() => void lifecycle.push('useLayoutEffect'), [])
       React.useEffect(() => void lifecycle.push('useEffect'), [])
-      return <transform attach={() => (lifecycle.push('attach'), () => {})} />
+      lifecycle.push('render')
+      return (
+        <transform
+          ref={() => void lifecycle.push('ref')}
+          attach={() => (lifecycle.push('attach'), () => lifecycle.push('detach'))}
+        />
+      )
     }
+    await act(async () => render(<Test />))
 
-    await act(async () => {
-      render(<Test />)
-    })
-
-    expect(lifecycle).toStrictEqual(['attach', 'useLayoutEffect', 'useEffect'])
+    expect(lifecycle).toStrictEqual([
+      'render',
+      'useInsertionEffect',
+      'attach',
+      'ref',
+      'refCallback',
+      'useLayoutEffect',
+      'useEffect',
+    ])
   })
 
   it('should set pierced props', async () => {
@@ -67,10 +68,8 @@ describe('renderer', () => {
   })
 
   it('should handle attach', async () => {
-    let state: RootState = null!
-
-    await act(async () => {
-      state = render(
+    const state = await act(async () =>
+      render(
         <>
           <mesh>
             <geometry />
@@ -86,8 +85,8 @@ describe('renderer', () => {
             />
           </mesh>
         </>,
-      )
-    })
+      ),
+    )
 
     const [element1, element2] = state.scene.children as OGL.Mesh[]
 
@@ -108,19 +107,17 @@ describe('renderer', () => {
   })
 
   it('should accept vertex and fragment as program args', async () => {
-    let state: RootState = null!
-
     const vertex = 'vertex'
     const fragment = 'fragment'
 
-    await act(async () => {
-      state = render(
+    const state = await act(async () =>
+      render(
         <mesh>
           <box />
           <program vertex={vertex} fragment={fragment} />
         </mesh>,
-      )
-    })
+      ),
+    )
 
     const [mesh] = state.scene.children as OGL.Mesh[]
 
@@ -208,8 +205,6 @@ describe('renderer', () => {
   })
 
   it('should create an identical instance when reconstructing', async () => {
-    let state: RootState = null!
-
     const object1 = new OGL.Transform()
     const object2 = new OGL.Transform()
 
@@ -223,16 +218,12 @@ describe('renderer', () => {
       </primitive>
     )
 
-    await act(async () => {
-      state = render(<Test n={1} />)
-    })
+    let state = await act(async () => render(<Test n={1} />))
 
     const [oldInstance] = state.scene.children as any[]
     expect(oldInstance).toBe(object1)
 
-    await act(async () => {
-      state = render(<Test n={2} />)
-    })
+    state = await act(async () => render(<Test n={2} />))
 
     const [newInstance] = state.scene.children as any[]
     expect(newInstance).toBe(object2) // Swapped to new instance
@@ -241,12 +232,11 @@ describe('renderer', () => {
   })
 
   it('should prepare foreign objects when portaling', async () => {
-    let state: RootState = null!
     const object = new OGL.Transform()
     const mesh = React.createRef<OGL.Mesh>()
 
-    await act(async () => {
-      state = render(
+    const state = await act(async () =>
+      render(
         createPortal(
           <mesh ref={mesh}>
             <box />
@@ -254,8 +244,8 @@ describe('renderer', () => {
           </mesh>,
           object,
         ),
-      )
-    })
+      ),
+    )
 
     expect(state.scene.children.length).toBe(0)
     expect(object.children.length).not.toBe(0)

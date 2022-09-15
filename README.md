@@ -22,8 +22,6 @@
 - [Canvas](#canvas)
   - [Canvas Props](#canvas-props)
   - [Custom Canvas](#custom-canvas)
-  - [Testing](#testing)
-  - [Root State](#root-state)
 - [Creating Elements](#creating-elements)
   - [JSX, properties, and shortcuts](#jsx-properties-and-shortcuts)
   - [Setting constructor arguments via `args`](#setting-constructor-arguments-via-args)
@@ -31,6 +29,7 @@
   - [Creating custom elements via `extend`](#creating-custom-elements-via-extend)
   - [Adding third-party objects via `<primitive />`](#adding-third-party-objects-via-primitive-)
 - [Hooks](#hooks)
+  - [Root State](#root-state)
   - [Accessing state via `useOGL`](#accessing-state-via-useogl)
   - [Frameloop subscriptions via `useFrame`](#frameloop-subscriptions-via-useframe)
   - [Loading assets via `useLoader`](#loading-assets-via-useloader)
@@ -39,6 +38,8 @@
   - [Access internals via `useInstanceHandle`](#access-internals-via-useinstancehandle)
 - [Events](#events)
   - [Custom Events](#custom-events)
+- [Portals](#portals)
+- [Testing](#testing)
 
 ## Installation
 
@@ -60,6 +61,11 @@ react-ogl itself is super minimal, but you can use the familiar [@react-three/fi
 ### react-dom
 
 This example uses [`create-react-app`](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) for the sake of simplicity, but you can use your own environment or [create a codesandbox](https://react.new).
+
+<details>
+  <summary>Show full example</summary>
+  
+  <br />
 
 ```bash
 # Create app
@@ -143,9 +149,16 @@ createRoot(document.getElementById('root')).render(
 )
 ```
 
+</details>
+
 ### react-native
 
 This example uses [`expo-cli`](https://docs.expo.dev/get-started/create-a-new-app) but you can create a bare app with `react-native` CLI as well.
+
+<details>
+  <summary>Show full example</summary>
+  
+  <br />
 
 ```bash
 # Create app and cd into it
@@ -244,6 +257,8 @@ export default () => (
 )
 ```
 
+</details>
+
 ## Canvas
 
 react-ogl provides an x-platform `<Canvas />` component for web and native that serves as the entrypoint for your OGL scenes. It is a real DOM canvas or native view that accepts OGL elements as children (see [creating elements](#creating-elements)).
@@ -324,65 +339,6 @@ function CustomCanvas({ children }) {
   React.useEffect(() => () => root?.unmount(), [root])
   // Use callback-style ref to access canvas in render
   return <canvas ref={setCanvas} />
-}
-```
-
-### Testing
-
-In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an internal `reconciler` which can be used to safely flush async effects in tests via `reconciler#act`. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
-
-```tsx
-import * as React from 'react'
-import * as OGL from 'ogl'
-import { type RootState, createRoot, act } from 'react-ogl'
-
-it('tests against a react-ogl component or scene', async () => {
-  const transform = React.createRef<OGL.Transform>()
-  let state: RootState = null!
-
-  await act(async () => {
-    const root = createRoot(document.createElement('canvas'))
-    state = root.render(<transform ref={transform} />).getState()
-  })
-
-  expect(transform.current).toBeInstanceOf(OGL.Transform)
-  expect(state.scene.children.length).toBe(1)
-  expect(state.scene.children[0]).toBe(transform.current)
-})
-```
-
-### Root State
-
-Each `<Canvas />` or `Root` encapsulates its own OGL state via [React context](https://reactjs.org/docs/context.html) and a [Zustand](https://github.com/pmndrs/zustand) store, as defined by `RootState`. This can be accessed and modified with the `onCreated` canvas prop, and with hooks like `useOGL` (see [hooks](#hooks)).
-
-```tsx
-interface RootState {
-  // Zustand setter and getter for live state manipulation.
-  // See https://github.com/pmndrs/zustand
-  get(): RootState
-  set(fn: (previous: RootState) => (next: Partial<RootState>)): void
-  // Canvas layout information
-  size: { width: number; height: number }
-  // OGL scene internals
-  renderer: OGL.Renderer
-  gl: OGL.OGLRenderingContext
-  scene: OGL.Transform
-  camera: OGL.Camera
-  // OGL perspective and frameloop preferences
-  orthographic: boolean
-  frameloop: 'always' | 'never'
-  // Internal XR manager to enable WebXR features
-  xr: XRManager
-  // Frameloop internals for custom render loops
-  priority: number
-  subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  // Optional canvas event manager and its state
-  events?: EventManager
-  mouse: OGL.Vec2
-  raycaster: OGL.Raycast
-  hovered: Map<number, Instance<OGL.Mesh>['object']>
 }
 ```
 
@@ -563,6 +519,41 @@ const object = new OGL.Transform()
 ## Hooks
 
 react-ogl ships with hooks that allow you to tie or request information to your components. These are called within the body of `<Canvas />` and contain imperative and possibly stateful code.
+
+### Root State
+
+Each `<Canvas />` or `Root` encapsulates its own OGL state via [React context](https://reactjs.org/docs/context.html) and a [Zustand](https://github.com/pmndrs/zustand) store, as defined by `RootState`. This can be accessed and modified with the `onCreated` canvas prop, and with hooks like `useOGL`.
+
+```tsx
+interface RootState {
+  // Zustand setter and getter for live state manipulation.
+  // See https://github.com/pmndrs/zustand
+  get(): RootState
+  set(fn: (previous: RootState) => (next: Partial<RootState>)): void
+  // Canvas layout information
+  size: { width: number; height: number }
+  // OGL scene internals
+  renderer: OGL.Renderer
+  gl: OGL.OGLRenderingContext
+  scene: OGL.Transform
+  camera: OGL.Camera
+  // OGL perspective and frameloop preferences
+  orthographic: boolean
+  frameloop: 'always' | 'never'
+  // Internal XR manager to enable WebXR features
+  xr: XRManager
+  // Frameloop internals for custom render loops
+  priority: number
+  subscribed: React.MutableRefObject<Subscription>[]
+  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  // Optional canvas event manager and its state
+  events?: EventManager
+  mouse: OGL.Vec2
+  raycaster: OGL.Raycast
+  hovered: Map<number, Instance<OGL.Mesh>['object']>
+}
+```
 
 ### Accessing state via `useOGL`
 
@@ -779,3 +770,42 @@ const events = {
 ```
 
 </details>
+
+## Portals
+
+Portal children into a foreign OGL element via `createPortal`, which can modify children's `RootState`. This is particularly useful for postprocessing and complex render effects.
+
+```tsx
+function Component {
+  // scene & camera are inherited from portal parameters
+  const { scene, camera, ... } = useOGL()
+}
+
+const scene = new OGL.Transform()
+const camera = new OGL.Camera()
+
+<transform>
+  {createPortal(<Component />, scene, { camera })
+</transform>
+```
+
+## Testing
+
+In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an internal `act` which can be used to safely flush async effects in tests. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
+
+```tsx
+import * as React from 'react'
+import * as OGL from 'ogl'
+import { type Root, type RootStore, type RootState, createRoot, act } from 'react-ogl'
+
+it('tests against a react-ogl component or scene', async () => {
+  const transform = React.createRef<OGL.Transform>()
+
+  const root: Root = createRoot(document.createElement('canvas'))
+  const store: RootStore = await act(async () => root.render(<transform ref={transform} />))
+  const state: RootState = store.getState()
+
+  expect(transform.current).toBeInstanceOf(OGL.Transform)
+  expect(state.scene.children).toStrictEqual([transform.current])
+})
+```

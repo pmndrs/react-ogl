@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
+import type { Fiber } from 'react-reconciler'
 import { RESERVED_PROPS, INSTANCE_PROPS, POINTER_EVENTS } from './constants'
 import { useIsomorphicLayoutEffect } from './hooks'
-import { ConstructorRepresentation, DPR, EventHandlers, Instance, RootState } from './types'
+import { ConstructorRepresentation, DPR, EventHandlers, Instance, RootState, RootStore } from './types'
 
 /**
  * Converts camelCase primitives to PascalCase.
@@ -19,6 +20,43 @@ export const classExtends = (a: any, b: any) => (Object.prototype.isPrototypeOf.
  */
 export const calculateDpr = (dpr: DPR) =>
   Array.isArray(dpr) ? Math.min(Math.max(dpr[0], window.devicePixelRatio), dpr[1]) : dpr
+
+/**
+ * Returns only instance props from reconciler fibers.
+ */
+export function getInstanceProps<T = any>(queue: Fiber['pendingProps']): Instance<T>['props'] {
+  const props: Instance<T>['props'] = {}
+
+  for (const key in queue) {
+    if (!RESERVED_PROPS.includes(key)) props[key] = queue[key]
+  }
+
+  return props
+}
+
+/**
+ * Prepares an object, returning an instance descriptor.
+ */
+export function prepare<T>(target: T, root: RootStore, type: string, props: Instance<T>['props']): Instance<T> {
+  const object = (target as unknown as Instance['object']) ?? {}
+
+  // Create instance descriptor
+  let instance = object.__ogl
+  if (!instance) {
+    instance = {
+      root,
+      parent: null,
+      children: [],
+      type,
+      props: getInstanceProps(props),
+      object,
+      isHidden: false,
+    }
+    object.__ogl = instance
+  }
+
+  return instance
+}
 
 /**
  * Resolves a potentially pierced key type against an object.
