@@ -22,7 +22,6 @@
 - [Canvas](#canvas)
   - [Canvas Props](#canvas-props)
   - [Custom Canvas](#custom-canvas)
-  - [Root State](#root-state)
 - [Creating Elements](#creating-elements)
   - [JSX, properties, and shortcuts](#jsx-properties-and-shortcuts)
   - [Setting constructor arguments via `args`](#setting-constructor-arguments-via-args)
@@ -30,6 +29,7 @@
   - [Creating custom elements via `extend`](#creating-custom-elements-via-extend)
   - [Adding third-party objects via `<primitive />`](#adding-third-party-objects-via-primitive-)
 - [Hooks](#hooks)
+  - [Root State](#root-state)
   - [Accessing state via `useOGL`](#accessing-state-via-useogl)
   - [Frameloop subscriptions via `useFrame`](#frameloop-subscriptions-via-useframe)
   - [Loading assets via `useLoader`](#loading-assets-via-useloader)
@@ -327,41 +327,6 @@ function CustomCanvas({ children }) {
 }
 ```
 
-### Root State
-
-Each `<Canvas />` or `Root` encapsulates its own OGL state via [React context](https://reactjs.org/docs/context.html) and a [Zustand](https://github.com/pmndrs/zustand) store, as defined by `RootState`. This can be accessed and modified with the `onCreated` canvas prop, and with hooks like `useOGL` (see [hooks](#hooks)).
-
-```tsx
-interface RootState {
-  // Zustand setter and getter for live state manipulation.
-  // See https://github.com/pmndrs/zustand
-  get(): RootState
-  set(fn: (previous: RootState) => (next: Partial<RootState>)): void
-  // Canvas layout information
-  size: { width: number; height: number }
-  // OGL scene internals
-  renderer: OGL.Renderer
-  gl: OGL.OGLRenderingContext
-  scene: OGL.Transform
-  camera: OGL.Camera
-  // OGL perspective and frameloop preferences
-  orthographic: boolean
-  frameloop: 'always' | 'never'
-  // Internal XR manager to enable WebXR features
-  xr: XRManager
-  // Frameloop internals for custom render loops
-  priority: number
-  subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  // Optional canvas event manager and its state
-  events?: EventManager
-  mouse: OGL.Vec2
-  raycaster: OGL.Raycast
-  hovered: Map<number, Instance<OGL.Mesh>['object']>
-}
-```
-
 ## Creating elements
 
 react-ogl renders React components into an OGL scene-graph, and can be used on top of other renderers like [react-dom](https://npmjs.com/react-dom) and [react-native](https://npmjs.com/react-native) that render for web and native, respectively. react-ogl components are defined by primitives or lower-case elements native to the OGL namespace (for custom elements, see [extend](#creating-custom-elements-via-extend)).
@@ -539,6 +504,41 @@ const object = new OGL.Transform()
 ## Hooks
 
 react-ogl ships with hooks that allow you to tie or request information to your components. These are called within the body of `<Canvas />` and contain imperative and possibly stateful code.
+
+### Root State
+
+Each `<Canvas />` or `Root` encapsulates its own OGL state via [React context](https://reactjs.org/docs/context.html) and a [Zustand](https://github.com/pmndrs/zustand) store, as defined by `RootState`. This can be accessed and modified with the `onCreated` canvas prop, and with hooks like `useOGL`.
+
+```tsx
+interface RootState {
+  // Zustand setter and getter for live state manipulation.
+  // See https://github.com/pmndrs/zustand
+  get(): RootState
+  set(fn: (previous: RootState) => (next: Partial<RootState>)): void
+  // Canvas layout information
+  size: { width: number; height: number }
+  // OGL scene internals
+  renderer: OGL.Renderer
+  gl: OGL.OGLRenderingContext
+  scene: OGL.Transform
+  camera: OGL.Camera
+  // OGL perspective and frameloop preferences
+  orthographic: boolean
+  frameloop: 'always' | 'never'
+  // Internal XR manager to enable WebXR features
+  xr: XRManager
+  // Frameloop internals for custom render loops
+  priority: number
+  subscribed: React.MutableRefObject<Subscription>[]
+  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  // Optional canvas event manager and its state
+  events?: EventManager
+  mouse: OGL.Vec2
+  raycaster: OGL.Raycast
+  hovered: Map<number, Instance<OGL.Mesh>['object']>
+}
+```
 
 ### Accessing state via `useOGL`
 
