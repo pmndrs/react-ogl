@@ -61,6 +61,11 @@ react-ogl itself is super minimal, but you can use the familiar [@react-three/fi
 
 This example uses [`create-react-app`](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) for the sake of simplicity, but you can use your own environment or [create a codesandbox](https://react.new).
 
+<details>
+  <summary>Show full example</summary>
+  
+  <br />
+
 ```bash
 # Create app
 npx create-react-app my-app
@@ -143,9 +148,16 @@ createRoot(document.getElementById('root')).render(
 )
 ```
 
+</details>
+
 ### react-native
 
 This example uses [`expo-cli`](https://docs.expo.dev/get-started/create-a-new-app) but you can create a bare app with `react-native` CLI as well.
+
+<details>
+  <summary>Show full example</summary>
+  
+  <br />
 
 ```bash
 # Create app and cd into it
@@ -243,6 +255,8 @@ export default () => (
   </Canvas>
 )
 ```
+
+</details>
 
 ## Canvas
 
