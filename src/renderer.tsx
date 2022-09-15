@@ -1,12 +1,11 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { ReactPortal } from 'react-reconciler'
 import { ConcurrentRoot } from 'react-reconciler/constants.js'
 import create, { GetState, SetState } from 'zustand'
 import { reconciler } from './reconciler'
-import { OGLContext, useStore } from './hooks'
+import { OGLContext, useStore, useIsomorphicLayoutEffect } from './hooks'
 import { RenderProps, Root, RootState, RootStore, Subscription } from './types'
-import { applyProps, calculateDpr } from './utils'
+import { applyProps, calculateDpr, prepare } from './utils'
 
 // Store roots here since we can render to multiple targets
 const roots = new Map<HTMLCanvasElement, { container: any; store: RootStore }>()
@@ -108,8 +107,11 @@ export function render(
       } as RootState
     }) as RootStore
 
-    // Bind events
+    // Prepare scene
     const state = store.getState()
+    prepare(state.scene, store, '', {})
+
+    // Bind events
     if (state.events?.connect && !state.events?.connected) state.events.connect(target, state)
 
     // Handle callback
@@ -178,9 +180,7 @@ export function render(
 
   // Update contanier
   reconciler.updateContainer(
-    <OGLContext.Provider value={root.store}>
-      <primitive object={state.scene}>{element}</primitive>
-    </OGLContext.Provider>,
+    <OGLContext.Provider value={root.store}>{element}</OGLContext.Provider>,
     root.container,
     null,
     () => undefined,
@@ -219,29 +219,32 @@ export const createRoot = (target: HTMLCanvasElement, config?: RenderProps): Roo
   unmount: () => unmountComponentAtNode(target),
 })
 
-// Prepares portal target
 interface PortalRootProps {
   children: React.ReactElement
   target: OGL.Transform
-  container: any
 }
-function PortalRoot({ children, target, container }: PortalRootProps) {
+function PortalRoot({ children, target }: PortalRootProps): JSX.Element {
   const store = useStore()
-  React.useMemo(() => Object.assign(container, store), [container, store])
-  return <primitive object={target}>{children}</primitive>
+  const container = React.useMemo(
+    () =>
+      create((set: SetState<RootState>, get: GetState<RootState>) => ({
+        ...store.getState(),
+        set,
+        get,
+        scene: target,
+      })),
+    [store, target],
+  )
+  useIsomorphicLayoutEffect(() => {
+    const { set, get, scene } = container.getState()
+    return store.subscribe((state) => container.setState({ ...state, set, get, scene }))
+  }, [container, store])
+  return <>{reconciler.createPortal(children, container, null, null)}</>
 }
 
 /**
  * Portals into a remote OGL element.
  */
-export function createPortal(children: React.ReactElement, target: OGL.Transform): ReactPortal {
-  const container = {}
-  return reconciler.createPortal(
-    <PortalRoot target={target} container={container}>
-      {children}
-    </PortalRoot>,
-    container,
-    null,
-    null,
-  )
+export function createPortal(children: React.ReactElement, target: OGL.Transform): JSX.Element {
+  return <PortalRoot target={target}>{children}</PortalRoot>
 }

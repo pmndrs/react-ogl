@@ -26,7 +26,10 @@ export const useIsomorphicLayoutEffect =
  */
 export function useInstanceHandle<O>(ref: React.MutableRefObject<O>): React.MutableRefObject<Instance> {
   const instance = React.useRef<Instance>(null!)
-  useIsomorphicLayoutEffect(() => void (instance.current = (ref.current as unknown as any).__ogl), [ref])
+  useIsomorphicLayoutEffect(
+    () => void (instance.current = (ref.current as unknown as Instance<O>['object']).__ogl!),
+    [ref],
+  )
   return instance
 }
 
