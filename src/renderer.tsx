@@ -222,8 +222,9 @@ export const createRoot = (target: HTMLCanvasElement, config?: RenderProps): Roo
 interface PortalRootProps {
   children: React.ReactElement
   target: OGL.Transform
+  state?: Partial<RootState>
 }
-function PortalRoot({ children, target }: PortalRootProps): JSX.Element {
+function PortalRoot({ children, target, state }: PortalRootProps): JSX.Element {
   const store = useStore()
   const container = React.useMemo(
     () =>
@@ -235,16 +236,35 @@ function PortalRoot({ children, target }: PortalRootProps): JSX.Element {
       })),
     [store, target],
   )
+
   useIsomorphicLayoutEffect(() => {
     const { set, get, scene } = container.getState()
-    return store.subscribe((state) => container.setState({ ...state, set, get, scene }))
-  }, [container, store])
-  return <>{reconciler.createPortal(children, container, null, null)}</>
+    return store.subscribe((parentState) => container.setState({ ...parentState, ...state, set, get, scene }))
+  }, [container, store, state])
+
+  return (
+    <>
+      {reconciler.createPortal(
+        <OGLContext.Provider value={store}>{children}</OGLContext.Provider>,
+        container,
+        null,
+        null,
+      )}
+    </>
+  )
 }
 
 /**
  * Portals into a remote OGL element.
  */
-export function createPortal(children: React.ReactElement, target: OGL.Transform): JSX.Element {
-  return <PortalRoot target={target}>{children}</PortalRoot>
+export function createPortal(
+  children: React.ReactElement,
+  target: OGL.Transform,
+  state?: Partial<RootState>,
+): JSX.Element {
+  return (
+    <PortalRoot target={target} state={state}>
+      {children}
+    </PortalRoot>
+  )
 }
