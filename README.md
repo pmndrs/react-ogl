@@ -22,7 +22,6 @@
 - [Canvas](#canvas)
   - [Canvas Props](#canvas-props)
   - [Custom Canvas](#custom-canvas)
-  - [Testing](#testing)
   - [Root State](#root-state)
 - [Creating Elements](#creating-elements)
   - [JSX, properties, and shortcuts](#jsx-properties-and-shortcuts)
@@ -39,6 +38,7 @@
   - [Access internals via `useInstanceHandle`](#access-internals-via-useinstancehandle)
 - [Events](#events)
   - [Custom Events](#custom-events)
+- [Testing](#testing)
 
 ## Installation
 
@@ -325,30 +325,6 @@ function CustomCanvas({ children }) {
   // Use callback-style ref to access canvas in render
   return <canvas ref={setCanvas} />
 }
-```
-
-### Testing
-
-In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an internal `reconciler` which can be used to safely flush async effects in tests via `reconciler#act`. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
-
-```tsx
-import * as React from 'react'
-import * as OGL from 'ogl'
-import { type RootState, createRoot, act } from 'react-ogl'
-
-it('tests against a react-ogl component or scene', async () => {
-  const transform = React.createRef<OGL.Transform>()
-  let state: RootState = null!
-
-  await act(async () => {
-    const root = createRoot(document.createElement('canvas'))
-    state = root.render(<transform ref={transform} />).getState()
-  })
-
-  expect(transform.current).toBeInstanceOf(OGL.Transform)
-  expect(state.scene.children.length).toBe(1)
-  expect(state.scene.children[0]).toBe(transform.current)
-})
 ```
 
 ### Root State
@@ -779,3 +755,24 @@ const events = {
 ```
 
 </details>
+
+## Testing
+
+In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exports an internal `act` which can be used to safely flush async effects in tests. The following emulates a legacy root and asserts against `RootState` (see [root state](#root-state)).
+
+```tsx
+import * as React from 'react'
+import * as OGL from 'ogl'
+import { type Root, type RootStore, type RootState, createRoot, act } from 'react-ogl'
+
+it('tests against a react-ogl component or scene', async () => {
+  const transform = React.createRef<OGL.Transform>()
+
+  const root: Root = createRoot(document.createElement('canvas'))
+  const store: RootStore = await act(async () => root.render(<transform ref={transform} />))
+  const state: RootState = store.getState()
+
+  expect(transform.current).toBeInstanceOf(OGL.Transform)
+  expect(state.scene.children).toStrictEqual([transform.current])
+})
+```
