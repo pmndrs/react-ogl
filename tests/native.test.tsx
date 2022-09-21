@@ -16,7 +16,7 @@ describe('Canvas', () => {
       )
     })
 
-    expect(renderer.toTree()).toMatchSnapshot()
+    expect(renderer.toJSON()).toMatchSnapshot()
   })
 
   it('should forward ref', async () => {
@@ -31,6 +31,28 @@ describe('Canvas', () => {
     })
 
     expect(ref.current).toBeDefined()
+  })
+
+  it('should forward context', async () => {
+    const ParentContext = React.createContext<boolean>(null!)
+    let receivedValue!: boolean
+
+    function Test() {
+      receivedValue = React.useContext(ParentContext)
+      return null
+    }
+
+    await act(async () => {
+      create(
+        <ParentContext.Provider value={true}>
+          <Canvas>
+            <Test />
+          </Canvas>
+        </ParentContext.Provider>,
+      )
+    })
+
+    expect(receivedValue).toBe(true)
   })
 
   it('should correctly unmount', async () => {

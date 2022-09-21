@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { PixelRatio, ViewProps, ViewStyle, View, StyleSheet, LayoutChangeEvent } from 'react-native'
 import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
+import { useContextBridge, FiberProvider } from 'its-fine'
 import { Block, SetBlock, ErrorBoundary } from './utils'
-import { events as createTouchEvents } from './events'
+import { events as createTouchEvents } from './events.native' // explicitly require native module
 import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
@@ -11,13 +12,11 @@ export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProp
   style?: ViewStyle
 }
 
-/**
- * A resizeable canvas whose children are declarative OGL elements.
- */
-export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
+const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
   { children, style, renderer, camera, orthographic, frameloop, events = createTouchEvents, onCreated, ...props },
   forwardedRef,
 ) {
+  const Bridge = useContextBridge()
   const [{ width, height }, setSize] = React.useState({ width: 0, height: 0 })
   const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null)
   const [bind, setBind] = React.useState<any>()
@@ -52,9 +51,11 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
   // Render to screen
   if (canvas && width > 0 && height > 0) {
     render(
-      <ErrorBoundary set={setError}>
-        <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
-      </ErrorBoundary>,
+      <Bridge>
+        <ErrorBoundary set={setError}>
+          <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
+        </ErrorBoundary>
+      </Bridge>,
       canvas,
       {
         size: { width, height },
@@ -97,5 +98,16 @@ export const Canvas = React.forwardRef<View, CanvasProps>(function Canvas(
     <View {...props} ref={forwardedRef} onLayout={onLayout} style={{ flex: 1, ...style }} {...bind}>
       {width > 0 && <GLView onContextCreate={onContextCreate} style={StyleSheet.absoluteFill} />}
     </View>
+  )
+})
+
+/**
+ * A resizeable canvas whose children are declarative OGL elements.
+ */
+export const Canvas = React.forwardRef<View, CanvasProps>(function CanvasWrapper(props, ref) {
+  return (
+    <FiberProvider>
+      <CanvasImpl {...props} ref={ref} />
+    </FiberProvider>
   )
 })

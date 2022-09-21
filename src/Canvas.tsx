@@ -1,6 +1,7 @@
 import * as React from 'react'
 // eslint-disable-next-line import/named
 import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
+import { useContextBridge, FiberProvider } from 'its-fine'
 import { useIsomorphicLayoutEffect } from './hooks'
 import { Block, SetBlock, ErrorBoundary } from './utils'
 import { events as createPointerEvents } from './events'
@@ -12,10 +13,7 @@ export interface CanvasProps extends Omit<RenderProps, 'size'>, React.HTMLAttrib
   resize?: ResizeOptions
 }
 
-/**
- * A resizeable canvas whose children are declarative OGL elements.
- */
-export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function Canvas(
+const CanvasImpl = React.forwardRef<HTMLCanvasElement, CanvasProps>(function Canvas(
   {
     resize,
     children,
@@ -31,6 +29,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
   },
   forwardedRef,
 ) {
+  const Bridge = useContextBridge()
   const canvasRef = React.useRef<HTMLCanvasElement>(null!)
   const [div, { width, height }] = useMeasure({
     scroll: true,
@@ -50,9 +49,11 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
   // Render to screen
   if (canvas && width > 0 && height > 0) {
     render(
-      <ErrorBoundary set={setError}>
-        <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
-      </ErrorBoundary>,
+      <Bridge>
+        <ErrorBoundary set={setError}>
+          <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
+        </ErrorBoundary>
+      </Bridge>,
       canvas,
       {
         size: { width, height },
@@ -90,5 +91,16 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function 
     >
       <canvas ref={canvasRef} style={{ display: 'block' }} />
     </div>
+  )
+})
+
+/**
+ * A resizeable canvas whose children are declarative OGL elements.
+ */
+export const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(function CanvasWrapper(props, ref) {
+  return (
+    <FiberProvider>
+      <CanvasImpl {...props} ref={ref} />
+    </FiberProvider>
   )
 })

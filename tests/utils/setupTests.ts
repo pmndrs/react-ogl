@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ViewProps, LayoutChangeEvent } from 'react-native'
+import type { GLViewProps, ExpoWebGLRenderingContext } from 'expo-gl'
 import WebGLRenderingContext from './WebGLRenderingContext'
 
 declare global {
@@ -15,35 +16,30 @@ jest.mock('scheduler', () => ({
   unstable_scheduleCallback: (_: any, callback: () => void) => callback(),
 }))
 
-// Polyfill PointerEvent
+// PointerEvent is not in JSDOM
+// https://github.com/jsdom/jsdom/pull/2666#issuecomment-691216178
+// https://w3c.github.io/pointerevents/#pointerevent-interface
 if (!global.PointerEvent) {
-  class PointerEvent extends MouseEvent {
-    public height?: number
-    public isPrimary?: boolean
-    public pointerId?: number
-    public pointerType?: string
-    public pressure?: number
-    public tangentialPressure?: number
-    public tiltX?: number
-    public tiltY?: number
-    public twist?: number
-    public width?: number
+  global.PointerEvent = class extends MouseEvent implements PointerEvent {
+    readonly pointerId: number = 0
+    readonly width: number = 1
+    readonly height: number = 1
+    readonly pressure: number = 0
+    readonly tangentialPressure: number = 0
+    readonly tiltX: number = 0
+    readonly tiltY: number = 0
+    readonly twist: number = 0
+    readonly pointerType: string = ''
+    readonly isPrimary: boolean = false
 
     constructor(type: string, params: PointerEventInit = {}) {
       super(type, params)
-      this.pointerId = params.pointerId
-      this.width = params.width
-      this.height = params.height
-      this.pressure = params.pressure
-      this.tangentialPressure = params.tangentialPressure
-      this.tiltX = params.tiltX
-      this.tiltY = params.tiltY
-      this.pointerType = params.pointerType
-      this.isPrimary = params.isPrimary
+      Object.assign(this, params)
     }
-  }
 
-  global.PointerEvent = PointerEvent as any
+    getCoalescedEvents = () => []
+    getPredictedEvents = () => []
+  }
 }
 
 // Polyfill WebGL Context
@@ -79,40 +75,60 @@ jest.mock('react-use-measure', () => ({
 
 // Mock native dependencies for react-ogl/native
 jest.mock('react-native', () => ({
-  StyleSheet: {},
-  View: React.memo(
-    React.forwardRef(({ onLayout, ...props }: ViewProps, ref) => {
-      React.useLayoutEffect(() => {
-        onLayout?.({
-          nativeEvent: {
-            layout: {
-              x: 0,
-              y: 0,
-              width: 1280,
-              height: 800,
-            },
+  View: class extends React.Component<ViewProps> {
+    componentDidMount(): void {
+      this.props.onLayout?.({
+        nativeEvent: {
+          layout: {
+            x: 0,
+            y: 0,
+            width: 1280,
+            height: 800,
           },
-        } as LayoutChangeEvent)
+        },
+      } as LayoutChangeEvent)
+    }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps, @typescript-eslint/no-unused-vars
-        ref = { current: { props } }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [])
-
-      return null
-    }),
-  ),
+    render() {
+      return this.props.children
+    }
+  },
+  StyleSheet: {
+    absoluteFill: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+  },
+  PixelRatio: {
+    get() {
+      return 1
+    },
+  },
 }))
-jest.mock('react-native/Libraries/Pressability/Pressability.js', () => ({}))
-jest.mock('expo-gl', () => ({
-  GLView: ({ onContextCreate }: { onContextCreate: any }) => {
-    React.useLayoutEffect(() => {
-      const gl = new WebGLRenderingContext({ width: 1280, height: 800 } as HTMLCanvasElement)
-      onContextCreate(gl)
+jest.mock(
+  'react-native/Libraries/Pressability/Pressability.js',
+  () =>
+    class {
+      getEventHandlers = () => ({})
+      reset() {}
+    },
+)
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+jest.mock('expo-gl', () => ({
+  GLView({ onContextCreate }: GLViewProps) {
+    const canvas = React.useMemo(
+      () => Object.assign(document.createElement('canvas'), { width: 1280, height: 800 }),
+      [],
+    )
+
+    React.useLayoutEffect(() => {
+      const gl = canvas.getContext('webgl2') as ExpoWebGLRenderingContext
+      gl.endFrameEXP = () => {}
+      onContextCreate?.(gl)
+    }, [canvas, onContextCreate])
 
     return null
   },
