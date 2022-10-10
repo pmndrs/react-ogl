@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { suspend } from 'suspend-react'
-import type { StateSelector, EqualityChecker } from 'zustand'
 import type { Instance, RootState, RootStore, Subscription } from './types'
 import { classExtends } from './utils'
 
@@ -51,8 +50,8 @@ export function useStore() {
  * Returns the internal OGL state.
  */
 export function useOGL<T = RootState>(
-  selector: StateSelector<RootState, T> = (state) => state as unknown as T,
-  equalityFn?: EqualityChecker<T>,
+  selector: (state: RootState) => T = (state) => state as unknown as T,
+  equalityFn?: <T>(state: T, newState: T) => boolean,
 ) {
   return useStore()(selector, equalityFn)
 }

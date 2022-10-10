@@ -1,7 +1,7 @@
 /// <reference types="webxr" />
 import type * as OGL from 'ogl'
 import type * as React from 'react'
-import type { SetState, GetState, UseBoundStore, StoreApi } from 'zustand'
+import type { UseBoundStore, StoreApi } from 'zustand'
 
 type Mutable<P> = { [K in keyof P]: P[K] | Readonly<P[K]> }
 type NonFunctionKeys<P> = { [K in keyof P]-?: P[K] extends Function ? never : K }[keyof P]
@@ -57,8 +57,8 @@ export type Frameloop = 'always' | 'never'
 export type Subscription = (state: RootState, time: number, frame?: XRFrame) => any
 
 export interface RootState {
-  set: SetState<RootState>
-  get: GetState<RootState>
+  set: StoreApi<RootState>['setState']
+  get: StoreApi<RootState>['getState']
   size: Size
   xr: XRManager
   orthographic: boolean
@@ -80,7 +80,7 @@ export interface RootState {
 
 export type Act = <T = any>(cb: () => Promise<T>) => Promise<T>
 
-export type RootStore = UseBoundStore<RootState, StoreApi<RootState>>
+export type RootStore = UseBoundStore<StoreApi<RootState>>
 
 export interface Root {
   render: (element: React.ReactNode) => RootStore
