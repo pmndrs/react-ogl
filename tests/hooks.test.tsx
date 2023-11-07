@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as OGL from 'ogl'
 import create from 'zustand'
 import { render } from './utils'
 import { act, OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'

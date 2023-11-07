@@ -71,9 +71,12 @@ export function useGraph(object: OGL.Transform) {
     object.traverse((obj: OGL.Transform | OGL.Mesh) => {
       if (!(obj instanceof OGL.Mesh)) return
 
+      // @ts-ignore
       if (obj.name) data.nodes[obj.name] = obj
 
+      // @ts-ignore
       if (obj.program.gltfMaterial && !data.programs[obj.program.gltfMaterial.name]) {
+        // @ts-ignore
         data.programs[obj.program.gltfMaterial.name] = obj.program
       }
     })
@@ -128,7 +131,7 @@ export function useLoader<L extends LoaderRepresentation, I extends string | str
         urls.map(async (url: string) => {
           // @ts-ignore OGL's loaders don't have a consistent signature
           if (classExtends(loader, OGL.TextureLoader)) return loader.load(gl, { src: url })
-
+          // @ts-ignore
           return await loader.load(gl, url)
         }),
       )
