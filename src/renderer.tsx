@@ -100,7 +100,7 @@ export function render(
         },
         events,
         mouse: new OGL.Vec2(),
-        raycaster: new OGL.Raycast(gl),
+        raycaster: new OGL.Raycast(),
         hovered: new Map(),
         set,
         get,
