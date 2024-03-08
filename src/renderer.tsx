@@ -1,7 +1,7 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { ConcurrentRoot } from 'react-reconciler/constants.js'
-import create from 'zustand'
+import { create } from 'zustand'
 import { reconciler } from './reconciler'
 import { OGLContext, useStore, useIsomorphicLayoutEffect } from './hooks'
 import { RenderProps, Root, RootState, RootStore, Subscription } from './types'
