@@ -53,7 +53,7 @@ export function useOGL<T = RootState>(
   selector: (state: RootState) => T = (state) => state as unknown as T,
   equalityFn?: <T>(state: T, newState: T) => boolean,
 ) {
-  return useStore()(selector, equalityFn)
+  return useStore()(selector, equalityFn!)
 }
 
 export interface ObjectMap {
