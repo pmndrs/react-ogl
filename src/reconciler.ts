@@ -1,5 +1,6 @@
 import Reconciler from 'react-reconciler'
-import { DefaultEventPriority } from 'react-reconciler/constants.js'
+// @ts-ignore
+import { NoEventPriority, DefaultEventPriority } from 'react-reconciler/constants.js'
 import { unstable_IdlePriority as idlePriority, unstable_scheduleCallback as scheduleCallback } from 'scheduler'
 import * as OGL from 'ogl'
 import * as React from 'react'
@@ -202,6 +203,9 @@ function switchInstance(
   props: Instance['props'],
   fiber: Reconciler.Fiber,
 ) {
+  // React 19 regression from (un)hide hooks
+  oldInstance.object.visible = true
+
   // Create a new instance
   const newInstance = createInstance(type, props, oldInstance.root)
 
@@ -281,6 +285,10 @@ function diffProps<T extends ConstructorRepresentation = any>(
   return changedProps
 }
 
+const NO_CONTEXT = {}
+
+let currentUpdatePriority: number = NoEventPriority
+
 /**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
@@ -302,7 +310,7 @@ export const reconciler = Reconciler<
   // Public (ref) instance
   Instance['object'],
   // Host context
-  null,
+  {},
   // applyProps diff sets
   null | [true] | [false, Instance['props']],
   // Hydration child set
@@ -335,8 +343,8 @@ export const reconciler = Reconciler<
   getPublicInstance: (instance) => instance.object,
   // We can optionally access different host contexts on instance creation/update.
   // Instances' data structures are self-sufficient, so we don't make use of this
-  getRootHostContext: () => null,
-  getChildHostContext: (parentHostContext) => parentHostContext,
+  getRootHostContext: () => NO_CONTEXT,
+  getChildHostContext: () => NO_CONTEXT,
   // We can optionally mutate portal containers here, but we do that in createPortal instead from state
   preparePortalMount: (container) => prepare(container.getState().scene, container, '', {}),
   // This lets us store stuff at the container-level before/after React mutates our OGL elements.
@@ -374,56 +382,50 @@ export const reconciler = Reconciler<
 
     removeChild(scene, child)
   },
-  // Used to calculate updates in the render phase or commitUpdate.
-  // Greatly improves performance by reducing paint to rapid mutations.
-  prepareUpdate(instance, type, oldProps, newProps) {
+  // This is where we mutate OGL elements in the render phase
+  // @ts-ignore
+  commitUpdate(instance: Instance, type: Type, oldProps: Instance['props'], newProps: Instance['props'], fiber: any) {
+    let reconstruct = false
+
     // Element is a primitive. We must recreate it when its object prop is changed
-    if (instance.type === 'primitive' && oldProps.object !== newProps.object) return [true]
-
+    if (instance.type === 'primitive' && oldProps.object !== newProps.object) reconstruct = true
     // Element is a program. Check whether its vertex or fragment props changed to recreate
-    if (type === 'program') {
-      if (oldProps.vertex !== newProps.vertex) return [true]
-      if (oldProps.fragment !== newProps.fragment) return [true]
+    else if (type === 'program') {
+      if (oldProps.vertex !== newProps.vertex) reconstruct = true
+      if (oldProps.fragment !== newProps.fragment) reconstruct = true
     }
-
     // Element is a geometry. Check whether its attribute props changed to recreate.
-    if (type === 'geometry') {
+    else if (type === 'geometry') {
       for (const key in oldProps) {
         const isAttribute = (oldProps[key] as OGL.Attribute)?.data || (newProps[key] as OGL.Attribute)?.data
-        if (isAttribute && oldProps[key] !== newProps[key]) return [true]
+        if (isAttribute && oldProps[key] !== newProps[key]) {
+          reconstruct = true
+          break
+        }
       }
     }
-
     // If the instance has new args, recreate it
-    if (newProps.args?.length !== oldProps.args?.length) return [true]
-    if (newProps.args?.some((value, index) => value !== oldProps.args?.[index])) return [true]
+    else if (newProps.args?.length !== oldProps.args?.length) reconstruct = true
+    else if (newProps.args?.some((value, index) => value !== oldProps.args?.[index])) reconstruct = true
+
+    // If flagged for recreation, swap to a new instance.
+    if (reconstruct) return switchInstance(instance, type, newProps, fiber)
 
     // Diff through props and flag with changes
     const changedProps = diffProps(instance, newProps, oldProps)
-    if (Object.keys(changedProps).length) return [false, changedProps]
+    if (Object.keys(changedProps).length) {
+      // Handle attach update
+      if (changedProps?.attach) {
+        if (oldProps.attach) detach(instance.parent!, instance)
+        instance.props.attach = newProps.attach
+        if (newProps.attach) attach(instance.parent!, instance)
+      }
 
-    // No changes, don't update the instance
-    return null
-  },
-  // This is where we mutate OGL elements in the render phase
-  commitUpdate(instance, payload, type, oldProps, newProps, root) {
-    const [reconstruct, changedProps] = payload!
-
-    // If flagged for recreation, swap to a new instance.
-    if (reconstruct) return switchInstance(instance, type, newProps, root)
-
-    // Handle attach update
-    if (changedProps?.attach) {
-      if (oldProps.attach) detach(instance.parent!, instance)
-      instance.props.attach = newProps.attach
-      if (newProps.attach) attach(instance.parent!, instance)
+      // Update instance props
+      Object.assign(instance.props, changedProps)
+      // Apply changed props
+      applyProps(instance.object, changedProps)
     }
-
-    // Update instance props
-    Object.assign(instance.props, changedProps)
-
-    // Apply changed props
-    applyProps(instance.object, changedProps)
   },
   // Methods to toggle instance visibility on demand.
   // React uses this with React.Suspense to display fallback content
@@ -444,17 +446,46 @@ export const reconciler = Reconciler<
   // Configures a callback once the tree is finalized after commit-effects are fired
   finalizeInitialChildren: () => false,
   commitMount() {},
-  // @ts-ignore
-  getCurrentEventPriority: () => DefaultEventPriority,
   beforeActiveInstanceBlur: () => {},
   afterActiveInstanceBlur: () => {},
   detachDeletedInstance: () => {},
+  prepareScopeUpdate() {},
+  getInstanceFromScope: () => null,
+  // @ts-ignore untyped react-experimental options inspired by react-art
+  // TODO: add shell types for these and upstream to DefinitelyTyped
+  // https://github.com/facebook/react/blob/main/packages/react-art/src/ReactFiberConfigART.js
+  setCurrentUpdatePriority(newPriority) {
+    currentUpdatePriority = newPriority
+  },
+  getCurrentUpdatePriority() {
+    return currentUpdatePriority
+  },
+  resolveUpdatePriority() {
+    return currentUpdatePriority || DefaultEventPriority
+  },
+  shouldAttemptEagerTransition() {
+    return false
+  },
+  requestPostPaintCallback() {},
+  maySuspendCommit() {
+    return false
+  },
+  preloadInstance() {
+    return true // true indicates already loaded
+  },
+  startSuspendingCommit() {},
+  suspendInstance() {},
+  waitForCommitToBeReady() {
+    return null
+  },
+  NotPendingTransition: null,
+  resetFormInstance() {},
 })
 
 /**
  * Safely flush async effects when testing, simulating a legacy root.
  */
-export const act: Act = (React as any).unstable_act
+export const act: Act = (React as any).act
 
 // Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
