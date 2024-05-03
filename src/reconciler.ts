@@ -454,7 +454,7 @@ export const reconciler = Reconciler<
 /**
  * Safely flush async effects when testing, simulating a legacy root.
  */
-export const act: Act = (React as any)?.unstable_act
+export const act: Act = (React as any)?.unstable_act ?? (React as any)?.act
 
 // Inject renderer meta into devtools
 const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
