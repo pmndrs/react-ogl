@@ -191,3 +191,9 @@ declare global {
     interface IntrinsicElements extends OGLElements {}
   }
 }
+
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements extends OGLElements {}
+  }
+}
