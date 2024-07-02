@@ -140,17 +140,11 @@ export function render(
     if (state.frameloop !== 'never') animate()
 
     // Handle resize
-    function onResize(state: RootState) {
-      const { width, height } = state.size
-      const projection = state.orthographic ? 'orthographic' : 'perspective'
-
-      if (state.renderer.width !== width || state.renderer.height !== height || state.camera.type !== projection) {
-        state.renderer.setSize(width, height)
-        state.camera[projection]({ aspect: width / height })
-      }
+    const onResize = config.onResize ?? onResizeDefault
+    if (onResize) {
+      store.subscribe(onResize)
+      onResize(state)
     }
-    store.subscribe(onResize)
-    onResize(state)
 
     // Report when an error was detected in a previous render
     const logRecoverableError = typeof reportError === 'function' ? reportError : console.error
@@ -187,6 +181,19 @@ export function render(
   )
 
   return root.store
+}
+
+/**
+ * Default resize callback.
+ */
+function onResizeDefault(state: RootState) {
+  const { width, height } = state.size
+  const projection = state.orthographic ? 'orthographic' : 'perspective'
+
+  if (state.renderer.width !== width || state.renderer.height !== height || state.camera.type !== projection) {
+    state.renderer.setSize(width, height)
+    state.camera[projection]({ aspect: width / height })
+  }
 }
 
 /**

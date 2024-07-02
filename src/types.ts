@@ -103,6 +103,7 @@ export interface RenderProps {
   camera?: OGL.Camera | OGLElement<typeof OGL.Camera> | Partial<OGL.CameraOptions>
   scene?: OGL.Transform
   events?: EventManager
+  onResize?: (state: RootState)=> void
   onCreated?: (state: RootState) => any
 }
 
