@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as OGL from 'ogl'
 import { render } from './utils'
-import { OGLElement, extend, act, createPortal } from '../src'
+import { OGLElement, extend, createPortal } from '../src'
 
 class CustomElement extends OGL.Transform {}
 
@@ -13,13 +13,13 @@ declare module '../src' {
 
 describe('renderer', () => {
   it('should render JSX', async () => {
-    const state = await act(async () => render(<transform />))
+    const state = await React.act(async () => render(<transform />))
     expect(state.scene.children.length).not.toBe(0)
   })
 
   it('should render extended elements', async () => {
     extend({ CustomElement })
-    const state = await act(async () => render(<customElement />))
+    const state = await React.act(async () => render(<customElement />))
     expect(state.scene.children[0]).toBeInstanceOf(CustomElement)
   })
 
@@ -39,7 +39,7 @@ describe('renderer', () => {
         />
       )
     }
-    await act(async () => render(<Test />))
+    await React.act(async () => render(<Test />))
 
     expect(lifecycle).toStrictEqual([
       'render',
@@ -55,7 +55,7 @@ describe('renderer', () => {
   it('should set pierced props', async () => {
     const mesh = React.createRef<OGL.Mesh>()
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <mesh ref={mesh}>
           <geometry attributes-test={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }} />
@@ -68,7 +68,7 @@ describe('renderer', () => {
   })
 
   it('should handle attach', async () => {
-    const state = await act(async () =>
+    const state = await React.act(async () =>
       render(
         <>
           <mesh>
@@ -98,7 +98,7 @@ describe('renderer', () => {
     let crashed = false
 
     try {
-      await act(async () => render(<box />))
+      await React.act(async () => render(<box />))
     } catch (_) {
       crashed = true
     }
@@ -110,7 +110,7 @@ describe('renderer', () => {
     const vertex = 'vertex'
     const fragment = 'fragment'
 
-    const state = await act(async () =>
+    const state = await React.act(async () =>
       render(
         <mesh>
           <box />
@@ -135,10 +135,10 @@ describe('renderer', () => {
       </mesh>
     )
 
-    await act(async () => render(<Test value={false} />))
+    await React.act(async () => render(<Test value={false} />))
     expect(mesh.current!.program.uniforms.uniform.value).toBe(false)
 
-    await act(async () => render(<Test value={true} />))
+    await React.act(async () => render(<Test value={true} />))
     expect(mesh.current!.program.uniforms.uniform.value).toBe(true)
   })
 
@@ -148,7 +148,7 @@ describe('renderer', () => {
     const renderer = new OGL.Renderer({ canvas: document.createElement('canvas') })
     const texture = new OGL.Texture(renderer.gl)
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <mesh ref={mesh}>
           <box />
@@ -172,7 +172,7 @@ describe('renderer', () => {
     const position = { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }
     const uv = { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <mesh ref={mesh}>
           <geometry position={position} uv={uv} />
@@ -189,7 +189,7 @@ describe('renderer', () => {
     let bind = false
     let unbind = false
 
-    await act(async () => {
+    await React.act(async () => {
       const state = render(<transform />, {
         events: {
           connected: false,
@@ -218,12 +218,12 @@ describe('renderer', () => {
       </primitive>
     )
 
-    let state = await act(async () => render(<Test n={1} />))
+    let state = await React.act(async () => render(<Test n={1} />))
 
     const [oldInstance] = state.scene.children as any[]
     expect(oldInstance).toBe(object1)
 
-    state = await act(async () => render(<Test n={2} />))
+    state = await React.act(async () => render(<Test n={2} />))
 
     const [newInstance] = state.scene.children as any[]
     expect(newInstance).toBe(object2) // Swapped to new instance
@@ -235,7 +235,7 @@ describe('renderer', () => {
     const object = new OGL.Transform()
     const mesh = React.createRef<OGL.Mesh>()
 
-    const state = await act(async () =>
+    const state = await React.act(async () =>
       render(
         createPortal(
           <mesh ref={mesh}>
@@ -265,16 +265,16 @@ describe('renderer', () => {
       </mesh>
     )
 
-    await act(async () => render(<Test first mono />))
+    await React.act(async () => render(<Test first mono />))
     expect(mesh.current!.program).toBe(program1.current)
 
-    await act(async () => render(<Test mono />, { frameloop: 'never' }))
+    await React.act(async () => render(<Test mono />, { frameloop: 'never' }))
     expect(mesh.current!.program).toBe(undefined)
 
-    await act(async () => render(<Test first />))
+    await React.act(async () => render(<Test first />))
     expect(mesh.current!.program).toBe(program1.current)
 
-    await act(async () => render(<Test />))
+    await React.act(async () => render(<Test />))
     expect(mesh.current!.program).toBe(program2.current)
   })
 })

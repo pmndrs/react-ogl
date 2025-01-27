@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import { act, Canvas } from '../src'
+import { Canvas } from '../src'
 
 it('handles all interactive meshes', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handleOnClick = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <transform>
@@ -32,7 +32,7 @@ it('handles onClick', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handleOnClick = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onClick={handleOnClick}>
@@ -56,7 +56,7 @@ it('handles onPointerUp', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerUp = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onPointerUp={handlePointerUp}>
@@ -80,7 +80,7 @@ it('handles onPointerDown', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerDown = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onPointerDown={handlePointerDown}>
@@ -104,7 +104,7 @@ it('handles onPointerMove', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerMove = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onPointerMove={handlePointerMove}>
@@ -128,7 +128,7 @@ it('handles onPointerOver', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handleOnPointerOver = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onPointerOver={handleOnPointerOver}>
@@ -152,7 +152,7 @@ it('handles onPointerOut', async () => {
   const canvas = React.createRef<HTMLCanvasElement>()
   const handlePointerOut = jest.fn()
 
-  await act(async () => {
+  await React.act(async () => {
     render(
       <Canvas ref={canvas}>
         <mesh scale={2} onPointerOut={handlePointerOut}>

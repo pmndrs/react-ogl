@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { render, RenderResult } from '@testing-library/react'
-import { act, Canvas } from '../src'
+import { Canvas } from '../src'
 
 describe('Canvas', () => {
   it('should correctly mount', async () => {
     let renderer: RenderResult = null!
 
-    await act(async () => {
+    await React.act(async () => {
       renderer = render(
         <Canvas>
           <transform />
@@ -20,7 +20,7 @@ describe('Canvas', () => {
   it('should forward ref', async () => {
     const ref = React.createRef<HTMLCanvasElement>()
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <Canvas ref={ref}>
           <transform />
@@ -40,7 +40,7 @@ describe('Canvas', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <ParentContext.Provider value={true}>
           <Canvas>
@@ -56,7 +56,7 @@ describe('Canvas', () => {
   it('should correctly unmount', async () => {
     let renderer: RenderResult
 
-    await act(async () => {
+    await React.act(async () => {
       renderer = render(
         <Canvas>
           <transform />

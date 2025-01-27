@@ -1,6 +1,8 @@
 /// <reference types="webxr" />
 import type * as OGL from 'ogl'
 import type * as React from 'react'
+import type {} from 'react/jsx-runtime'
+import type {} from 'react/jsx-dev-runtime'
 import type { UseBoundStore, StoreApi } from 'zustand'
 
 type Mutable<P> = { [K in keyof P]: P[K] | Readonly<P[K]> }
@@ -68,9 +70,9 @@ export interface RootState {
   scene: OGL.Transform
   camera: OGL.Camera
   priority: number
-  subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  subscribed: React.RefObject<Subscription>[]
+  subscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
   events?: EventManager
   mouse?: OGL.Vec2
   raycaster?: OGL.Raycast
@@ -186,7 +188,19 @@ export interface OGLElements extends OGLElementsImpl {
   }
 }
 
-declare global {
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements extends OGLElements {}
+  }
+}
+
+declare module 'react/jsx-runtime' {
+  namespace JSX {
+    interface IntrinsicElements extends OGLElements {}
+  }
+}
+
+declare module 'react/jsx-dev-runtime' {
   namespace JSX {
     interface IntrinsicElements extends OGLElements {}
   }

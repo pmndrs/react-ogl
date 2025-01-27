@@ -544,9 +544,9 @@ interface RootState {
   xr: XRManager
   // Frameloop internals for custom render loops
   priority: number
-  subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  subscribed: React.RefObject<Subscription>[]
+  subscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
   // Optional canvas event manager and its state
   events?: EventManager
   mouse: OGL.Vec2
@@ -796,13 +796,13 @@ In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exp
 ```tsx
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { type Root, type RootStore, type RootState, createRoot, act } from 'react-ogl'
+import { type Root, type RootStore, type RootState, createRoot } from 'react-ogl'
 
 it('tests against a react-ogl component or scene', async () => {
   const transform = React.createRef<OGL.Transform>()
 
   const root: Root = createRoot(document.createElement('canvas'))
-  const store: RootStore = await act(async () => root.render(<transform ref={transform} />))
+  const store: RootStore = await React.act(async () => root.render(<transform ref={transform} />))
   const state: RootState = store.getState()
 
   expect(transform.current).toBeInstanceOf(OGL.Transform)

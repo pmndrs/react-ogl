@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { create } from 'zustand'
 import { render } from './utils'
-import { act, OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'
+import { OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
@@ -13,7 +13,7 @@ describe('useOGL', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ test: 'test' })) as any}>
           <Test />
@@ -42,7 +42,7 @@ describe('useFrame', () => {
     let state: RootState = null!
     let time: number = null!
 
-    const subscribe = (callback: React.MutableRefObject<Subscription>) => {
+    const subscribe = (callback: React.RefObject<Subscription>) => {
       callback.current('test' as any, 1)
     }
 
@@ -54,7 +54,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
@@ -69,7 +69,7 @@ describe('useFrame', () => {
   it('should accept render priority', async () => {
     let priority = 0
 
-    const subscribe = (_: React.MutableRefObject<Subscription>, renderPriority: number) => {
+    const subscribe = (_: React.RefObject<Subscription>, renderPriority: number) => {
       if (renderPriority) priority += renderPriority
     }
 
@@ -78,7 +78,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
@@ -93,13 +93,13 @@ describe('useFrame', () => {
 describe('useInstanceHandle', () => {
   it('should return Instance state', async () => {
     const ref = React.createRef<OGL.Transform>()
-    let instance!: React.MutableRefObject<Instance>
+    let instance!: React.RefObject<Instance>
 
     const Component = () => {
       instance = useInstanceHandle(ref)
       return <transform ref={ref} />
     }
-    await act(async () => render(<Component />))
+    await React.act(async () => render(<Component />))
 
     expect(instance.current).toBe((ref.current as unknown as any).__ogl)
   })

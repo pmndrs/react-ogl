@@ -81,7 +81,7 @@ export function render(
         priority: 0,
         subscribed: [],
         // Subscribe/unsubscribe elements to the render loop
-        subscribe(refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) {
+        subscribe(refCallback: React.RefObject<Subscription>, renderPriority = 0) {
           // Subscribe callback
           const { subscribed } = get()
           subscribed.push(refCallback)
@@ -89,7 +89,7 @@ export function render(
           // Enable manual rendering if renderPriority is positive
           set((state) => ({ priority: state.priority + renderPriority }))
         },
-        unsubscribe(refCallback: React.MutableRefObject<Subscription>, renderPriority = 0) {
+        unsubscribe(refCallback: React.RefObject<Subscription>, renderPriority = 0) {
           // Unsubscribe callback
           const { subscribed } = get()
           const index = subscribed.indexOf(refCallback)
@@ -156,15 +156,17 @@ export function render(
     const logRecoverableError = typeof reportError === 'function' ? reportError : console.error
 
     // Create root container
-    const container = reconciler.createContainer(
-      store,
-      ConcurrentRoot,
-      null,
-      false,
-      null,
-      '',
-      logRecoverableError,
-      null,
+    const container = (reconciler as any).createContainer(
+      store, // containerInfo
+      ConcurrentRoot, // tag
+      null, // hydrationCallbacks
+      false, // isStrictMode
+      null, // concurrentUpdatesByDefaultOverride
+      '', // identifierPrefix
+      logRecoverableError, // onUncaughtError
+      logRecoverableError, // onCaughtError
+      logRecoverableError, // onRecoverableError
+      null, // transitionCallbacks
     )
 
     // Set root
@@ -224,7 +226,7 @@ interface PortalRootProps {
   target: OGL.Transform
   state?: Partial<RootState>
 }
-function PortalRoot({ children, target, state }: PortalRootProps): JSX.Element {
+function PortalRoot({ children, target, state }: PortalRootProps): React.JSX.Element {
   const store = useStore()
   const container = React.useMemo(
     () =>
@@ -243,6 +245,7 @@ function PortalRoot({ children, target, state }: PortalRootProps): JSX.Element {
   }, [container, store, state])
 
   return (
+    // @ts-expect-error
     <>
       {reconciler.createPortal(
         <OGLContext.Provider value={store}>{children}</OGLContext.Provider>,
@@ -261,10 +264,17 @@ export function createPortal(
   children: React.ReactElement,
   target: OGL.Transform,
   state?: Partial<RootState>,
-): JSX.Element {
+): React.JSX.Element {
   return (
     <PortalRoot target={target} state={state}>
       {children}
     </PortalRoot>
   )
+}
+
+/**
+ * Force React to flush any updates inside the provided callback synchronously and immediately.
+ */
+export function flushSync<R>(fn: () => R): R {
+  return reconciler.flushSync(fn)
 }
