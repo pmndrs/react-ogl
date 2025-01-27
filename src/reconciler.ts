@@ -601,8 +601,3 @@ export const reconciler = /* @__PURE__ */ createReconciler<
   },
   resetFormInstance() {},
 })
-
-/**
- * Safely flush async effects when testing, simulating a legacy root.
- */
-export const act: Act = React.act

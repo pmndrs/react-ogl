@@ -796,13 +796,13 @@ In addition to `createRoot` (see [custom canvas](#custom-canvas)), react-ogl exp
 ```tsx
 import * as React from 'react'
 import * as OGL from 'ogl'
-import { type Root, type RootStore, type RootState, createRoot, act } from 'react-ogl'
+import { type Root, type RootStore, type RootState, createRoot } from 'react-ogl'
 
 it('tests against a react-ogl component or scene', async () => {
   const transform = React.createRef<OGL.Transform>()
 
   const root: Root = createRoot(document.createElement('canvas'))
-  const store: RootStore = await act(async () => root.render(<transform ref={transform} />))
+  const store: RootStore = await React.act(async () => root.render(<transform ref={transform} />))
   const state: RootState = store.getState()
 
   expect(transform.current).toBeInstanceOf(OGL.Transform)

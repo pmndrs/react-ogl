@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as OGL from 'ogl'
 import { create } from 'zustand'
 import { render } from './utils'
-import { act, OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'
+import { OGLContext, useOGL, useFrame, RootState, Subscription, Instance, useInstanceHandle } from '../src'
 
 describe('useOGL', () => {
   it('should return OGL state', async () => {
@@ -13,7 +13,7 @@ describe('useOGL', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ test: 'test' })) as any}>
           <Test />
@@ -54,7 +54,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
@@ -78,7 +78,7 @@ describe('useFrame', () => {
       return null
     }
 
-    await act(async () => {
+    await React.act(async () => {
       render(
         <OGLContext.Provider value={create(() => ({ subscribe })) as any}>
           <Test />
@@ -99,7 +99,7 @@ describe('useInstanceHandle', () => {
       instance = useInstanceHandle(ref)
       return <transform ref={ref} />
     }
-    await act(async () => render(<Component />))
+    await React.act(async () => render(<Component />))
 
     expect(instance.current).toBe((ref.current as unknown as any).__ogl)
   })
