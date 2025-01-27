@@ -544,9 +544,9 @@ interface RootState {
   xr: XRManager
   // Frameloop internals for custom render loops
   priority: number
-  subscribed: React.MutableRefObject<Subscription>[]
-  subscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
-  unsubscribe: (refCallback: React.MutableRefObject<Subscription>, renderPriority?: number) => void
+  subscribed: React.RefObject<Subscription>[]
+  subscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
+  unsubscribe: (refCallback: React.RefObject<Subscription>, renderPriority?: number) => void
   // Optional canvas event manager and its state
   events?: EventManager
   mouse: OGL.Vec2

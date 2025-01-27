@@ -7,7 +7,10 @@ import { events as createTouchEvents } from './events.native' // explicitly requ
 import { RenderProps } from './types'
 import { render, unmountComponentAtNode } from './renderer'
 
-export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, ViewProps {
+// TODO: React 19 needs support from react-native
+const _View = View as any
+
+export interface CanvasProps extends Omit<RenderProps, 'size' | 'dpr'>, Omit<ViewProps, 'children'> {
   children: React.ReactNode
   style?: ViewStyle
 }
@@ -51,6 +54,7 @@ const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
   // Render to screen
   if (canvas && width > 0 && height > 0) {
     render(
+      // @ts-expect-error
       <Bridge>
         <ErrorBoundary set={setError}>
           <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
@@ -95,9 +99,9 @@ const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
   }, [canvas])
 
   return (
-    <View {...props} ref={forwardedRef} onLayout={onLayout} style={{ flex: 1, ...style }} {...bind}>
+    <_View {...props} ref={forwardedRef} onLayout={onLayout} style={{ flex: 1, ...style }} {...bind}>
       {width > 0 && <GLView onContextCreate={onContextCreate} style={StyleSheet.absoluteFill} />}
-    </View>
+    </_View>
   )
 })
 
@@ -106,6 +110,7 @@ const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
  */
 export const Canvas = React.forwardRef<View, CanvasProps>(function CanvasWrapper(props, ref) {
   return (
+    // @ts-expect-error
     <FiberProvider>
       <CanvasImpl {...props} ref={ref} />
     </FiberProvider>

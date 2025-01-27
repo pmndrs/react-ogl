@@ -122,11 +122,9 @@ export function detach(parent: Instance, child: Instance) {
 /**
  * Safely mutates an OGL element, respecting special JSX syntax.
  */
-export function applyProps<T extends ConstructorRepresentation = any>(
-  object: Instance<T>['object'],
-  newProps: Instance<T>['props'],
-  oldProps?: Instance<T>['props'],
-): void {
+export function applyProps<T = any>(target: T, newProps: Instance<T>['props'], oldProps?: Instance<T>['props']): void {
+  const object = target as Instance<T>['object']
+
   // Mutate our OGL element
   for (const prop in newProps) {
     // Don't mutate reserved keys

@@ -42,7 +42,7 @@ describe('useFrame', () => {
     let state: RootState = null!
     let time: number = null!
 
-    const subscribe = (callback: React.MutableRefObject<Subscription>) => {
+    const subscribe = (callback: React.RefObject<Subscription>) => {
       callback.current('test' as any, 1)
     }
 
@@ -69,7 +69,7 @@ describe('useFrame', () => {
   it('should accept render priority', async () => {
     let priority = 0
 
-    const subscribe = (_: React.MutableRefObject<Subscription>, renderPriority: number) => {
+    const subscribe = (_: React.RefObject<Subscription>, renderPriority: number) => {
       if (renderPriority) priority += renderPriority
     }
 
@@ -93,7 +93,7 @@ describe('useFrame', () => {
 describe('useInstanceHandle', () => {
   it('should return Instance state', async () => {
     const ref = React.createRef<OGL.Transform>()
-    let instance!: React.MutableRefObject<Instance>
+    let instance!: React.RefObject<Instance>
 
     const Component = () => {
       instance = useInstanceHandle(ref)

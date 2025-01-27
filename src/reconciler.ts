@@ -1,12 +1,130 @@
 import Reconciler from 'react-reconciler'
-// @ts-ignore
-import { NoEventPriority, DefaultEventPriority } from 'react-reconciler/constants.js'
+import {
+  // NoEventPriority,
+  ContinuousEventPriority,
+  DiscreteEventPriority,
+  DefaultEventPriority,
+} from 'react-reconciler/constants.js'
 import { unstable_IdlePriority as idlePriority, unstable_scheduleCallback as scheduleCallback } from 'scheduler'
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { toPascalCase, applyProps, attach, detach, classExtends, prepare } from './utils'
 import { RESERVED_PROPS } from './constants'
 import { Act, Catalogue, ConstructorRepresentation, Instance, OGLElements, RootStore } from './types'
+
+// @ts-ignore
+const __DEV__ = /* @__PURE__ */ (() => typeof process !== 'undefined' && process.env.NODE_ENV !== 'production')()
+
+// TODO: upstream to DefinitelyTyped for React 19
+// https://github.com/facebook/react/issues/28956
+type EventPriority = number
+
+function createReconciler<
+  Type,
+  Props,
+  Container,
+  Instance,
+  TextInstance,
+  SuspenseInstance,
+  HydratableInstance,
+  FormInstance,
+  PublicInstance,
+  HostContext,
+  ChildSet,
+  TimeoutHandle,
+  NoTimeout,
+  TransitionStatus,
+>(
+  config: Omit<
+    Reconciler.HostConfig<
+      Type,
+      Props,
+      Container,
+      Instance,
+      TextInstance,
+      SuspenseInstance,
+      HydratableInstance,
+      PublicInstance,
+      HostContext,
+      null, // updatePayload
+      ChildSet,
+      TimeoutHandle,
+      NoTimeout
+    >,
+    'getCurrentEventPriority' | 'prepareUpdate' | 'commitUpdate'
+  > & {
+    /**
+     * This method should mutate the `instance` and perform prop diffing if needed.
+     *
+     * The `internalHandle` data structure is meant to be opaque. If you bend the rules and rely on its internal fields, be aware that it may change significantly between versions. You're taking on additional maintenance risk by reading from it, and giving up all guarantees if you write something to it.
+     */
+    commitUpdate?(
+      instance: Instance,
+      type: Type,
+      prevProps: Props,
+      nextProps: Props,
+      internalHandle: Reconciler.OpaqueHandle,
+    ): void
+
+    // Undocumented
+    // https://github.com/facebook/react/pull/26722
+    NotPendingTransition: TransitionStatus | null
+    HostTransitionContext: React.Context<TransitionStatus>
+    // https://github.com/facebook/react/pull/28751
+    setCurrentUpdatePriority(newPriority: EventPriority): void
+    getCurrentUpdatePriority(): EventPriority
+    resolveUpdatePriority(): EventPriority
+    // https://github.com/facebook/react/pull/28804
+    resetFormInstance(form: FormInstance): void
+    // https://github.com/facebook/react/pull/25105
+    requestPostPaintCallback(callback: (time: number) => void): void
+    // https://github.com/facebook/react/pull/26025
+    shouldAttemptEagerTransition(): boolean
+    // https://github.com/facebook/react/pull/31528
+    trackSchedulerEvent(): void
+    // https://github.com/facebook/react/pull/31008
+    resolveEventType(): null | string
+    resolveEventTimeStamp(): number
+
+    /**
+     * This method is called during render to determine if the Host Component type and props require some kind of loading process to complete before committing an update.
+     */
+    maySuspendCommit(type: Type, props: Props): boolean
+    /**
+     * This method may be called during render if the Host Component type and props might suspend a commit. It can be used to initiate any work that might shorten the duration of a suspended commit.
+     */
+    preloadInstance(type: Type, props: Props): boolean
+    /**
+     * This method is called just before the commit phase. Use it to set up any necessary state while any Host Components that might suspend this commit are evaluated to determine if the commit must be suspended.
+     */
+    startSuspendingCommit(): void
+    /**
+     * This method is called after `startSuspendingCommit` for each Host Component that indicated it might suspend a commit.
+     */
+    suspendInstance(type: Type, props: Props): void
+    /**
+     * This method is called after all `suspendInstance` calls are complete.
+     *
+     * Return `null` if the commit can happen immediately.
+     *
+     * Return `(initiateCommit: Function) => Function` if the commit must be suspended. The argument to this callback will initiate the commit when called. The return value is a cancellation function that the Reconciler can use to abort the commit.
+     *
+     */
+    waitForCommitToBeReady(): ((initiateCommit: Function) => Function) | null
+  },
+): Reconciler.Reconciler<Container, Instance, TextInstance, SuspenseInstance, PublicInstance> {
+  const reconciler = Reconciler(config as any)
+
+  reconciler.injectIntoDevTools({
+    bundleType: __DEV__ ? 1 : 0,
+    rendererPackageName: 'react-ogl',
+    version: React.version,
+  })
+
+  return reconciler as any
+}
+
+const NoEventPriority = 0
 
 // Custom objects that extend the OGL namespace
 const catalogue = { ...OGL } as unknown as Catalogue
@@ -292,33 +410,21 @@ let currentUpdatePriority: number = NoEventPriority
 /**
  * Centralizes and handles mutations through an OGL scene-graph.
  */
-export const reconciler = Reconciler<
-  // Instance type
-  keyof OGLElements,
-  // Instance props
-  Instance['props'],
-  // Root Store
-  RootStore,
-  // Normal instance
-  Instance,
-  // Text instance
-  never,
-  // Suspense instance
-  Instance,
-  // Hydratable instance
-  never,
-  // Public (ref) instance
-  Instance['object'],
-  // Host context
-  {},
-  // applyProps diff sets
-  null | [true] | [false, Instance['props']],
-  // Hydration child set
-  never,
-  // Timeout id handle
-  typeof setTimeout | undefined,
-  // NoTimeout
-  -1
+export const reconciler = /* @__PURE__ */ createReconciler<
+  keyof OGLElements, // type
+  Instance['props'], // props
+  RootStore, // container
+  Instance, // instance
+  never, // text instance
+  Instance, // suspense instance
+  never, // hydratable instance
+  never, // form instance
+  Instance['object'], // public instance
+  {}, // host context
+  never, // child set
+  typeof setTimeout | undefined, // timeout handle
+  -1, // no timeout
+  null // transition status
 >({
   // Configure renderer for tree-like mutation and interop w/react-dom
   isPrimaryRenderer: false,
@@ -446,52 +552,57 @@ export const reconciler = Reconciler<
   // Configures a callback once the tree is finalized after commit-effects are fired
   finalizeInitialChildren: () => false,
   commitMount() {},
-  beforeActiveInstanceBlur: () => {},
-  afterActiveInstanceBlur: () => {},
-  detachDeletedInstance: () => {},
+  // Undocumented
+  getInstanceFromNode: () => null,
+  beforeActiveInstanceBlur() {},
+  afterActiveInstanceBlur() {},
+  detachDeletedInstance() {},
   prepareScopeUpdate() {},
   getInstanceFromScope: () => null,
-  // @ts-ignore untyped react-experimental options inspired by react-art
-  // TODO: add shell types for these and upstream to DefinitelyTyped
-  // https://github.com/facebook/react/blob/main/packages/react-art/src/ReactFiberConfigART.js
-  setCurrentUpdatePriority(newPriority) {
+  shouldAttemptEagerTransition: () => false,
+  trackSchedulerEvent: () => {},
+  resolveEventType: () => null,
+  resolveEventTimeStamp: () => -1.1,
+  requestPostPaintCallback() {},
+  maySuspendCommit: () => false,
+  preloadInstance: () => true, // true indicates already loaded
+  startSuspendingCommit() {},
+  suspendInstance() {},
+  waitForCommitToBeReady: () => null,
+  NotPendingTransition: null,
+  HostTransitionContext: /* @__PURE__ */ React.createContext(null),
+  setCurrentUpdatePriority(newPriority: number) {
     currentUpdatePriority = newPriority
   },
   getCurrentUpdatePriority() {
     return currentUpdatePriority
   },
   resolveUpdatePriority() {
-    return currentUpdatePriority || DefaultEventPriority
+    if (currentUpdatePriority !== NoEventPriority) return currentUpdatePriority
+
+    switch (typeof window !== 'undefined' && window.event?.type) {
+      case 'click':
+      case 'contextmenu':
+      case 'dblclick':
+      case 'pointercancel':
+      case 'pointerdown':
+      case 'pointerup':
+        return DiscreteEventPriority
+      case 'pointermove':
+      case 'pointerout':
+      case 'pointerover':
+      case 'pointerenter':
+      case 'pointerleave':
+      case 'wheel':
+        return ContinuousEventPriority
+      default:
+        return DefaultEventPriority
+    }
   },
-  shouldAttemptEagerTransition() {
-    return false
-  },
-  requestPostPaintCallback() {},
-  maySuspendCommit() {
-    return false
-  },
-  preloadInstance() {
-    return true // true indicates already loaded
-  },
-  startSuspendingCommit() {},
-  suspendInstance() {},
-  waitForCommitToBeReady() {
-    return null
-  },
-  NotPendingTransition: null,
   resetFormInstance() {},
 })
 
 /**
  * Safely flush async effects when testing, simulating a legacy root.
  */
-export const act: Act = (React as any).act
-
-// Inject renderer meta into devtools
-const isProd = typeof process === 'undefined' || process.env?.['NODE_ENV'] === 'production'
-reconciler.injectIntoDevTools({
-  findFiberByHostInstance: () => null,
-  bundleType: isProd ? 0 : 1,
-  version: React.version,
-  rendererPackageName: 'react-ogl',
-})
+export const act: Act = React.act

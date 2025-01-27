@@ -1,11 +1,11 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
-import { useFrame, Canvas } from 'react-ogl'
+import { type OGLElements, useFrame, Canvas } from 'react-ogl'
 
 const hotpink = new OGL.Color(0xfba2d4)
 const orange = new OGL.Color(0xf5ce54)
 
-const Box = (props: JSX.IntrinsicElements['mesh']) => {
+const Box = (props: OGLElements['mesh']) => {
   const mesh = React.useRef<OGL.Mesh>(null!)
   const [hovered, setHover] = React.useState(false)
   const [active, setActive] = React.useState(false)
