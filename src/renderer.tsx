@@ -271,3 +271,10 @@ export function createPortal(
     </PortalRoot>
   )
 }
+
+/**
+ * Force React to flush any updates inside the provided callback synchronously and immediately.
+ */
+export function flushSync<R>(fn: () => R): R {
+  return reconciler.flushSync(fn)
+}
