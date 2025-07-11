@@ -54,7 +54,6 @@ const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
   // Render to screen
   if (canvas && width > 0 && height > 0) {
     render(
-      // @ts-expect-error
       <Bridge>
         <ErrorBoundary set={setError}>
           <React.Suspense fallback={<Block set={setBlock} />}>{children}</React.Suspense>
@@ -110,7 +109,6 @@ const CanvasImpl = React.forwardRef<View, CanvasProps>(function Canvas(
  */
 export const Canvas = React.forwardRef<View, CanvasProps>(function CanvasWrapper(props, ref) {
   return (
-    // @ts-expect-error
     <FiberProvider>
       <CanvasImpl {...props} ref={ref} />
     </FiberProvider>

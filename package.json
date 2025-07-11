@@ -57,12 +57,13 @@
   "dependencies": {
     "@types/react-reconciler": "^0.28.9",
     "@types/webxr": "*",
-    "its-fine": "^1.2.5",
+    "its-fine": "^2.0.0",
     "react-reconciler": "^0.31.0",
     "react-use-measure": "^2.1.1",
     "scheduler": "^0.25.0",
     "suspend-react": "^0.1.3",
-    "zustand": "^4.5.2"
+    "use-sync-external-store": "^1.5.0",
+    "zustand": "^5.0.6"
   },
   "peerDependencies": {
     "expo-gl": ">=11.4",

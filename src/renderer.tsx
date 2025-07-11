@@ -1,7 +1,7 @@
 import * as OGL from 'ogl'
 import * as React from 'react'
 import { ConcurrentRoot } from 'react-reconciler/constants.js'
-import { create } from 'zustand'
+import { createWithEqualityFn } from 'zustand/traditional'
 import { reconciler } from './reconciler'
 import { OGLContext, useStore, useIsomorphicLayoutEffect } from './hooks'
 import { RenderProps, Root, RootState, RootStore, Subscription } from './types'
@@ -29,7 +29,7 @@ export function render(
   let root = roots.get(target)
   if (!root) {
     // Create root store
-    const store = create<RootState>((set, get) => {
+    const store = createWithEqualityFn<RootState>((set, get) => {
       // Create renderer
       const renderer =
         config.renderer instanceof OGL.Renderer
@@ -230,7 +230,7 @@ function PortalRoot({ children, target, state }: PortalRootProps): React.JSX.Ele
   const store = useStore()
   const container = React.useMemo(
     () =>
-      create<RootState>((set, get) => ({
+      createWithEqualityFn<RootState>((set, get) => ({
         ...store.getState(),
         set,
         get,

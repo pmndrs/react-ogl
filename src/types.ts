@@ -3,7 +3,8 @@ import type * as OGL from 'ogl'
 import type * as React from 'react'
 import type {} from 'react/jsx-runtime'
 import type {} from 'react/jsx-dev-runtime'
-import type { UseBoundStore, StoreApi } from 'zustand'
+import { createWithEqualityFn, type UseBoundStoreWithEqualityFn } from 'zustand/traditional'
+import type { StoreApi } from 'zustand'
 
 type Mutable<P> = { [K in keyof P]: P[K] | Readonly<P[K]> }
 type NonFunctionKeys<P> = { [K in keyof P]-?: P[K] extends Function ? never : K }[keyof P]
@@ -82,7 +83,7 @@ export interface RootState {
 
 export type Act = <T = any>(cb: () => Promise<T>) => Promise<T>
 
-export type RootStore = UseBoundStore<StoreApi<RootState>>
+export type RootStore = UseBoundStoreWithEqualityFn<StoreApi<RootState>>
 
 export interface Root {
   render: (element: React.ReactNode) => RootStore
